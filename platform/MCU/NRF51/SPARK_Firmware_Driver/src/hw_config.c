@@ -1,3 +1,5 @@
+#include <string.h>
+
 #include "hw_config.h"
 #include "sst25vf_spi.h"
 
@@ -86,13 +88,6 @@ void FLASH_End(void)
 {
 	uint32_t fw_len = (uint32_t)(External_Flash_Address - External_Flash_Start_Address);
 
-	uint8_t byte1 = sFLASH_ReadSingleByte(0x0101);
-	simple_uart_putstring("Size of app: ");
-	char str1[80];
-	sprintf(str1, "%d", fw_len);
-	simple_uart_putstring(str1);
-	simple_uart_putstring("\n");
-
 	//erase the sector for now, so we can store the FW size and set the flag
 	sFLASH_EraseSector(FLASH_FW_STATUS);
 
@@ -106,21 +101,7 @@ void FLASH_End(void)
 	sFLASH_WriteSingleByte(FLASH_FW_LENGTH1, length1);
 	sFLASH_WriteSingleByte(FLASH_FW_LENGTH2, length2);
 	sFLASH_WriteSingleByte(FLASH_FW_LENGTH3, length3);
-
-	simple_uart_putstring("Size of 2nd byte: ");
-	char str2[80];
-	sprintf(str2, "%d", length2);
-	simple_uart_putstring(str2);
-	simple_uart_putstring("\n");
-
-
-	uint8_t byte17 = sFLASH_ReadSingleByte(FLASH_FW_STATUS);
-	simple_uart_putstring("Byte at 0x0101: ");
-	char str3[80];
-	sprintf(str3, "%d", byte17);
-	simple_uart_putstring(str3);
-	simple_uart_putstring("\n");
-
-
+    
+    //reboot
     NVIC_SystemReset();
 }

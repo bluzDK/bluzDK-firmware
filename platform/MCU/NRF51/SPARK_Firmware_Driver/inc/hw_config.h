@@ -33,6 +33,7 @@
 #include "spi_master.h"
 #include "nrf_gpio.h"
 #include "app_util_platform.h"
+#include "system_tick_hal.h"
 
 #define SPI_MASTER_1_ENABLE				1
 #define BUTTON_PULL    NRF_GPIO_PIN_PULLUP
@@ -66,6 +67,10 @@
 #define FLASH_FW_ADDRESS 0x01A000
 #define FLASH_LENGTH 0x040000
 
+//On-Board Flash Addresses
+#define CORE_FW_ADDRESS			        ((uint32_t)0x08005000)
+
+
 //Flash functions
 uint32_t OTA_FlashAddress(void);
 uint32_t OTA_FlashLength(void);
@@ -74,7 +79,35 @@ uint32_t FLASH_PagesMask(uint32_t fileSize);
 uint16_t FLASH_Update(uint8_t *pBuffer, uint32_t bufferSize);
 void FLASH_End(void);
 
+/* Exported functions ------------------------------------------------------- */
+void Set_System(void);
+void NVIC_Configuration(void);
+void SysTick_Configuration(void);
+void SysTick_Disable(void);
+void System1MsTick(void);
+system_tick_t GetSystem1MsTick(void);
 
+void IWDG_Reset_Enable(uint32_t msTimeout);
+
+#define SYSTEM_FLAG(x) (x)
+void Load_SystemFlags(void);
+void Save_SystemFlags(void);
+
+void Bootloader_Update_Version(uint16_t bootloaderVersion);
+
+/* External variables --------------------------------------------------------*/
+extern uint8_t USE_SYSTEM_FLAGS;
+extern uint16_t Bootloader_Version_SysFlag;
+extern uint16_t NVMEM_SPARK_Reset_SysFlag;
+extern uint16_t FLASH_OTA_Update_SysFlag;
+extern uint16_t OTA_FLASHED_Status_SysFlag;
+extern uint16_t Factory_Reset_SysFlag;
+extern uint8_t dfu_on_no_firmware;
+extern uint8_t Factory_Reset_Done_SysFlag;
+extern uint8_t StartupMode_SysFlag;
+extern uint32_t RCC_CSR_SysFlag;
+
+void Save_Reset_Syndrome();
 
 
 #endif  /*__NRF_HW_CONFIG_H*/

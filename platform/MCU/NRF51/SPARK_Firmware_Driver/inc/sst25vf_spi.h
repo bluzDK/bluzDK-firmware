@@ -69,7 +69,7 @@ void sFLASH_WriteBuffer(const uint8_t *pBuffer, uint32_t WriteAddr, uint32_t Num
 void sFLASH_ReadBuffer(uint8_t *pBuffer, uint32_t ReadAddr, uint32_t NumByteToRead);
 uint32_t sFLASH_ReadID(void);
 uint32_t sFLASH_ReadStatus(void);
-static void sFLASH_WaitForWriteEnd(void);
+void sFLASH_WaitForWriteEnd(void);
 
 /* Flash Self Test Routine */
 int sFLASH_SelfTest(void);
