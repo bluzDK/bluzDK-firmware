@@ -56,6 +56,10 @@ ifeq ("$(PLATFORM)","ethernet")
 PLATFORM_ID = 9
 endif
 
+ifeq ("$(PLATFORM)","bluz")
+PLATFORM_ID = 103
+endif
+
 ifeq ("$(PLATFORM)","newhal")
 PLATFORM_ID=60000
 endif
@@ -202,6 +206,16 @@ USBD_VID_SPARK=0x2B04
 USBD_PID_DFU=0xD009
 USBD_PID_CDC=0xC009
 DEFAULT_PRODUCT_ID=9
+endif
+
+ifeq ("$(PLATFORM_ID)","103")
+ARCH=arm-m0
+PLATFORM=bluz
+PLATFORM_NAME=bluz
+PLATFORM_MCU=NRF51
+PLATFORM_NET=NRF51
+PRODUCT_DESC=Bluz Production
+DEFAULT_PRODUCT_ID=103
 endif
 
 ifeq ("$(PLATFORM_ID)","60000")

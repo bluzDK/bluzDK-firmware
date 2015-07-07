@@ -8,9 +8,13 @@ include $(current_dir)/top-level-module.mk
 ifeq ("$(ARCH)","arm")
 include $(current_dir)/arm-tools.mk
 else
+ifeq ("$(ARCH)","arm-m0")
+include $(current_dir)/arm-m0-tools.mk
+else
 ifeq ("$(ARCH)","gcc")
 include $(current_dir)/gcc-tools.mk
 else
 $(error "Unknown architecture '$(ARCH)'");
+endif
 endif
 endif
