@@ -8,6 +8,7 @@ TARGET_STDPERIPH_SRC_PATH = $(TARGET_STDPERIPH_PATH)/src
 
 # C source files included in this build.
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/app_button.c
+CSRC += $(TARGET_STDPERIPH_SRC_PATH)/app_error.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/app_gpiote.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/app_scheduler.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/app_timer.c

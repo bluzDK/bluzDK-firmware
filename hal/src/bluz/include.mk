@@ -14,14 +14,14 @@ HAL_LINK ?= $(findstring hal,$(MAKE_DEPENDENCIES))
 
 # if hal is used as a make dependency (linked) then add linker commands
 ifneq (,$(HAL_LINK))
-LINKER_FILE=$(HAL_SRC_BLUZ_PATH)/linker.ld
-LINKER_DEPS=$(LINKER_FILE)
 
 LDFLAGS += --specs=nano.specs -lc -lnosys
-LDFLAGS += -T$(LINKER_FILE)
+LDFLAGS += -T$(COMMON_BUILD)/arm/linker/linker_nrf51_mem.ld
+LDFLAGS += -T$(COMMON_BUILD)/arm/linker/linker_nrf51_sections.ld
 # support for external linker file
-# LD_FLAGS += -L/some/directory
 LDFLAGS += -Wl,-Map,$(TARGET_BASE).map
+
+ASRC += $(COMMON_BUILD)/arm/startup/startup_$(PLATFORM_MCU).S
+# ASFLAGS +=  -Wa,--defsym -Wa,SPARK_INIT_STARTUP=1
+
 endif
-
-
