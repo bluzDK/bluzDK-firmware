@@ -70,7 +70,7 @@ endif
 endif
 
 ifndef PLATFORM_ID
-PLATFORM_ID=0
+PLATFORM_ID=103
 endif
 
 # Determine which is the target device

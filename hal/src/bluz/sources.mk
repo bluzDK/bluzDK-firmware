@@ -2,7 +2,7 @@
 HAL_SRC_TEMPLATE_PATH = $(TARGET_HAL_PATH)/src/template
 
 templatedir=$(HAL_SRC_TEMPLATE_PATH)
-overridedir=$(HAL_SRC_NEWHAL_PATH)
+overridedir=$(HAL_SRC_BLUZ_PATH)
 
 # C source files included in this build.
 # Use files from the template unless they are overridden by files in the 

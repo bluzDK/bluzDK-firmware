@@ -2,19 +2,19 @@
 # Define the prefix to this directory. 
 # Note: The name must be unique within this build and should be
 #       based on the root of the project
-HAL_SRC_NEWHAL_PATH = $(TARGET_HAL_PATH)/src/newhal
+HAL_SRC_BLUZ_PATH = $(TARGET_HAL_PATH)/src/bluz
 
 # if we are being compiled with platform as a dependency, then also include
 # implementation headers.
 ifneq (,$(findstring platform,$(DEPENDENCIES)))
-INCLUDE_DIRS += $(HAL_SRC_NEWHAL_PATH)
+INCLUDE_DIRS += $(HAL_SRC_BLUZ_PATH)
 endif
 
 HAL_LINK ?= $(findstring hal,$(MAKE_DEPENDENCIES))
 
 # if hal is used as a make dependency (linked) then add linker commands
 ifneq (,$(HAL_LINK))
-LINKER_FILE=$(HAL_SRC_NEWHAL_PATH)/linker.ld
+LINKER_FILE=$(HAL_SRC_BLUZ_PATH)/linker.ld
 LINKER_DEPS=$(LINKER_FILE)
 
 LDFLAGS += --specs=nano.specs -lc -lnosys
