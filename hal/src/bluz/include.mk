@@ -18,6 +18,7 @@ ifneq (,$(HAL_LINK))
 LDFLAGS += --specs=nano.specs -lc -lnosys
 LDFLAGS += -T$(COMMON_BUILD)/arm/linker/linker_nrf51_mem.ld
 LDFLAGS += -T$(COMMON_BUILD)/arm/linker/linker_nrf51_sections.ld
+LDFLAGS += -L$(COMMON_BUILD)/arm/linker
 # support for external linker file
 LDFLAGS += -Wl,-Map,$(TARGET_BASE).map
 

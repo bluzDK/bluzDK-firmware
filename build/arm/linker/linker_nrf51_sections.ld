@@ -18,7 +18,7 @@
 OUTPUT_FORMAT ("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
 
 /* Linker script to place sections and symbol values. Should be used together
- * with other linker script that defines memory regions FLASH and RAM.
+ * with other linker script that defines memory regions APP_FLASH and RAM.
  * It references following symbols, which must be defined in code:
  *   Reset_Handler : Entry of reset handler
  * 
@@ -47,6 +47,8 @@ ENTRY(Reset_Handler)
 
 SECTIONS
 {
+    INCLUDE module_start.ld
+    INCLUDE module_info.ld
 	.text :
 	{
 		KEEP(*(.Vectors))
@@ -72,24 +74,25 @@ SECTIONS
 		*(.rodata*)
 
 		*(.eh_frame*)
-	} > FLASH
+	} > APP_FLASH
     
 
 	.ARM.extab : 
 	{
 		*(.ARM.extab* .gnu.linkonce.armextab.*)
-	} > FLASH
+	} > APP_FLASH
 
 	__exidx_start = .;
 	.ARM.exidx :
 	{
 		*(.ARM.exidx* .gnu.linkonce.armexidx.*)
-	} > FLASH
+	} > APP_FLASH
+
 	__exidx_end = .;
 
 	__etext = .;
-		
-	.data : AT (__etext)
+
+	.data :
 	{
 		__data_start__ = .;
 		*(vtable)
@@ -121,7 +124,7 @@ SECTIONS
 		/* All data end */
 		__data_end__ = .;
 
-	} > RAM
+	} > RAM AT>APP_FLASH
 
 	.bss :
 	{
@@ -148,6 +151,8 @@ SECTIONS
 	{
 		*(.stack*)
 	} > RAM
+
+    INCLUDE module_end.ld
 
 	/* Set stack top to end of RAM, and stack limit move down by
 	 * size of stack_dummy section */
