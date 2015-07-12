@@ -62,9 +62,6 @@ endif
 
 ifeq ("$(PLATFORM)","bluz")
 PLATFORM_ID = 103
-=======
-ifeq ("$(PLATFORM)","electron")
-PLATFORM_ID=10
 endif
 
 ifeq ("$(PLATFORM)","newhal")
@@ -237,6 +234,7 @@ PLATFORM_MCU=NRF51
 PLATFORM_NET=NRF51
 PRODUCT_DESC=Bluz Production
 DEFAULT_PRODUCT_ID=103
+endif
 
 ifeq ("$(PLATFORM_ID)","60000")
 PLATFORM=newhal
