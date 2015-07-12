@@ -34,12 +34,11 @@
 #include "nrf_gpio.h"
 #include "app_util_platform.h"
 #include "system_tick_hal.h"
+#include "nrf51_config.h"
+#include "nrf51_callbacks.h"
 
 #define SPI_MASTER_1_ENABLE				1
 #define BUTTON_PULL    NRF_GPIO_PIN_PULLUP
-
-//Particle cloud flags
-#define SPARK_NO_CLOUD                  1   /**< Turns off some initial setup in the SPARK_WLAN_Setup function. */
 
 //Board LED's and buttons
 #define BOARD_LED_PIN          			20                                       /**< Main LED on the board. */
@@ -72,6 +71,27 @@
 
 //On-Board Flash Addresses
 #define CORE_FW_ADDRESS			        ((uint32_t)0x08005000)
+
+//HW Init Functions
+void leds_init(void);
+void timers_init(void);
+void gpiote_init(void);
+void buttons_init(void);
+
+//BLE Stack Functions
+void ble_stack_init(void);
+void scheduler_init(void);
+void gap_params_init(void);
+void services_init(void);
+void advertising_init(void);
+void conn_params_init(void);
+void sec_params_init(void);
+void advertising_start(void);
+void timers_start(void);
+
+//event handling
+void power_manage(void);
+void app_sched_execute(void);
 
 
 //Flash functions

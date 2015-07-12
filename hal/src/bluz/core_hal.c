@@ -24,6 +24,8 @@
  */
 
 #include "core_hal.h"
+#include "hw_config.h"
+#include "nrf51_config.h"
 
 /* Extern variables ----------------------------------------------------------*/
 
@@ -31,10 +33,16 @@
 
 void HAL_Core_Init(void)
 {
+    leds_init();
+    timers_init();
+    gpiote_init();
+    buttons_init();
 }
 
 void HAL_Network_Init(void)
 {
+    
+    timers_start();
 }
 
 void HAL_Events_Manage(void)

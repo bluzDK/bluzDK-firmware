@@ -14,7 +14,7 @@ include $(COMMON_BUILD)/common-tools.mk
 #
 
 # C compiler flags
-CFLAGS +=  -g3 -gdwarf-2 -Os -mcpu=cortex-m0 -mthumb -DNRF51
+CFLAGS +=  -g3 -gdwarf-2 -Os -mcpu=cortex-m0 -mthumb -DSOFTDEVICE_PRESENT -DBLE_STACK_SUPPORT_REQUIRED -DS110_SUPPORT_REQUIRED -DNRF51 -DNRF51822_QFAA_CA -DBLE_STACK_SUPPORT_REQD -DUSE_CUSTOM_STATIC_ASSERT
 
 # C++ specific flags
 CPPFLAGS += -fno-exceptions -fno-rtti

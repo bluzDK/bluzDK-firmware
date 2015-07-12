@@ -26,7 +26,9 @@
 #ifndef SYSHEALTH_HAL_H
 #define	SYSHEALTH_HAL_H
 
+#ifndef USE_CUSTOM_STATIC_ASSERT
 #include "static_assert.h"
+#endif
 
 #ifdef	__cplusplus
 extern "C" {
@@ -48,8 +50,10 @@ typedef enum eSystemHealth_ {
 } eSystemHealth;
 
 #if PLATFORM_ID!=3
+#ifndef USE_CUSTOM_STATIC_ASSERT
 // gcc enums are at least an int wide
 STATIC_ASSERT(system_health_16_bits, sizeof(eSystemHealth)==2);
+#endif
 #endif
 
 eSystemHealth HAL_Get_Sys_Health();

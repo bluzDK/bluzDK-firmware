@@ -105,3 +105,35 @@ void FLASH_End(void)
     //reboot
     NVIC_SystemReset();
 }
+
+//HW Init Functions
+void leds_init(void)
+{
+    nrf_gpio_cfg_output(BOARD_LED_PIN);
+}
+void timers_init(void)
+{
+      uint32_t err_code;
+    // Initialize timer module, making it use the scheduler
+    APP_TIMER_INIT(APP_TIMER_PRESCALER, APP_TIMER_MAX_TIMERS, APP_TIMER_OP_QUEUE_SIZE, true);
+    err_code = app_timer_create(&millis_timer, APP_TIMER_MODE_REPEATED, millis_timer_timeout);
+    APP_ERROR_CHECK(err_code);
+}
+void gpiote_init(void)
+{
+    APP_GPIOTE_INIT(APP_GPIOTE_MAX_USERS);
+}
+void buttons_init(void)
+{
+    static app_button_cfg_t buttons[] =
+    {
+        {BOARD_BUTTON, false, BUTTON_PULL, button_event_handler}
+    };
+    
+    APP_BUTTON_INIT(buttons, sizeof(buttons) / sizeof(buttons[0]), BUTTON_DETECTION_DELAY, true);
+}
+
+void timers_start(void)
+{
+    app_timer_start(millis_timer, TIME_KEPPER_INTERVAL, NULL);
+}
