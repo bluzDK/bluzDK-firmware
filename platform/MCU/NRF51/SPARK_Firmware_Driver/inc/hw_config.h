@@ -38,6 +38,9 @@
 #define SPI_MASTER_1_ENABLE				1
 #define BUTTON_PULL    NRF_GPIO_PIN_PULLUP
 
+//Particle cloud flags
+#define SPARK_NO_CLOUD                  1   /**< Turns off some initial setup in the SPARK_WLAN_Setup function. */
+
 //Board LED's and buttons
 #define BOARD_LED_PIN          			20                                       /**< Main LED on the board. */
 #define RGB_LED_PIN_NO_1          		19                                       /**< Pin one for the RGB LED. */

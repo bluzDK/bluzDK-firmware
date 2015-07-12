@@ -33,6 +33,13 @@ void HAL_Core_Init(void)
 {
 }
 
+void HAL_Network_Init(void)
+{
+}
+
+void HAL_Events_Manage(void)
+{
+}
 
 /*******************************************************************************
  * Function Name  : HAL_Core_Config.
@@ -106,6 +113,6 @@ void HAL_Notify_WDT()
 
 //main function
 int main() {
-//    app_setup_and_loop();
+    app_setup_and_loop_passive();
     return 0;
 }

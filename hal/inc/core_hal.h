@@ -103,6 +103,10 @@ void HAL_Core_Execute_Stop_Mode(void);
 void HAL_Core_Enter_Standby_Mode(void);
 void HAL_Core_Execute_Standby_Mode(void);
 uint32_t HAL_Core_Compute_CRC32(const uint8_t *pBuffer, uint32_t bufferSize);
+    
+//used for passive network devices
+void HAL_Network_Init(void);
+void HAL_Events_Manage(void);
 
 typedef enum _BootloaderFlag_t {
     BOOTLOADER_FLAG_VERSION,
@@ -124,6 +128,7 @@ void HAL_Bootloader_Lock(bool lock);
 bool HAL_Core_System_Reset_FlagSet(RESET_TypeDef resetType);
 
 extern void app_setup_and_loop();
+extern void app_setup_and_loop_passive();
 
 #ifdef __cplusplus
 }
