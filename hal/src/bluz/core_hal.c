@@ -25,7 +25,6 @@
 
 #include "core_hal.h"
 #include "hw_config.h"
-#include "nrf51_config.h"
 
 /* Extern variables ----------------------------------------------------------*/
 
@@ -41,8 +40,12 @@ void HAL_Core_Init(void)
 
 void HAL_Network_Init(void)
 {
+    ble_stack_init();
+    services_init();
+    advertising_init();
     
     timers_start();
+    advertising_start();
 }
 
 void HAL_Events_Manage(void)
