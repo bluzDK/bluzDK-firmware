@@ -15,6 +15,11 @@ CSRC += $(TARGET_SPARK_SRC_PATH)/hw_config.c
 CSRC += $(TARGET_SPARK_SRC_PATH)/system_nrf51.c
 CSRC += $(TARGET_SPARK_SRC_PATH)/nrf51_callbacks.c
 
+#ifdef BLUZ
+CSRC += $(TARGET_SPARK_SRC_PATH)/ble_stream.c
+#endif
+
+
 # C++ source files included in this build.
 CPPSRC +=
 

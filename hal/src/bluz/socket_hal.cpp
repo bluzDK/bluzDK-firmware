@@ -24,6 +24,11 @@
  */
 
 #include "socket_hal.h"
+#include "stream_hal.h"
+
+const sock_handle_t SOCKET_MAX = 8;
+
+Stream streams[SOCKET_MAX];
 
 
 int32_t socket_connect(sock_handle_t sd, const sockaddr_t *addr, long addrlen)
@@ -87,7 +92,6 @@ sock_result_t socket_sendto(sock_handle_t sd, const void* buffer, socklen_t len,
 }
 
 
-const sock_handle_t SOCKET_MAX = (sock_handle_t)0xFFFE;
 const sock_handle_t SOCKET_INVALID = (sock_handle_t)-1;
 
 sock_handle_t socket_handle_invalid()
