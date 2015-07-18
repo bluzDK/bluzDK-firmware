@@ -78,6 +78,11 @@ void app_setup_and_loop_passive(void)
     //setup BLE stack
     HAL_Network_Init();
     
+#ifndef SPARK_NO_CLOUD
+    //Initialize spark protocol callbacks for all System modes
+    Spark_Protocol_Init();
+#endif
+    
     //call user setup function, device may or may not be connected
     setup();
     
