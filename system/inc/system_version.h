@@ -1,8 +1,4 @@
 /**
- ******************************************************************************
- * @file    rt-dynalib.h
- * @author  Matthew McGowan
- ******************************************************************************
   Copyright (c) 2015 Particle Industries, Inc.  All rights reserved.
 
   This library is free software; you can redistribute it and/or
@@ -17,24 +13,33 @@
 
   You should have received a copy of the GNU Lesser General Public
   License along with this library; if not, see <http://www.gnu.org/licenses/>.
- ******************************************************************************
+  ******************************************************************************
+ */
+#ifndef VERSION_H
+#define	VERSION_H
+
+#ifdef	__cplusplus
+extern "C" {
+#endif
+
+/**
+ * This file is referenced from https://github.com/spark/firmware/wiki/Firmware-Release-Checklist
  */
 
-#pragma once
+const int PARTICLE_v040 = 0x00040000;
+const int PARTICLE_v041 = 0x00040100;
+const int PARTICLE_v042 = 0x00040200;
+const int PARTICLE_v043 = 0x00040300;
+const int PARTICLE_v044 = 0x00040400;
 
-#include "dynalib.h"
+const int SYSTEM_VERSION = PARTICLE_v044;
 
-DYNALIB_BEGIN(rt)
-DYNALIB_FN(rt, malloc)
-DYNALIB_FN(rt, free)
-DYNALIB_FN(rt, realloc)
-DYNALIB_FN(rt, sprintf)
-DYNALIB_FN(rt, siprintf)
-DYNALIB_FN(rt, sscanf)
-DYNALIB_FN(rt, siscanf)
-DYNALIB_FN(rt, snprintf)
-DYNALIB_FN(rt, sniprintf)
-DYNALIB_FN(rt, vsnprintf)
-DYNALIB_FN(rt, vsniprintf)
-DYNALIB_FN(rt, abort)
-DYNALIB_END(rt)
+#define SYSTEM_VERSION_STRING "0.4.4"
+
+
+#ifdef	__cplusplus
+}
+#endif
+
+#endif	/* VERSION_H */
+

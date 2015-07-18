@@ -4,11 +4,12 @@ GLOBAL_DEFINES += MODULE_FUNCTION=$(MODULE_FUNCTION_SYSTEM_PART)
 GLOBAL_DEFINES += MODULE_INDEX=1
 GLOBAL_DEFINES += MODULE_DEPENDENCY=0,0,0
 
-WIFI_MODULE_WICED_LIB_FILES = $(HAL_LIB_COREV2)/resources.a
-
+# This is specific to the photon. Include the WICED WIFI
+WIFI_MODULE_WICED_LIB_FILES = $(HAL_LIB_COREV2)/resources.a $(HAL_LIB_DIR)/src/photon/resources.o
+$(info $(WIFI_MODULE_WICED_LIB_FILES))
 LINKER_FILE=$(SYSTEM_PART1_MODULE_PATH)/linker.ld
 LINKER_DEPS=$(LINKER_FILE) $(WIFI_MODULE_WICED_LIB_FILES)
-LINKER_DEPS += $(SYSTEM_PART2_MODULE_PATH)/module_system_part2_export.ld 
+LINKER_DEPS += $(SYSTEM_PART2_MODULE_PATH)/module_system_part2_export.ld
 LINKER_DEPS += $(SYSTEM_PART1_MODULE_PATH)/module_system_part1_export.ld
 
 
@@ -22,7 +23,7 @@ LDFLAGS += -Wl,-Map,$(TARGET_BASE).map
 WIFI_SYSTEM_MODULE_SRC_PATH = $(SYSTEM_PART1_MODULE_PATH)/src
 
 CPPSRC += $(call target_files,$(WIFI_SYSTEM_MODULE_SRC_PATH),*.cpp)
-CSRC += $(call target_files,$(WIFI_SYSTEM_MODULE_SRC_PATH),*.c)    
+CSRC += $(call target_files,$(WIFI_SYSTEM_MODULE_SRC_PATH),*.c)
 
-BUILTINS_EXCLUDE = malloc free
+BUILTINS_EXCLUDE = malloc free realloc
 CFLAGS += $(addprefix -fno-builtin-,$(BUILTINS_EXCLUDE))
