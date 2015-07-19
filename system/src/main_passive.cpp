@@ -97,6 +97,14 @@ void app_setup_and_loop_passive(void)
             DECLARE_SYS_HEALTH(RAN_Loop);
         }
         
+#ifndef SPARK_NO_CLOUD
+        //Initialize spark protocol callbacks for all System modes
+        if (SPARK_CLOUD_CONNECT && !SPARK_CLOUD_SOCKETED){
+            Spark_Handshake();
+        }
+        Spark_Process_Events();
+#endif
+        
         //manage connection. this will manage network connection states which are event driven, as well as any interrupts from BLE stack or peripherals
         HAL_Events_Manage();
     }

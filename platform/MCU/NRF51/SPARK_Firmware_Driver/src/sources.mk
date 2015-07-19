@@ -21,7 +21,7 @@ CSRC += $(TARGET_SPARK_SRC_PATH)/ble_stream.c
 
 
 # C++ source files included in this build.
-CPPSRC +=
+CPPSRC += $(TARGET_SPARK_SRC_PATH)/stream_manager.cpp
 
 # ASM source files included in this build.
 ASRC +=

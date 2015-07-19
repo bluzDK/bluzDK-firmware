@@ -24,16 +24,16 @@
  */
 
 #include "socket_hal.h"
-#include "stream_hal.h"
+#include "stream_manager.h"
 
-const sock_handle_t SOCKET_MAX = 8;
+const sock_handle_t SOCKET_MAX = StreamManager::MAX_NUMBER_OF_SOCKETS;
 
-Stream streams[SOCKET_MAX];
+StreamManager manager;
 
 
 int32_t socket_connect(sock_handle_t sd, const sockaddr_t *addr, long addrlen)
 {
-    return 0;
+    return manager.connect((const sockaddr_b *)addr, addrlen);
 }
 
 sock_result_t socket_reset_blocking_call()
