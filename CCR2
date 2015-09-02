@@ -1,0 +1,7 @@
+./platform/MCU/STM32F1xx/SPARK_Firmware_Driver/src/hw_config.c:    TIM1->CCR2 = r;
+./platform/MCU/STM32F1xx/SPARK_Firmware_Driver/src/hw_config.c:    TIM1->CCR3 = g;
+./platform/MCU/STM32F1xx/SPARK_Firmware_Driver/src/hw_config.c:    TIM1->CCR1 = b;
+./platform/MCU/STM32F1xx/SPARK_Firmware_Driver/src/hw_config.c:    values[0] = TIM1->CCR2;
+./platform/MCU/STM32F1xx/SPARK_Firmware_Driver/src/hw_config.c:    values[1] = TIM1->CCR3;
+./platform/MCU/STM32F1xx/SPARK_Firmware_Driver/src/hw_config.c:    values[2] = TIM1->CCR1;
+./platform/MCU/STM32F1xx/SPARK_Firmware_Driver/src/hw_config.c:    return (TIM1->ARR + 1);

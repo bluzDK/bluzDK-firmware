@@ -1,4 +1,5 @@
 #include "nrf51_callbacks.h"
+#include "data_management_layer.h"
 
 void button_event_handler(uint8_t pin_no, uint8_t button_action)
 {
@@ -25,12 +26,12 @@ void millis_timer_timeout(void * p_context)
  *
  * @param[in]   p_ble_evt   Bluetooth stack event.
  */
-
 void on_ble_evt(ble_evt_t * p_ble_evt)
 {
     uint32_t                         err_code;
     static ble_gap_evt_auth_status_t m_auth_status;
     ble_gap_enc_info_t *             p_enc_info;
+    ble_gap_addr_t* address = 0;
     
     switch (p_ble_evt->header.evt_id)
     {
@@ -38,7 +39,6 @@ void on_ble_evt(ble_evt_t * p_ble_evt)
             nrf_gpio_pin_clear(BOARD_LED_PIN);
             m_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
             
-            ble_gap_addr_t* address = 0;
             sd_ble_gap_address_get(address);
             break;
             
@@ -134,7 +134,11 @@ void sys_evt_dispatch(uint32_t sys_evt)
 void data_write_handler(scs_t * p_lbs, uint8_t *data, uint16_t length)
 {
     //TO DO: This needs to feed data into Spark Utilities library
-//    BLESocketFeedData(data, length);
+//    uint16_t serviceID = (data[0] << 8) | data[1];
+//    DataManagementLayer::feedData(serviceID, length-2, data+2);
+
+    
+    //    BLESocketFeedData(data, length);
 //    if (length == 40) {
 //        if (!handShook) {
 //            doHandshake = true;

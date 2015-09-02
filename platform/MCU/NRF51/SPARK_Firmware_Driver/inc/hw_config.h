@@ -30,12 +30,12 @@
 /* Includes ------------------------------------------------------------------*/
 #include <stdint.h>
 #include <stdbool.h>
+#include "nrf51_config.h"
+#include "nrf51_callbacks.h"
 #include "spi_master.h"
 #include "nrf_gpio.h"
 #include "app_util_platform.h"
 #include "system_tick_hal.h"
-#include "nrf51_config.h"
-#include "nrf51_callbacks.h"
 
 #define SPI_MASTER_1_ENABLE				1
 #define BUTTON_PULL    NRF_GPIO_PIN_PULLUP

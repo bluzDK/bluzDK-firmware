@@ -33,7 +33,7 @@ void FLASH_Begin(uint32_t sFLASH_Address, uint32_t fileSize)
     NbrOfPage = FLASH_PagesMask(fileSize);
 
     /* Erase the SPI Flash pages */
-    for (int EraseCounter = 0; (EraseCounter < NbrOfPage); EraseCounter++)
+    for (uint32_t EraseCounter = 0; (EraseCounter < NbrOfPage); EraseCounter++)
     {
         sFLASH_EraseSector(External_Flash_Start_Address + (sFLASH_PAGESIZE * EraseCounter));
     }

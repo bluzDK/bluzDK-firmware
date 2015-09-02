@@ -1,6 +1,5 @@
 
 #include "syshealth_hal.h"
-
 #include "hw_config.h"
 
 eSystemHealth sys_health_cache;

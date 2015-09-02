@@ -9,20 +9,18 @@ TARGET_SPARK_SRC_PATH = $(TARGET_SPARK_PATH)/src
 INCLUDE_DIRS += SPARK_Services/inc
 
 # C source files included in this build.
-CSRC += $(TARGET_SPARK_SRC_PATH)/ble_scs.c
 CSRC += $(TARGET_SPARK_SRC_PATH)/hw_config.c
+CSRC += $(TARGET_SPARK_SRC_PATH)/ble_scs.c
 # CSRC += $(TARGET_SPARK_SRC_PATH)/sst25vf_spi.c
 CSRC += $(TARGET_SPARK_SRC_PATH)/system_nrf51.c
 CSRC += $(TARGET_SPARK_SRC_PATH)/nrf51_callbacks.c
-
 #ifdef BLUZ
-CSRC += $(TARGET_SPARK_SRC_PATH)/ble_stream.c
+
 #endif
 
 
 # C++ source files included in this build.
-CPPSRC += $(TARGET_SPARK_SRC_PATH)/stream_manager.cpp
-
+CPPSRC += $(TARGET_SPARK_SRC_PATH)/data_management_layer.cpp
 # ASM source files included in this build.
 ASRC +=
 
