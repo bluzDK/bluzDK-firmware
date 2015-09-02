@@ -114,3 +114,22 @@ public:
 };
 
 #endif
+
+#if Wiring_BLE
+class BLESetupConsoleConfig : SystemSetupConsoleConfig
+{
+    
+};
+
+class BLESetupConsole : public SystemSetupConsole<BLESetupConsoleConfig>
+{
+    using super = SystemSetupConsole<BLESetupConsoleConfig>;
+    
+public:
+    BLESetupConsole(BLESetupConsoleConfig& config);
+    ~BLESetupConsole() = default;
+    
+    virtual void exit() override;
+};
+
+#endif

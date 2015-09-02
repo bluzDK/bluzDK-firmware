@@ -282,3 +282,19 @@ void CellularSetupConsole::exit()
 
 
 #endif
+
+#if Wiring_BLE
+
+BLESetupConsole::BLESetupConsole(BLESetupConsoleConfig& config)
+: SystemSetupConsole(config)
+{
+}
+
+void BLESetupConsole::exit()
+{
+    network_listen(0, 1, NULL);
+}
+
+
+#endif
+

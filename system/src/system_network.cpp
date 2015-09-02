@@ -99,6 +99,11 @@ void Start_Smart_Config(void)
 
     CellularSetupConsoleConfig config;
     CellularSetupConsole console(config);
+    
+#elif Wiring_BLE
+    
+    BLESetupConsoleConfig config;
+    BLESetupConsole console(config);
 #endif
 
     const uint32_t start = millis();

@@ -75,6 +75,12 @@
 #define Wiring_Wire3 1 /* System PMIC and Fuel Guage I2C3 */
 #endif
 
+#if PLATFORM_ID==103      // bluz
+#define Wiring_BLE 1
+#define Wiring_SPI1 1
+#define Wiring_IPv6 0
+#endif
+
 #ifndef Wiring_SPI1
 #define Wiring_SPI1 0
 #endif
@@ -93,6 +99,10 @@
 
 #ifndef Wiring_Cellular
 #define Wiring_Cellular 0
+#endif
+
+#ifndef Wiring_BLE
+#define Wiring_BLE 0
 #endif
 
 #endif	/* SPARK_WIRING_PLATFORM_H */
