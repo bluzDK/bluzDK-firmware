@@ -119,10 +119,10 @@ extern "C" {
  *            __Stack_Init marks the bottom of the stack, as reserved
  *            in the linker script (../linker/linker_stm32f10x_md*.ld)
  */
+extern char _end, __Stack_Init;
+static char *heap_end = &_end;
 caddr_t _sbrk(int incr)
 {
-	extern char _end, __Stack_Init;
-	static char *heap_end = &_end;
 	char *prev_heap_end = heap_end;
 
 	heap_end += incr;
@@ -133,6 +133,11 @@ caddr_t _sbrk(int incr)
 	}
 
 	return (caddr_t) prev_heap_end;
+}
+
+uint32_t freeheap()
+{
+    return &__Stack_Init-heap_end;
 }
 
 /* Bare metal, no processes, so error */

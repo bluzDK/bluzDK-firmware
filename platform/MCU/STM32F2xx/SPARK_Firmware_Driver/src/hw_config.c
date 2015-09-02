@@ -157,11 +157,6 @@ void NVIC_Configuration(void)
     //OLD: NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
 }
 
-void SysTick_Disable() {
-    SysTick->CTRL = SysTick->CTRL & ~SysTick_CTRL_ENABLE_Msk;
-}
-
-
 /*******************************************************************************
  * Function Name  : SysTick_Configuration
  * Description    : Setup SysTick Timer and Configure its Interrupt Priority
@@ -458,7 +453,7 @@ void BUTTON_ResetDebouncedState(Button_TypeDef Button)
     BUTTON_DEBOUNCED_TIME[Button] = 0;
 }
 
-#ifdef USE_SERIAL_FLASH
+#ifdef HAS_SERIAL_FLASH
 /**
  * @brief  DeInitializes the peripherals used by the SPI FLASH driver.
  * @param  None

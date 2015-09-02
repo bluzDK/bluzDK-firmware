@@ -27,6 +27,9 @@
 #include "application.h"
 #include "stdarg.h"
 
+PRODUCT_ID(PLATFORM_ID);
+PRODUCT_VERSION(2);
+
 /* Function prototypes -------------------------------------------------------*/
 int tinkerDigitalRead(String pin);
 int tinkerDigitalWrite(String command);
@@ -40,11 +43,11 @@ void setup()
 {
     //Setup the Tinker application here
     //Register all the Tinker functions
-    Spark.function("digitalread", tinkerDigitalRead);
-    Spark.function("digitalwrite", tinkerDigitalWrite);
+    Particle.function("digitalread", tinkerDigitalRead);
+    Particle.function("digitalwrite", tinkerDigitalWrite);
 
-    Spark.function("analogread", tinkerAnalogRead);
-    Spark.function("analogwrite", tinkerAnalogWrite);
+    Particle.function("analogread", tinkerAnalogRead);
+    Particle.function("analogwrite", tinkerAnalogWrite);
 }
 
 /* This function loops forever --------------------------------------------*/

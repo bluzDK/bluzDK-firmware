@@ -46,7 +46,7 @@ extern "C" {
 #ifndef INTERNAL_FLASH_SIZE
 #   error "INTERNAL_FLASH_SIZE not defined"
 #endif
-       
+
 /* Internal Flash memory address where various firmwares are located */
 #ifndef INTERNAL_FLASH_START
 #define INTERNAL_FLASH_START        ((uint32_t)0x08000000)
@@ -60,23 +60,23 @@ extern "C" {
 
 /* Internal Flash page size */
 #define INTERNAL_FLASH_PAGE_SIZE    ((uint32_t)0x20000) //128K (7 sectors of 128K each used by main firmware)
-    
+
 #ifdef MODULAR_FIRMWARE
     #define FACTORY_RESET_MODULE_FUNCTION MODULE_FUNCTION_USER_PART
     #ifndef USER_FIRMWARE_IMAGE_SIZE
     #error USER_FIRMWARE_IMAGE_SIZE not defined
     #else
-    #define FIRMWARE_IMAGE_SIZE  USER_FIRMWARE_IMAGE_SIZE    
+    #define FIRMWARE_IMAGE_SIZE  USER_FIRMWARE_IMAGE_SIZE
     #endif
-    
+
     #ifndef USER_FIRMWARE_IMAGE_LOCATION
     #error USER_FIRMWARE_IMAGE_LOCATION not defined
     #endif
-    
+
     #define INTERNAL_FLASH_OTA_ADDRESS (USER_FIRMWARE_IMAGE_LOCATION+FIRMWARE_IMAGE_SIZE)
     #define INTERNAL_FLASH_FAC_ADDRESS (USER_FIRMWARE_IMAGE_LOCATION+FIRMWARE_IMAGE_SIZE+FIRMWARE_IMAGE_SIZE)
-    
-#else        
+
+#else
     #define FACTORY_RESET_MODULE_FUNCTION MODULE_FUNCTION_MONO_FIRMWARE
     #define USER_FIRMWARE_IMAGE_LOCATION CORE_FW_ADDRESS
     #ifndef FIRMWARE_IMAGE_SIZE
@@ -85,8 +85,8 @@ extern "C" {
     #else
     #define FIRMWARE_IMAGE_SIZE     0x60000 //384K (monolithic firmware size)
     #endif
-    #endif    
-    
+    #endif
+
     /* Internal Flash memory address where Factory programmed monolithic core firmware is located */
     #define INTERNAL_FLASH_FAC_ADDRESS  ((uint32_t)(USER_FIRMWARE_IMAGE_LOCATION + FIRMWARE_IMAGE_SIZE))
     /* Internal Flash memory address where monolithic core firmware will be saved for backup/restore */
@@ -103,7 +103,7 @@ extern "C" {
     #define EXTERNAL_FLASH_OTA_ADDRESS  ((uint32_t)(EXTERNAL_FLASH_FAC_ADDRESS + FIRMWARE_IMAGE_SIZE))
     #endif
 #endif
-    
+
 #if FIRMWARE_IMAGE_SIZE > INTERNAL_FLASH_SIZE
 #   error "FIRMWARE_IMAGE_SIZE too large to fit into internal flash"
 #endif
@@ -118,6 +118,18 @@ uint16_t FLASH_SectorToErase(flash_device_t flashDeviceID, uint32_t startAddress
 bool FLASH_CheckValidAddressRange(flash_device_t flashDeviceID, uint32_t startAddress, uint32_t length);
 bool FLASH_WriteProtectMemory(flash_device_t flashDeviceID, uint32_t startAddress, uint32_t length, bool protect);
 bool FLASH_EraseMemory(flash_device_t flashDeviceID, uint32_t startAddress, uint32_t length);
+
+typedef bool (*copymem_fn_t)(flash_device_t sourceDeviceID, uint32_t sourceAddress,
+                      flash_device_t destinationDeviceID, uint32_t destinationAddress,
+                      uint32_t length, uint8_t module_function, uint8_t flags);
+
+
+/**
+ * Determines if the memory copy can be performed.
+ */
+bool FLASH_CheckCopyMemory(flash_device_t sourceDeviceID, uint32_t sourceAddress,
+                      flash_device_t destinationDeviceID, uint32_t destinationAddress,
+                      uint32_t length, uint8_t module_function, uint8_t flags);
 
 /**
  * @param validateDestinationAddress checks if the destination address corresponds with the start address in the module
@@ -138,6 +150,7 @@ bool FLASH_AddToFactoryResetModuleSlot(flash_device_t sourceDeviceID, uint32_t s
                                        flash_device_t destinationDeviceID, uint32_t destinationAddress,
                                        uint32_t length, uint8_t module_function, uint8_t flags);
 
+bool FLASH_IsFactoryResetAvailable(void);
 bool FLASH_ClearFactoryResetModuleSlot(void);
 bool FLASH_RestoreFromFactoryResetModuleSlot(void);
 void FLASH_UpdateModules(void (*flashModulesCallback)(bool isUpdating));

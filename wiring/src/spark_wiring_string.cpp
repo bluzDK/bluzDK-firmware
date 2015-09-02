@@ -4,7 +4,7 @@
  * @author  Mohit Bhoite
  * @version V1.0.0
  * @date    13-March-2013
- * @brief   
+ * @brief
  ******************************************************************************
   Copyright (c) 2013-2015 Particle Industries, Inc.  All rights reserved.
   ...mostly rewritten by Paul Stoffregen...
@@ -41,18 +41,18 @@ void dtoa (double val, unsigned char prec, char *sout) {
     if (negative) {
         val = -val;
         *sout++ = '-';
-    }    
+    }
     long scale = 1;
     for (uint8_t i=0; i<prec; i++)
-        scale *= 10;    
+        scale *= 10;
     val *= scale;   // capture all the significant digits
-    long fixed = long(val);
+    uint64_t fixed = uint64_t(val);
     if ((val-fixed)>=0.5)    // round last digit
         fixed++;
-    
-    long first = fixed / scale;
-    long second = fixed % scale;
-    
+
+    unsigned long first = (unsigned long)(fixed / scale);
+    unsigned long second = (unsigned long)(fixed % scale);
+
     ultoa(first, sout, 10, 1);
     if (prec) {
         sout += strlen(sout);
@@ -240,10 +240,10 @@ void String::move(String &rhs)
 String & String::operator = (const String &rhs)
 {
 	if (this == &rhs) return *this;
-	
+
 	if (rhs.buffer) copy(rhs.buffer, rhs.len);
 	else invalidate();
-	
+
 	return *this;
 }
 
@@ -265,7 +265,7 @@ String & String::operator = (const char *cstr)
 {
 	if (cstr) copy(cstr, strlen(cstr));
 	else invalidate();
-	
+
 	return *this;
 }
 
@@ -480,7 +480,7 @@ unsigned char String::equalsIgnoreCase( const String &s2 ) const
 	const char *p2 = s2.buffer;
 	while (*p1) {
 		if (tolower(*p1++) != tolower(*p2++)) return 0;
-	} 
+	}
 	return 1;
 }
 
@@ -511,7 +511,7 @@ char String::charAt(unsigned int loc) const
 	return operator[](loc);
 }
 
-void String::setCharAt(unsigned int loc, char c) 
+void String::setCharAt(unsigned int loc, char c)
 {
 	if (loc < len) buffer[loc] = c;
 }
@@ -625,7 +625,7 @@ String String::substring(unsigned int left, unsigned int right) const
 	if (left > len) return out;
 	if (right > len) right = len;
 	char temp = buffer[right];  // save the replaced character
-	buffer[right] = '\0';	
+	buffer[right] = '\0';
 	out = buffer + left;  // pointer arithmetic
 	buffer[right] = temp;  //restore character
 	return out;
@@ -635,17 +635,18 @@ String String::substring(unsigned int left, unsigned int right) const
 /*  Modification                             */
 /*********************************************/
 
-void String::replace(char find, char replace)
+String& String::replace(char find, char replace)
 {
-	if (!buffer) return;
-	for (char *p = buffer; *p; p++) {
-		if (*p == find) *p = replace;
-	}
+	if (buffer)
+            for (char *p = buffer; *p; p++) {
+                    if (*p == find) *p = replace;
+            }
+        return *this;
 }
 
-void String::replace(const String& find, const String& replace)
+String& String::replace(const String& find, const String& replace)
 {
-	if (len == 0 || find.len == 0) return;
+	if (len == 0 || find.len == 0) return *this;
 	int diff = replace.len - find.len;
 	char *readFrom = buffer;
 	char *foundAt;
@@ -672,8 +673,8 @@ void String::replace(const String& find, const String& replace)
 			readFrom = foundAt + find.len;
 			size += diff;
 		}
-		if (size == len) return;
-		if (size > capacity && !changeBuffer(size)) return; // XXX: tell user!
+		if (size == len) return *this;;
+		if (size > capacity && !changeBuffer(size)) return *this; // XXX: tell user!
 		int index = len - 1;
 		while (index >= 0 && (index = lastIndexOf(find, index)) >= 0) {
 			readFrom = buffer + index + find.len;
@@ -684,43 +685,48 @@ void String::replace(const String& find, const String& replace)
 			index--;
 		}
 	}
+        return *this;
 }
 
-void String::remove(unsigned int index){
-	if (index >= len) { return; }
-	int count = len - index;
-	remove(index, count);
+String& String::remove(unsigned int index){
+        int count = len - index;
+        return remove(index, count);
 }
 
-void String::remove(unsigned int index, unsigned int count){
-	if (index >= len) { return; }
-	if (count <= 0) { return; }
+String& String::remove(unsigned int index, unsigned int count){
+	if (index >= len) { return *this; }
+	if (count <= 0) { return *this; }
 	if (index + count > len) { count = len - index; }
 	char *writeTo = buffer + index;
 	len = len - count;
 	strncpy(writeTo, buffer + index + count,len - index);
 	buffer[len] = 0;
+        return *this;
 }
 
-void String::toLowerCase(void)
+String& String::toLowerCase(void)
 {
-	if (!buffer) return;
-	for (char *p = buffer; *p; p++) {
-		*p = tolower(*p);
-	}
+	if (!buffer) {
+            for (char *p = buffer; *p; p++) {
+                    *p = tolower(*p);
+            }
+        }
+        return *this;
 }
 
-void String::toUpperCase(void)
+String& String::toUpperCase(void)
 {
-	if (!buffer) return;
-	for (char *p = buffer; *p; p++) {
-		*p = toupper(*p);
-	}
+	if (buffer) {
+            for (char *p = buffer; *p; p++) {
+                    *p = toupper(*p);
+            }
+        }
+        return *this;
 }
 
-void String::trim(void)
+String& String::trim(void)
 {
-	if (!buffer || len == 0) return;
+	if (!buffer || len == 0) return *this;
 	char *begin = buffer;
 	while (isspace(*begin)) begin++;
 	char *end = buffer + len - 1;
@@ -728,6 +734,7 @@ void String::trim(void)
 	len = end + 1 - begin;
 	if (begin > buffer) memcpy(buffer, begin, len);
 	buffer[len] = 0;
+        return *this;
 }
 
 /*********************************************/
@@ -745,4 +752,34 @@ float String::toFloat(void) const
 {
 	if (buffer) return float(atof(buffer));
 	return 0;
+}
+
+class StringPrintableHelper : public Print
+{
+    String& s;
+
+public:
+
+    StringPrintableHelper(String& s_) : s(s_) {
+        s.reserve(20);
+    }
+
+    virtual size_t write(const uint8_t *buffer, size_t size) override
+    {
+        unsigned len = s.length();
+        s.concat((const char*)buffer, size);
+        return s.length()-len;
+    }
+
+    virtual size_t write(uint8_t c)
+    {
+        return s.concat((char)c);
+    }
+};
+
+String::String(const Printable& printable)
+{
+    init();
+    StringPrintableHelper help(*this);
+    printable.printTo(help);
 }

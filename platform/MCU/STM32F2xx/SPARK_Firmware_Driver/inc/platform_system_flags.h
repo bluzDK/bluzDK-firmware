@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   platform_system_flags.h
  * Author: mat
  *
@@ -12,9 +12,9 @@
 extern "C" {
 #endif
 
-#include <stdint.h>    
-    
-typedef struct platform_system_flags {    
+#include <stdint.h>
+
+typedef struct platform_system_flags {
     uint16_t header[2];
     uint16_t Bootloader_Version_SysFlag;
     uint16_t NVMEM_SPARK_Reset_SysFlag;
@@ -29,10 +29,11 @@ typedef struct platform_system_flags {
      */
     uint8_t Factory_Reset_Done_SysFlag;
     /**
-     * This is a placeholder for when the bootloader can influence how the system module executes.     
+     * This is a placeholder for when the bootloader can influence how the system module executes.
      */
     uint8_t StartupMode_SysFlag;
-    uint8_t unused;
+    uint8_t FeaturesEnabled_SysFlag;        // default is 0xFF all features enabled. If any bits are cleared in the bottom 4-bits, then the upper 4 bits should be the logical inverse of these.
+                                            // This is to prevent against corrupted data causing the bootloader to be unavailable.
     uint32_t RCC_CSR_SysFlag;
     uint16_t reserved[4];
 } platform_system_flags_t;

@@ -39,7 +39,8 @@ DYNALIB_FN(hal_spi,HAL_SPI_Set_Clock_Divider)
 DYNALIB_FN(hal_spi,HAL_SPI_Send_Receive_Data)
 DYNALIB_FN(hal_spi,HAL_SPI_Is_Enabled_Old)
 DYNALIB_FN(hal_spi,HAL_SPI_Init)
-DYNALIB_FN(hal_spi,HAL_SPI_Is_Enabled)        
+DYNALIB_FN(hal_spi,HAL_SPI_Is_Enabled)
+DYNALIB_FN(hal_spi,HAL_SPI_Info)
 DYNALIB_END(hal_spi)
 
 

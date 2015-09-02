@@ -31,6 +31,7 @@
 #ifdef __cplusplus
 
 #include "spark_wiring_print.h" // for HEX, DEC ... constants
+#include "spark_wiring_printable.h"
 
 // When compiling programs with this class, the following gcc parameters
 // dramatically increase performance and memory (RAM) efficiency, typically
@@ -47,7 +48,7 @@ class StringSumHelper;
 
 // The string class
 class String
-{    
+{
 	// use a function pointer to allow for "if (s)" without the
 	// complications of an operator bool(). for more information, see:
 	// http://www.artima.com/cppsource/safebool.html
@@ -62,6 +63,7 @@ public:
 	// be false).
 	String(const char *cstr = "");
 	String(const String &str);
+        String(const Printable& printable);
 	#ifdef __GXX_EXPERIMENTAL_CXX0X__
 	String(String &&rval);
 	String(StringSumHelper &&rval);
@@ -84,7 +86,7 @@ public:
 	inline unsigned int length(void) const {return len;}
 
 	// creates a copy of the assigned value.  if the value is null or
-	// invalid, or if the memory allocation fails, the string will be 
+	// invalid, or if the memory allocation fails, the string will be
 	// marked as invalid ("if (s)" will be false).
 	String & operator = (const String &rhs);
 	String & operator = (const char *cstr);
@@ -94,12 +96,12 @@ public:
 	#endif
 
         operator const char*() const { return c_str(); }
-        
+
 	// concatenate (works w/ built-in types)
-	
+
 	// returns true on success, false on failure (in which case, the string
-	// is left unchanged).  if the argument is null or invalid, the 
-	// concatenation is considered unsucessful.  
+	// is left unchanged).  if the argument is null or invalid, the
+	// concatenation is considered unsucessful.
 	unsigned char concat(const String &str);
 	unsigned char concat(const char *cstr);
 	unsigned char concat(char c);
@@ -110,7 +112,7 @@ public:
 	unsigned char concat(unsigned long num);
 	unsigned char concat(float num);
 	unsigned char concat(double num);
-	
+
 	// if there's not enough memory for the concatenated value, the string
 	// will be left unchanged (but this isn't signalled in any way)
 	String & operator += (const String &rhs)	{concat(rhs); return (*this);}
@@ -174,13 +176,13 @@ public:
 	String substring( unsigned int beginIndex, unsigned int endIndex ) const;
 
 	// modification
-	void replace(char find, char replace);
-	void replace(const String& find, const String& replace);
-	void remove(unsigned int index);
-	void remove(unsigned int index, unsigned int count);
-	void toLowerCase(void);
-	void toUpperCase(void);
-	void trim(void);
+	String& replace(char find, char replace);
+	String& replace(const String& find, const String& replace);
+	String& remove(unsigned int index);
+	String& remove(unsigned int index, unsigned int count);
+	String& toLowerCase(void);
+	String& toUpperCase(void);
+	String& trim(void);
 
 	// parsing/conversion
 	long toInt(void) const;
@@ -202,6 +204,9 @@ protected:
 	#ifdef __GXX_EXPERIMENTAL_CXX0X__
 	void move(String &rhs);
 	#endif
+
+        friend class StringPrintableHelper;
+
 };
 
 class StringSumHelper : public String
