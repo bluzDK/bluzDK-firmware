@@ -1,5 +1,9 @@
 #include <stdint.h>
+#include <cstdlib>
 #include "data_management_layer.h"
+
+int16_t DataManagementLayer::dataServicesRegistered = 0;
+DataService DataManagementLayer::services[MAX_NUMBER_OF_SERVICES] = {DataService()};
 
 DataManagementLayer::DataManagementLayer() { dataServicesRegistered=0; }
 
@@ -19,9 +23,19 @@ void DataManagementLayer::feedData(uint16_t id, int16_t length, uint8_t *data)
     }
 }
 
-void DataManagementLayer::sendData(uint8_t *data, int16_t length)
+void DataManagementLayer::sendData(int16_t length, uint8_t *data)
 {
 //#ifdef BLUZ
 //    scs_data_send
 //#endif
+}
+
+void dataManagementFeedData(uint16_t id, int16_t length, uint8_t *data)
+{
+    DataManagementLayer::feedData(id, length, data);
+}
+    
+void dataManagementSendData(int16_t length, uint8_t *data)
+{
+    DataManagementLayer::sendData(length, data);
 }

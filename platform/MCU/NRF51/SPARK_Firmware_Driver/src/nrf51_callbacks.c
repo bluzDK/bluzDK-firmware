@@ -134,8 +134,8 @@ void sys_evt_dispatch(uint32_t sys_evt)
 void data_write_handler(scs_t * p_lbs, uint8_t *data, uint16_t length)
 {
     //TO DO: This needs to feed data into Spark Utilities library
-//    uint16_t serviceID = (data[0] << 8) | data[1];
-//    DataManagementLayer::feedData(serviceID, length-2, data+2);
+    uint16_t serviceID = (data[0] << 8) | data[1];
+    dataManagementFeedData(serviceID, length-2, data+2);
 
     
     //    BLESocketFeedData(data, length);

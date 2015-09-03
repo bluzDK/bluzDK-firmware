@@ -8,8 +8,9 @@
 class DataService
 {
 public:
-    virtual int32_t getServiceID();
-    virtual int32_t DataCallback(uint8_t *data, int16_t length);
+    DataService();
+    virtual int32_t getServiceID() { return 0; };
+    virtual int32_t DataCallback(uint8_t *data, int16_t length) { return 0; };
 };
 
 #endif
