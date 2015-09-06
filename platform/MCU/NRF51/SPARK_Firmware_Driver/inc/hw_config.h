@@ -34,6 +34,7 @@
 #include "nrf51_callbacks.h"
 #include "spi_master.h"
 #include "nrf_gpio.h"
+#include "nrf_delay.h"
 #include "app_util_platform.h"
 #include "system_tick_hal.h"
 
@@ -41,7 +42,7 @@
 #define BUTTON_PULL    NRF_GPIO_PIN_PULLUP
 
 //Board LED's and buttons
-#define BOARD_LED_PIN          			20                                       /**< Main LED on the board. */
+#define BOARD_LED_PIN          			30                                       /**< Main LED on the board. */
 #define RGB_LED_PIN_NO_1          		19                                       /**< Pin one for the RGB LED. */
 #define RGB_LED_PIN_NO_2          		18                                       /**< Pin one for the RGB LED. */
 #define RGB_LED_PIN_NO_3          		17                                       /**< Pin one for the RGB LED. */

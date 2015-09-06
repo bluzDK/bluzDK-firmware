@@ -123,7 +123,7 @@ void HAL_Notify_WDT()
 }
 
 //main function
-int main() {
+int main(void) {
     app_setup_and_loop_passive();
     return 0;
 }

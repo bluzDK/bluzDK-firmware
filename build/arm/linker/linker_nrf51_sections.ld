@@ -48,7 +48,6 @@ ENTRY(Reset_Handler)
 SECTIONS
 {
     INCLUDE module_start.ld
-    INCLUDE module_info.ld
 	.text :
 	{
 		KEEP(*(.Vectors))
@@ -75,7 +74,8 @@ SECTIONS
 
 		*(.eh_frame*)
 	} > APP_FLASH
-    
+
+    INCLUDE module_info.ld
 
 	.ARM.extab : 
 	{
