@@ -78,6 +78,8 @@ void leds_init(void);
 void timers_init(void);
 void gpiote_init(void);
 void buttons_init(void);
+void gap_params_init(void);
+void scheduler_init(void);
 
 //BLE Stack Functions
 void ble_stack_init(void);
@@ -94,6 +96,9 @@ void timers_start(void);
 void power_manage(void);
 void app_sched_execute(void);
 
+//useful functions
+void blinkLED(int times);
+void heartBeat(void);
 
 //Flash functions
 uint32_t OTA_FlashAddress(void);

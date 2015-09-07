@@ -41,15 +41,18 @@ void HAL_Core_Init(void)
 void HAL_Network_Init(void)
 {
     ble_stack_init();
+    scheduler_init();
+    gap_params_init();
     services_init();
     advertising_init();
-    
     timers_start();
     advertising_start();
 }
 
 void HAL_Events_Manage(void)
 {
+    power_manage();
+    app_sched_execute();
 }
 
 /*******************************************************************************

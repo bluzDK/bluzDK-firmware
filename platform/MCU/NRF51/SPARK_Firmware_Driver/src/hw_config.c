@@ -8,6 +8,78 @@ uint16_t Flash_Update_Index = 0;
 uint32_t External_Flash_Address = 0;
 static uint32_t External_Flash_Start_Address = 0;
 
+void blinkLED(int times)
+{
+    for (int i = 0; i < times; i++) {
+        nrf_gpio_pin_set(BOARD_LED_PIN);
+        nrf_delay_ms(300);
+        nrf_gpio_pin_clear(BOARD_LED_PIN);
+        nrf_delay_ms(300);
+    }
+    nrf_delay_ms(600);
+}
+
+void heartBeat(void)
+{
+    for (;;) {
+        nrf_gpio_pin_set(BOARD_LED_PIN);
+        nrf_delay_ms(100);
+        nrf_gpio_pin_clear(BOARD_LED_PIN);
+        nrf_delay_ms(100);
+        nrf_gpio_pin_set(BOARD_LED_PIN);
+        nrf_delay_ms(100);
+        nrf_gpio_pin_clear(BOARD_LED_PIN);
+        nrf_delay_ms(100);
+        nrf_delay_ms(600);
+    }
+}
+
+/**@brief Function for error handling, which is called when an error has occurred.
+ *
+ * @warning This handler is an example only and does not fit a final product. You need to analyze
+ *          how your product is supposed to react in case of error.
+ *
+ * @param[in] error_code  Error code supplied to the handler.
+ * @param[in] line_num    Line number where the handler is called.
+ * @param[in] p_file_name Pointer to the file name.
+ */
+void app_error_handler(uint32_t error_code, uint32_t line_num, const uint8_t * p_file_name)
+{
+    //SOS Call
+    for (int i = 0; i < 3; i++) {
+        nrf_gpio_pin_set(BOARD_LED_PIN);
+        nrf_delay_ms(100);
+        nrf_gpio_pin_clear(BOARD_LED_PIN);
+        nrf_delay_ms(100);
+    }
+    nrf_delay_ms(250);
+    for (int i = 0; i < 3; i++) {
+        nrf_gpio_pin_set(BOARD_LED_PIN);
+        nrf_delay_ms(250);
+        nrf_gpio_pin_clear(BOARD_LED_PIN);
+        nrf_delay_ms(250);
+    }
+    nrf_delay_ms(250);
+    for (int i = 0; i < 3; i++) {
+        nrf_gpio_pin_set(BOARD_LED_PIN);
+        nrf_delay_ms(100);
+        nrf_gpio_pin_clear(BOARD_LED_PIN);
+        nrf_delay_ms(100);
+    }
+    nrf_delay_ms(1000);
+    for (int i = 0; i < error_code; i++) {
+        nrf_gpio_pin_set(BOARD_LED_PIN);
+        nrf_delay_ms(250);
+        nrf_gpio_pin_clear(BOARD_LED_PIN);
+        nrf_delay_ms(250);
+    }
+    nrf_delay_ms(3000);
+    
+    
+    // On assert, the system can only recover with a reset.
+    NVIC_SystemReset();
+}
+
 uint32_t OTA_FlashAddress()
 {
     return FLASH_FW_ADDRESS;
@@ -133,6 +205,42 @@ void buttons_init(void)
     APP_BUTTON_INIT(buttons, sizeof(buttons) / sizeof(buttons[0]), BUTTON_DETECTION_DELAY, true);
 }
 
+/**@brief Function for the Event Scheduler initialization.
+ */
+void scheduler_init(void)
+{
+    APP_SCHED_INIT(SCHED_MAX_EVENT_DATA_SIZE, SCHED_QUEUE_SIZE);
+}
+
+/**@brief Function for the GAP initialization.
+ *
+ * @details This function sets up all the necessary GAP (Generic Access Profile) parameters of the
+ *          device including the device name, appearance, and the preferred connection parameters.
+ */
+void gap_params_init(void)
+{
+    uint32_t                err_code;
+    ble_gap_conn_params_t   gap_conn_params;
+    ble_gap_conn_sec_mode_t sec_mode;
+    
+    BLE_GAP_CONN_SEC_MODE_SET_OPEN(&sec_mode);
+    
+    err_code = sd_ble_gap_device_name_set(&sec_mode,
+                                          (const uint8_t *)DEVICE_NAME,
+                                          strlen(DEVICE_NAME));
+    APP_ERROR_CHECK(err_code);
+    
+    memset(&gap_conn_params, 0, sizeof(gap_conn_params));
+    
+    gap_conn_params.min_conn_interval = MIN_CONN_INTERVAL;
+    gap_conn_params.max_conn_interval = MAX_CONN_INTERVAL;
+    gap_conn_params.slave_latency     = SLAVE_LATENCY;
+    gap_conn_params.conn_sup_timeout  = CONN_SUP_TIMEOUT;
+    
+    err_code = sd_ble_gap_ppcp_set(&gap_conn_params);
+    APP_ERROR_CHECK(err_code);
+}
+
 void timers_start(void)
 {
     app_timer_start(millis_timer, TIME_KEPPER_INTERVAL, NULL);
@@ -227,5 +335,13 @@ void advertising_start(void)
     err_code = sd_ble_gap_adv_start(&adv_params);
     APP_ERROR_CHECK(err_code);
     nrf_gpio_pin_set(BOARD_LED_PIN);
+}
+
+/**@brief Function for the Power manager.
+ */
+void power_manage(void)
+{
+    uint32_t err_code = sd_app_evt_wait();
+    APP_ERROR_CHECK(err_code);
 }
 
