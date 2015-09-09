@@ -11,7 +11,8 @@ class SocketManager : public DataService
 public:
     SocketManager();
     
-    static int32_t connect(const sockaddr_b *addr, long addrlen);
+    static uint32_t create(uint8_t family, uint8_t type, uint8_t protocol, uint16_t port, uint32_t nif);
+    static int32_t connect(uint32_t sd, const sockaddr_b *addr, long addrlen);
     static int32_t send(uint32_t sockid, const void* buffer, uint32_t len);
     static int32_t receive(uint32_t sockid, void* buffer, uint32_t len, unsigned long _timeout);
     static int32_t close(uint32_t sockid);

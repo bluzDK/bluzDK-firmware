@@ -16,7 +16,6 @@ class Socket : public DataService
 {
 public:
     Socket();
-    Socket(int bufferSize);
     
     int32_t connect(const sockaddr_b *addr, long addrlen);
     int32_t send(uint32_t sockid, const void* buffer, uint32_t len);
@@ -24,7 +23,7 @@ public:
     int32_t close(uint32_t sockid);
     
     static const int32_t SOCKET_BUFFER_SIZE = 1024;
-    
+    bool inUse;
     
 private:
     uint32_t id;

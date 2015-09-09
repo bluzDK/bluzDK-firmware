@@ -20,6 +20,8 @@ CSRC += $(TARGET_SPARK_SRC_PATH)/nrf51_callbacks.c
 
 
 # C++ source files included in this build.
+CPPSRC += $(TARGET_SPARK_SRC_PATH)/socket.cpp
+CPPSRC += $(TARGET_SPARK_SRC_PATH)/socket_manager.cpp
 CPPSRC += $(TARGET_SPARK_SRC_PATH)/data_management_layer.cpp
 CPPSRC += $(TARGET_SPARK_SRC_PATH)/data_service.cpp
 # ASM source files included in this build.
