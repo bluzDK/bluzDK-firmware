@@ -1,6 +1,9 @@
 #ifndef _DATA_MANAGEMENT_LAYER_H
 #define	_DATA_MANAGEMENT_LAYER_H
 
+#include <stdint.h>
+#include "data_service.h"
+
 static const int32_t MAX_NUMBER_OF_SERVICES = 32;
 #ifdef __cplusplus
 extern "C" {
@@ -12,9 +15,6 @@ extern "C" {
 #endif
 
 #ifdef __cplusplus
-
-#include <stdint.h>
-#include "data_service.h"
 
 class DataManagementLayer
 {

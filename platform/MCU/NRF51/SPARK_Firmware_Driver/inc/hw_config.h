@@ -92,6 +92,9 @@ void sec_params_init(void);
 void advertising_start(void);
 void timers_start(void);
 
+//Data Services Functions
+void data_service_init(void);
+
 //event handling
 void power_manage(void);
 void app_sched_execute(void);

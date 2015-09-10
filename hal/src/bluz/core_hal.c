@@ -25,6 +25,7 @@
 
 #include "core_hal.h"
 #include "hw_config.h"
+#include "data_services.h"
 
 /* Extern variables ----------------------------------------------------------*/
 
@@ -45,6 +46,7 @@ void HAL_Network_Init(void)
     gap_params_init();
     services_init();
     advertising_init();
+    data_service_init();
     timers_start();
     advertising_start();
 }

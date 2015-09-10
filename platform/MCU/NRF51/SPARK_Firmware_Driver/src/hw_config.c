@@ -2,6 +2,8 @@
 
 #include "hw_config.h"
 #include "sst25vf_spi.h"
+#include "data_management_layer.h"
+#include "socket_manager.h"
 
 uint32_t NbrOfPage = 0;
 uint16_t Flash_Update_Index = 0;

@@ -39,3 +39,8 @@ void dataManagementSendData(int16_t length, uint8_t *data)
 {
     DataManagementLayer::sendData(length, data);
 }
+
+void dataManagementRegisterService(DataService service)
+{
+    DataManagementLayer::registerService(service);
+}

@@ -12,15 +12,15 @@ typedef struct
     uint8_t    sa_data[14];
 } sockaddr_b;
 
-class Socket : public DataService
+class Socket
 {
 public:
     Socket();
     
-    int32_t connect(const sockaddr_b *addr, long addrlen);
-    int32_t send(uint32_t sockid, const void* buffer, uint32_t len);
-    int32_t receive(uint32_t sockid, void* buffer, uint32_t len, unsigned long _timeout);
-    int32_t close(uint32_t sockid);
+    int32_t connect(uint32_t sockid, const sockaddr_b *addr, long addrlen);
+    int32_t send(const void* buffer, uint32_t len);
+    int32_t receive(void* buffer, uint32_t len, unsigned long _timeout);
+    int32_t close();
     
     static const int32_t SOCKET_BUFFER_SIZE = 1024;
     bool inUse;

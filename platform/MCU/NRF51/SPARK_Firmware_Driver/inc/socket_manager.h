@@ -4,24 +4,34 @@
 #ifdef __cplusplus
 
 #include <stdint.h>
+#include <stdlib.h>
 #include "socket.h"
 
 class SocketManager : public DataService
 {
 public:
-    SocketManager();
+    static SocketManager* instance();
     
-    static uint32_t create(uint8_t family, uint8_t type, uint8_t protocol, uint16_t port, uint32_t nif);
-    static int32_t connect(uint32_t sd, const sockaddr_b *addr, long addrlen);
-    static int32_t send(uint32_t sockid, const void* buffer, uint32_t len);
-    static int32_t receive(uint32_t sockid, void* buffer, uint32_t len, unsigned long _timeout);
-    static int32_t close(uint32_t sockid);
+    int32_t create(uint8_t family, uint8_t type, uint8_t protocol, uint16_t port, uint32_t nif);
+    int32_t connect(uint32_t sd, const sockaddr_b *addr, long addrlen);
+    int32_t send(uint32_t sockid, const void* buffer, uint32_t len);
+    int32_t receive(uint32_t sockid, void* buffer, uint32_t len, unsigned long _timeout);
+    int32_t close(uint32_t sockid);
     
     static const int32_t MAX_NUMBER_OF_SOCKETS = 2;
     
+    //DataService functions
+    virtual int32_t getServiceID();
+    virtual int32_t DataCallback(uint8_t *data, int16_t length);
     
 private:
-    static Socket sockets[MAX_NUMBER_OF_SOCKETS];
+    Socket sockets[MAX_NUMBER_OF_SOCKETS];
+
+    //this is a singleton class, so these all need to be private so they can't be called
+    SocketManager(){};
+    SocketManager(SocketManager const&){};
+    SocketManager& operator=(SocketManager const&);
+    static SocketManager* m_pInstance;
 };
 
 #endif
