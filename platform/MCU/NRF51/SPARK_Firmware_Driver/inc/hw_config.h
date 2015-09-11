@@ -73,6 +73,15 @@
 //On-Board Flash Addresses
 #define CORE_FW_ADDRESS			        ((uint32_t)0x08005000)
 
+//BLE State Information
+typedef enum {
+    BLE_ADVERTISING,
+    BLE_SLEEPING,
+    BLE_CONNECTED,
+} BLE_STATE;
+
+BLE_STATE state;
+
 //HW Init Functions
 void leds_init(void);
 void timers_init(void);

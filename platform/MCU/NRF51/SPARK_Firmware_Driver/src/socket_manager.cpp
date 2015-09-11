@@ -19,6 +19,7 @@ int32_t SocketManager::create(uint8_t family, uint8_t type, uint8_t protocol, ui
         if (!sockets[i].inUse)
         {
             sockets[i].inUse = true;
+            sockets[i].init(family, type, protocol, port, nif);
             return i;
         }
     }
@@ -44,6 +45,11 @@ int32_t SocketManager::getServiceID()
 }
 int32_t SocketManager::DataCallback(uint8_t *data, int16_t length)
 {
+    uint16_t socketID = (data[0] << 8) | data[1];
+    if (sockets[socketID].inUse)
+    {
+        sockets[socketID].feed(data, length);
+    }
     return -1;
 }
 

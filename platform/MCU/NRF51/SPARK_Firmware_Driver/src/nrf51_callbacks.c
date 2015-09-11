@@ -40,6 +40,8 @@ void on_ble_evt(ble_evt_t * p_ble_evt)
             m_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
             
             sd_ble_gap_address_get(address);
+            
+            state = BLE_CONNECTED;
             break;
             
         case BLE_GAP_EVT_DISCONNECTED:
@@ -49,6 +51,7 @@ void on_ble_evt(ble_evt_t * p_ble_evt)
             APP_ERROR_CHECK(err_code);
             
             advertising_start();
+            state = BLE_ADVERTISING;
             break;
             
         case BLE_GAP_EVT_SEC_PARAMS_REQUEST:

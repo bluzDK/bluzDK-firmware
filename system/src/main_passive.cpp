@@ -101,7 +101,7 @@ void app_setup_and_loop_passive(void)
         HAL_Events_Manage();
         
         //we may not be connected. if not, don't try to manage anything cloud related
-        if (SPARK_CLOUD_CONNECTED && !SPARK_CLOUD_SOCKETED){
+        if (HAL_Try_Cloud_Connection()){
             Spark_Idle();
         }
     }

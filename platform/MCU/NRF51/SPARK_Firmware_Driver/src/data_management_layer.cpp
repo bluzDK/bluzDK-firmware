@@ -2,6 +2,11 @@
 #include <cstdlib>
 #include "data_management_layer.h"
 
+extern "C" {
+#include "ble_scs.h"
+#include "nrf51_config.h"
+}
+
 int16_t DataManagementLayer::dataServicesRegistered = 0;
 DataService DataManagementLayer::services[MAX_NUMBER_OF_SERVICES] = {DataService()};
 
@@ -25,9 +30,10 @@ void DataManagementLayer::feedData(uint16_t id, int16_t length, uint8_t *data)
 
 void DataManagementLayer::sendData(int16_t length, uint8_t *data)
 {
-//#ifdef BLUZ
-//    scs_data_send
-//#endif
+//a bit of a hack for now, should HAL this out, but it'll work for the time being
+#ifdef BLUZ
+    scs_data_send(&m_scs, data, length);
+#endif
 }
 
 void dataManagementFeedData(uint16_t id, int16_t length, uint8_t *data)

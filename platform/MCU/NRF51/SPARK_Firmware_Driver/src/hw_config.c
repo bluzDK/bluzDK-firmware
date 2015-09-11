@@ -248,7 +248,6 @@ void timers_start(void)
     app_timer_start(millis_timer, TIME_KEPPER_INTERVAL, NULL);
 }
 
-//BLE Stack Functions
 /**@brief Function for initializing the BLE stack.
  *
  * @details Initializes the SoftDevice and the BLE event interrupt.

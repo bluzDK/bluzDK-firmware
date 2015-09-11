@@ -57,6 +57,11 @@ void HAL_Events_Manage(void)
     app_sched_execute();
 }
 
+bool HAL_Try_Cloud_Connection(void)
+{
+    return state == BLE_CONNECTED;
+}
+
 /*******************************************************************************
  * Function Name  : HAL_Core_Config.
  * Description    : Called in startup routine, before calling C++ constructors.
