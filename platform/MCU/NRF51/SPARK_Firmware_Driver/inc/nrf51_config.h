@@ -9,8 +9,8 @@
 #include "ble_advdata.h"
 
 #define APP_TIMER_PRESCALER             0                                           /**< Value of the RTC1 PRESCALER register. */
-#define APP_TIMER_MAX_TIMERS            10						                    /**< Maximum number of simultaneously created timers. */
-#define APP_TIMER_OP_QUEUE_SIZE         11                                          /**< Size of timer operation queues. */
+#define APP_TIMER_MAX_TIMERS            6						                    /**< Maximum number of simultaneously created timers. */
+#define APP_TIMER_OP_QUEUE_SIZE         7                                          /**< Size of timer operation queues. */
 
 #define TIME_KEPPER_INTERVAL     		APP_TIMER_TICKS(1000, APP_TIMER_PRESCALER)     /**< Keep track of time in roughly 1 second intervals. */
 

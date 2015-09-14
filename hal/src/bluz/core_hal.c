@@ -47,7 +47,7 @@ void HAL_Network_Init(void)
     services_init();
     advertising_init();
     data_service_init();
-    timers_start();
+//    timers_start();
     advertising_start();
 }
 

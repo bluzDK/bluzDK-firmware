@@ -6,6 +6,6 @@ extern "C" {
 void data_service_init(void)
 {
     DataService* socketService = SocketManager::instance();
-    DataManagementLayer::registerService(*socketService);
+    DataManagementLayer::registerService(socketService);
 }
 }

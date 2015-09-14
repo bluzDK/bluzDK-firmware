@@ -29,8 +29,14 @@ int32_t SocketManager::connect(uint32_t sd, const sockaddr_b *addr, long addrlen
 {
     return sockets[sd].connect(sd, addr, addrlen);
 }
-int32_t SocketManager::send(uint32_t sockid, const void* buffer, uint32_t len) { return -1; }
-int32_t SocketManager::receive(uint32_t sockid, void* buffer, uint32_t len, unsigned long _timeout) { return -1; }
+int32_t SocketManager::send(uint32_t sd, const void* buffer, uint32_t len)
+{
+    return sockets[sd].send(buffer, len);
+}
+int32_t SocketManager::receive(uint32_t sd, void* buffer, uint32_t len, unsigned long _timeout)
+{
+    return sockets[sd].receive(buffer, len, _timeout);
+}
 int32_t SocketManager::close(uint32_t sockid)
 {
     sockets[sockid].inUse = false;
@@ -48,7 +54,7 @@ int32_t SocketManager::DataCallback(uint8_t *data, int16_t length)
     uint16_t socketID = (data[0] << 8) | data[1];
     if (sockets[socketID].inUse)
     {
-        sockets[socketID].feed(data, length);
+        sockets[socketID].feed(data, length-2);
     }
     return -1;
 }

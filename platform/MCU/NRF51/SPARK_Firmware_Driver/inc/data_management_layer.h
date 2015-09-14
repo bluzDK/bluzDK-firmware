@@ -20,14 +20,14 @@ class DataManagementLayer
 {
 public:
     DataManagementLayer();
-    static void registerService(DataService service);
+    static void registerService(DataService* service);
     static void sendData(int16_t length, uint8_t *data);
     
     static void feedData(uint16_t id, int16_t length, uint8_t *data);
     
 private:
     static int16_t dataServicesRegistered;
-    static DataService services[MAX_NUMBER_OF_SERVICES];
+    static DataService* services[MAX_NUMBER_OF_SERVICES];
 };
 
 #endif

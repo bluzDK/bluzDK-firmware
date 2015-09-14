@@ -8,11 +8,11 @@ extern "C" {
 }
 
 int16_t DataManagementLayer::dataServicesRegistered = 0;
-DataService DataManagementLayer::services[MAX_NUMBER_OF_SERVICES] = {DataService()};
+DataService* DataManagementLayer::services[MAX_NUMBER_OF_SERVICES] = {NULL};
 
 DataManagementLayer::DataManagementLayer() { dataServicesRegistered=0; }
 
-void DataManagementLayer::registerService(DataService service)
+void DataManagementLayer::registerService(DataService* service)
 {
     services[dataServicesRegistered++] = service;
 }
@@ -21,8 +21,8 @@ void DataManagementLayer::feedData(uint16_t id, int16_t length, uint8_t *data)
 {
     for (int i = 0; i < dataServicesRegistered; i++)
     {
-        if (id == services[i].getServiceID()) {
-            services[i].DataCallback(data, length);
+        if (services[i] != NULL && id == services[i]->getServiceID()) {
+            services[i]->DataCallback(data, length);
             break;
         }
     }
@@ -46,7 +46,7 @@ void dataManagementSendData(int16_t length, uint8_t *data)
     DataManagementLayer::sendData(length, data);
 }
 
-void dataManagementRegisterService(DataService service)
+void dataManagementRegisterService(DataService* service)
 {
     DataManagementLayer::registerService(service);
 }
