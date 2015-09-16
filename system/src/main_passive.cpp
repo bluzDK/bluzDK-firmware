@@ -42,6 +42,7 @@
 #include "system_mode.h"
 #include "rgbled.h"
 #include "ledcontrol.h"
+#include "delay_hal.h"
 
 /* Private typedef -----------------------------------------------------------*/
 
@@ -118,7 +119,7 @@ void app_setup_and_loop_passive(void)
                 if (err_code) {
                     ERROR("Error when calling Spark Connect");
                 }
-                
+                HAL_Delay_Milliseconds(2000);
                 DEBUG("Calling Spark Handshake");
                 err_code = Spark_Handshake();
                 if (err_code) {

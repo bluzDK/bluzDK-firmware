@@ -41,30 +41,37 @@ int32_t Socket::connect(uint32_t sockid, const sockaddr_b *addr, long addrlen)
 int32_t Socket::send(const void* data, uint32_t len)
 {
     DEBUG("Sending data of size %d!", len);
-    uint8_t dataPlusID[len+2];
-    dataPlusID[0] = (id & 0xFF00) >> 8;
-    dataPlusID[1] = id & 0xFF;
+//    uint8_t dataPlusID[len+2];
+//    dataPlusID[0] = (id & 0xFF00) >> 8;
+//    dataPlusID[1] = id & 0xFF;
+//    
+//    memcpy(dataPlusID+2, data, len);
     
-    memcpy(dataPlusID+2, data, len);
+    uint8_t dataPlusID[len];
+    memcpy(dataPlusID, data, len);
+    
     DataManagementLayer::sendData(len, dataPlusID);
-    return 0;
+    return len;
 }
 int32_t Socket::receive(void* data, uint32_t len, unsigned long _timeout)
 {
-    DEBUG("Requesting data of size %d!", len);
-    memcpy(data, buffer+bufferStart, len);
-    bufferStart += len;
-    bufferLength -= len;
+    DEBUG("Requesting data of size %d", len);
     
+    int bytesToCopy = len;
     if (len > bufferLength) {
         //they are asking for too much data
-        return -1;
+        bytesToCopy = bufferLength;
     }
+    
+    memcpy(data, buffer+bytesToCopy, bytesToCopy);
+    bufferStart += bytesToCopy;
+    bufferLength -= bytesToCopy;
     
     if (bufferLength == 0) {
         bufferStart = 0;
     }
-    return len;
+    DEBUG("Copied over this many bytes %d", bytesToCopy);
+    return bytesToCopy;
 }
 int32_t Socket::close()
 {
@@ -81,6 +88,6 @@ int32_t Socket::feed(void* data, uint32_t len)
     
     memcpy(buffer+bufferStart, data, len);
     bufferLength+=len;
-    DEBUG("Copied data to socket buffer!");
+    DEBUG("Copied data to socket buffer of size %d", len);
     return 0;
 }
