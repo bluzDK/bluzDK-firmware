@@ -12,6 +12,7 @@ CSRC += $(TARGET_STDPERIPH_SRC_PATH)/app_error.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/app_gpiote.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/app_scheduler.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/app_timer.c
+CSRC += $(TARGET_STDPERIPH_SRC_PATH)/app_uart.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/ble_advdata.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/ble_conn_params.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/ble_debug_assert_handler.c

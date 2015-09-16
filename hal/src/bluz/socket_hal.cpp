@@ -64,12 +64,12 @@ sock_result_t socket_accept(sock_handle_t sock)
 
 uint8_t socket_active_status(sock_handle_t socket)
 {
-    return 0;
+    return SocketManager::instance()->active_status(socket);
 }
 
 sock_result_t socket_close(sock_handle_t sock)
 {
-    return 0;
+    return SocketManager::instance()->close(sock);
 }
 
 sock_handle_t socket_create(uint8_t family, uint8_t type, uint8_t protocol, uint16_t port, network_interface_t nif)

@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include "socket.h"
+#include "socket_hal.h"
 
 class SocketManager : public DataService
 {
@@ -16,6 +17,7 @@ public:
     int32_t connect(uint32_t sd, const sockaddr_b *addr, long addrlen);
     int32_t send(uint32_t sockid, const void* buffer, uint32_t len);
     int32_t receive(uint32_t sockid, void* buffer, uint32_t len, unsigned long _timeout);
+    int32_t active_status(uint32_t sockid);
     int32_t close(uint32_t sockid);
     
     static const int32_t MAX_NUMBER_OF_SOCKETS = 2;

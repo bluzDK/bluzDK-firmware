@@ -18,7 +18,6 @@ int32_t SocketManager::create(uint8_t family, uint8_t type, uint8_t protocol, ui
     {
         if (!sockets[i].inUse)
         {
-            sockets[i].inUse = true;
             sockets[i].init(family, type, protocol, port, nif);
             return i;
         }
@@ -39,8 +38,19 @@ int32_t SocketManager::receive(uint32_t sd, void* buffer, uint32_t len, unsigned
 }
 int32_t SocketManager::close(uint32_t sockid)
 {
-    sockets[sockid].inUse = false;
-    return sockets[sockid].close();
+    sockets[sockid].close();
+    return 1;
+}
+int32_t SocketManager::active_status(uint32_t sockid)
+{
+    if (sockets[sockid].inUse)
+    {
+        return SOCKET_STATUS_ACTIVE;
+    }
+    else
+    {
+        return SOCKET_STATUS_INACTIVE;
+    }
 }
 
 

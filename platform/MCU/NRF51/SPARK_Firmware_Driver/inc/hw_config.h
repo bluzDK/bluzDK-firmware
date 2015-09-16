@@ -54,13 +54,6 @@
 #define SPIM1_MISO_PIN      22u     /**< SPI Master In Slave Out GPIO pin number. */
 #define SPIM1_SS_PIN        21u     /**< SPI Slave Select GPIO pin number. */
 
-//UART address
-#define RX_PIN_NUMBER  11
-#define TX_PIN_NUMBER  9
-#define CTS_PIN_NUMBER 10
-#define RTS_PIN_NUMBER 8
-#define HWFC           true
-
 //FLash addresses
 #define FLASH_FW_STATUS 0x0100
 #define FLASH_FW_LENGTH1 0x0101

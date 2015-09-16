@@ -1,6 +1,18 @@
 #include "nrf51_callbacks.h"
 #include "data_management_layer.h"
 
+void uart_error_handle(app_uart_evt_t * p_event)
+{
+    if (p_event->evt_type == APP_UART_COMMUNICATION_ERROR)
+    {
+        APP_ERROR_HANDLER(p_event->data.error_communication);
+    }
+    else if (p_event->evt_type == APP_UART_FIFO_ERROR)
+    {
+        APP_ERROR_HANDLER(p_event->data.error_code);
+    }
+}
+
 void button_event_handler(uint8_t pin_no, uint8_t button_action)
 {
     switch (pin_no)

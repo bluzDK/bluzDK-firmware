@@ -6,6 +6,7 @@ Socket::Socket() { id=-1;inUse=false; bufferLength=bufferStart=0; }
 
 int32_t Socket::init(uint8_t family, uint8_t type, uint8_t protocol, uint16_t port, uint32_t nif)
 {
+    this->inUse = true;
     this->family = family;
     this->type = type;
     this->protocol = protocol;
@@ -64,7 +65,8 @@ int32_t Socket::receive(void* data, uint32_t len, unsigned long _timeout)
 }
 int32_t Socket::close()
 {
-    return -1;
+    inUse = false;
+    return 1;
 }
 
 int32_t Socket::feed(void* data, uint32_t len)
