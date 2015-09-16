@@ -53,11 +53,9 @@ void HAL_Network_Init(void)
 
 void HAL_Events_Manage(void)
 {
-    power_manage();
-    app_sched_execute();
 }
 
-bool HAL_Try_Cloud_Connection(void)
+bool HAL_Network_Connection(void)
 {
     return state == BLE_CONNECTED;
 }
@@ -104,6 +102,8 @@ void HAL_Core_Execute_Stop_Mode(void)
 
 void HAL_Core_Enter_Standby_Mode(void)
 {
+    power_manage();
+    app_sched_execute();
 }
 
 void HAL_Core_Execute_Standby_Mode(void)

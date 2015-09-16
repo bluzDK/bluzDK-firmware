@@ -1,12 +1,13 @@
 #include "socket.h"
 #include "data_management_layer.h"
+#include "debug.h"
 #include <cstring>
 
 Socket::Socket() { id=-1;inUse=false; bufferLength=bufferStart=0; }
 
 int32_t Socket::init(uint8_t family, uint8_t type, uint8_t protocol, uint16_t port, uint32_t nif)
 {
-    this->inUse = true;
+    inUse = true;
     this->family = family;
     this->type = type;
     this->protocol = protocol;
@@ -39,6 +40,7 @@ int32_t Socket::connect(uint32_t sockid, const sockaddr_b *addr, long addrlen)
 }
 int32_t Socket::send(const void* data, uint32_t len)
 {
+    DEBUG("Sending data of size %d!", len);
     uint8_t dataPlusID[len+2];
     dataPlusID[0] = (id & 0xFF00) >> 8;
     dataPlusID[1] = id & 0xFF;
@@ -49,6 +51,7 @@ int32_t Socket::send(const void* data, uint32_t len)
 }
 int32_t Socket::receive(void* data, uint32_t len, unsigned long _timeout)
 {
+    DEBUG("Requesting data of size %d!", len);
     memcpy(data, buffer+bufferStart, len);
     bufferStart += len;
     bufferLength -= len;
@@ -78,5 +81,6 @@ int32_t Socket::feed(void* data, uint32_t len)
     
     memcpy(buffer+bufferStart, data, len);
     bufferLength+=len;
+    DEBUG("Copied data to socket buffer!");
     return 0;
 }

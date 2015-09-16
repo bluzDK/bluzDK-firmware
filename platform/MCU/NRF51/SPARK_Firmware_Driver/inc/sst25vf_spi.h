@@ -51,6 +51,7 @@
 #define sFLASH_DUMMY_BYTE         		0xFF
 #define sFLASH_PAGESIZE					0x1000		/* 4096 bytes */
 
+#define sFLASH_SST25VF020_ID			0xBF258C	/* JEDEC Read-ID Data */
 #define sFLASH_SST25VF040_ID			0xBF258D	/* JEDEC Read-ID Data */
 #define sFLASH_SST25VF016_ID			0xBF2541	/* JEDEC Read-ID Data */
 #define TX_RX_MSG_LENGTH				1			/*Only transmitting one byte at a time for now*/

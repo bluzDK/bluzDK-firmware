@@ -88,7 +88,7 @@ void sFLASH_Init(void)
 	/* Read FLASH identification */
 	Device_ID = sFLASH_ReadID();
 
-	if(Device_ID == sFLASH_SST25VF040_ID || Device_ID == sFLASH_SST25VF016_ID)
+	if(Device_ID == sFLASH_SST25VF040_ID || Device_ID == sFLASH_SST25VF016_ID || Device_ID == sFLASH_SST25VF020_ID)
 	{
 		/* Select the FLASH: Chip Select low */
 		sFLASH_CS_LOW();
@@ -396,18 +396,12 @@ static uint8_t sFLASH_SendByte(uint8_t byte)
 	rx_data[0] = 0x0;
 
 	spi_transmission_completed = false;
-	uint32_t err_code = spi_master_send_recv(SPI_MASTER_1,(const uint8_t *)tx_data, 1, rx_data, 1);
+	uint32_t err_code = spi_master_send_recv(SPI_MASTER_1,(uint8_t *)tx_data, 1, rx_data, 1);
 	if (err_code == NRF_SUCCESS)
 	{
 		while(spi_transmission_completed == false) { }
 	}
-	else {
-		simple_uart_putstring("Error from spi_master_send_rcv: ");
-		char str4[80];
-		sprintf(str4, "%d", err_code);
-		simple_uart_putstring(str4);
-		simple_uart_putstring("\n");
-	}
+	else { }
 	return rx_data[0];
 }
 
@@ -471,7 +465,7 @@ static void sFLASH_WriteDisable(void)
   * @param  None
   * @retval None
   */
-static void sFLASH_WaitForWriteEnd(void)
+void sFLASH_WaitForWriteEnd(void)
 {
   uint8_t flashstatus = 0;
 
@@ -506,26 +500,15 @@ int sFLASH_SelfTest(void)
   int TestStatus = -1;
 
   /* Get SPI Flash ID */
-  int status = sFLASH_ReadStatus();
-  simple_uart_putstring("Read Status: ");
-  char str4[80];
-  sprintf(str4, "%d", status);
-  simple_uart_putstring(str4);
-  simple_uart_putstring("\n");
+  sFLASH_ReadStatus();
 
   /* Get SPI Flash ID */
   FlashID = sFLASH_ReadID();
   FlashID = sFLASH_ReadID();
-  simple_uart_putstring("Read Device ID: ");
-  char str3[80];
-  sprintf(str3, "%d", FlashID);
-  simple_uart_putstring(str3);
-  simple_uart_putstring("\n");
-
+    
   /* Check the SPI Flash ID */
-  if(FlashID == sFLASH_SST25VF040_ID || FlashID == sFLASH_SST25VF016_ID)
+  if(FlashID == sFLASH_SST25VF040_ID || FlashID == sFLASH_SST25VF016_ID || FlashID == sFLASH_SST25VF020_ID)
   {
-	simple_uart_putstring("Got the right ID \n");
     /* Perform a write in the Flash followed by a read of the written data */
     /* Erase SPI FLASH Sector to write on */
     sFLASH_EraseSector(FLASH_TestAddress);
@@ -543,33 +526,21 @@ int sFLASH_SelfTest(void)
       {
         //FAILED : Transmitted and Received data by SPI are different
     	TestStatus = -1;
-    	simple_uart_putstring("Tx: ");
-    	char str1[80];
-	    sprintf(str1, "%d", Tx_Buffer[Index]);
-	    simple_uart_putstring(str1);
-    	simple_uart_putstring(" and Rx: ");
-    	char str2[80];
-    	sprintf(str2, "%d", Rx_Buffer[Index]);
-    	simple_uart_putstring(str2);
-    	simple_uart_putstring(" are different \n");
     	return TestStatus;
       }
       else
       {
         //PASSED : Transmitted and Received data by SPI are same
     	TestStatus = 0;
-    	simple_uart_putstring("Tx and Rx data are the same! \n");
       }
     }
 
     /* Perform an erase in the Flash followed by a read of the written data */
     /* Erase SPI FLASH Sector to write on */
     sFLASH_EraseSector(FLASH_TestAddress);
-    simple_uart_putstring("Erased Sector \n");
 
     /* Read data from SPI FLASH memory */
     sFLASH_ReadBuffer(Rx_Buffer, FLASH_TestAddress, BufferSize);
-    simple_uart_putstring("Read buffer \n");
 
     /* Check the correctness of erasing operation data */
     for (Index = 0; Index < BufferSize; Index++)
@@ -578,18 +549,15 @@ int sFLASH_SelfTest(void)
       {
         //FAILED : Specified sector part is not well erased
     	TestStatus = -1;
-    	simple_uart_putstring("Sector didn't erase \n");
       }
       else
       {
         //PASSED : Specified sector part is erased
     	TestStatus = 0;
-    	simple_uart_putstring("Sector is erased! \n");
       }
     }
   }
 
-  simple_uart_putstring("Returning \n");
   return TestStatus;
 }
 
@@ -601,10 +569,8 @@ int sFLASH_TestReadWrite(void)
   uint32_t BufferSize = (sizeof(Tx_Buffer) / sizeof(*(Tx_Buffer))) - 1;
   uint8_t Rx_Buffer[BufferSize];
   uint8_t Index = 0;
-  uint32_t FlashID = 0;
   int TestStatus = -1;
 
-  simple_uart_putstring("Got the right ID \n");
   /* Perform a write in the Flash followed by a read of the written data */
   /* Erase SPI FLASH Sector to write on */
   sFLASH_EraseSector(FLASH_TestAddress);
@@ -622,22 +588,12 @@ int sFLASH_TestReadWrite(void)
     {
 	  //FAILED : Transmitted and Received data by SPI are different
 	  TestStatus = -1;
-	  simple_uart_putstring("Tx: ");
-	  char str1[80];
-	  sprintf(str1, "%d", Tx_Buffer[Index]);
-	  simple_uart_putstring(str1);
-	  simple_uart_putstring(" and Rx: ");
-	  char str2[80];
-	  sprintf(str2, "%d", Rx_Buffer[Index]);
-	  simple_uart_putstring(str2);
-	  simple_uart_putstring(" are different \n");
 	  return TestStatus;
     }
     else
     {
 	  //PASSED : Transmitted and Received data by SPI are same
 	  TestStatus = 0;
-	  simple_uart_putstring("Tx and Rx data are the same! \n");
     }
   }
   return TestStatus;
@@ -651,7 +607,6 @@ int sFLASH_WriteSingleByte(uint32_t FLASH_Address, uint8_t byteToSend)
 
 uint8_t sFLASH_ReadSingleByte(uint32_t FLASH_Address)
 {
-	uint8_t byteToSend = 0x55;
 	int BufferSize = 1;
 	uint8_t Rx_Buffer[BufferSize];
 

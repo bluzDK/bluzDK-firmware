@@ -52,6 +52,7 @@
 /* Private variables ---------------------------------------------------------*/
 static volatile uint32_t TimingLED;
 static volatile uint32_t TimingIWDGReload;
+static bool CLOUD_CONNECTED = false;
 
 /* Extern variables ----------------------------------------------------------*/
 
@@ -68,6 +69,11 @@ static volatile uint32_t TimingIWDGReload;
  *******************************************************************************/
 void app_setup_and_loop_passive(void)
 {
+    //Set some Particle flags to bypass functionality we don't need
+    WLAN_SMART_CONFIG_START = 0;
+    WLAN_SMART_CONFIG_STOP = 1;
+    
+    
     //setup all peripherals
     HAL_Core_Init();
     
@@ -93,16 +99,33 @@ void app_setup_and_loop_passive(void)
         //Execute user application loop
         DECLARE_SYS_HEALTH(ENTERED_Loop);
         if (system_mode()!=SAFE_MODE) {
+            DEBUG("Entering User Loop");
             loop();
             DECLARE_SYS_HEALTH(RAN_Loop);
+            DEBUG("Exited User Loop");
         }
         
-        //manage connection. this will manage network connection states which are event driven, as well as any interrupts from BLE stack or peripherals
-        HAL_Events_Manage();
-        
         //we may not be connected. if not, don't try to manage anything cloud related
-        if (HAL_Try_Cloud_Connection()){
-            Spark_Idle();
+        if (HAL_Network_Connection()){
+            if (CLOUD_CONNECTED) {
+                DEBUG("Calling Spark Comm Loop");
+                if (!Spark_Communication_Loop()) {
+                    ERROR("Error when calling Spark Communication Loop");
+                }
+            } else {
+                DEBUG("Calling Spark Connect");
+                int err_code = Spark_Connect();
+                if (err_code) {
+                    ERROR("Error when calling Spark Connect");
+                }
+                
+                DEBUG("Calling Spark Handshake");
+                err_code = Spark_Handshake();
+                if (err_code) {
+                    ERROR("Error when calling Spark Handshake");
+                }
+                CLOUD_CONNECTED = true;
+            }
         }
     }
 }

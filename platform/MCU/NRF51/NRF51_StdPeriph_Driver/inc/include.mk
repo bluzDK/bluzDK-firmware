@@ -15,6 +15,7 @@ INCLUDE_DIRS += $(TARGET_STDPERIPH_PATH)/inc/ble/ble_debug_assert_handler
 INCLUDE_DIRS += $(TARGET_STDPERIPH_PATH)/inc/libraries/timer
 INCLUDE_DIRS += $(TARGET_STDPERIPH_PATH)/inc/libraries/scheduler
 INCLUDE_DIRS += $(TARGET_STDPERIPH_PATH)/inc/libraries/gpiote
+INCLUDE_DIRS += $(TARGET_STDPERIPH_PATH)/inc/libraries/fifo
 INCLUDE_DIRS += $(TARGET_STDPERIPH_PATH)/inc/libraries/button
 INCLUDE_DIRS += $(TARGET_STDPERIPH_PATH)/inc/libraries/util
 INCLUDE_DIRS += $(TARGET_STDPERIPH_PATH)/inc/softdevice/s110/headers

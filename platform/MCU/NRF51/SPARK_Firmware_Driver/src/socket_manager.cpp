@@ -1,6 +1,7 @@
 
 #include "socket_manager.h"
 #include "registered_data_services.h"
+#include "debug.h"
 
 SocketManager* SocketManager::m_pInstance = NULL;
 
@@ -14,10 +15,12 @@ SocketManager* SocketManager::instance()
 
 int32_t SocketManager::create(uint8_t family, uint8_t type, uint8_t protocol, uint16_t port, uint32_t nif)
 {
+    DEBUG("Creating Socket");
     for (int i = 0; i < MAX_NUMBER_OF_SOCKETS; i++)
     {
         if (!sockets[i].inUse)
         {
+            DEBUG("Creating Socket with id %d", i);
             sockets[i].init(family, type, protocol, port, nif);
             return i;
         }
@@ -62,9 +65,11 @@ int32_t SocketManager::getServiceID()
 int32_t SocketManager::DataCallback(uint8_t *data, int16_t length)
 {
     uint16_t socketID = (data[0] << 8) | data[1];
+    DEBUG("Feeding data into proper socket of ID %d", socketID);
     if (sockets[socketID].inUse)
     {
-        sockets[socketID].feed(data, length-2);
+        DEBUG("Found socket, sending data");
+        sockets[socketID].feed(data+2, length-2);
     }
     return -1;
 }

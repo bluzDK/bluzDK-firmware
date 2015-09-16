@@ -353,7 +353,7 @@ int Spark_Handshake(void)
 // Returns true if all's well or
 //         false on error, meaning we're probably disconnected
 
-inline bool Spark_Communication_Loop(void)
+bool Spark_Communication_Loop(void)
 {
     return spark_protocol_event_loop(sp);
 }
@@ -469,6 +469,7 @@ int Spark_Connect(void)
     tSocketAddr.sa_data[0] = (SPARK_SERVER_PORT & 0xFF00) >> 8;
     tSocketAddr.sa_data[1] = (SPARK_SERVER_PORT & 0x00FF);
 
+    DEBUG("reading server address");
     ServerAddress server_addr;
     HAL_FLASH_Read_ServerAddress(&server_addr);
 
@@ -476,6 +477,7 @@ int Spark_Connect(void)
     IPAddress ip_addr;
     int rv = -1;
 
+    DEBUG("switching to address type");
     switch (server_addr.addr_type)
     {
         case IP_ADDRESS:
@@ -492,6 +494,7 @@ int Spark_Connect(void)
         }
 
         case DOMAIN_NAME:
+            DEBUG("address type was DOMAIN");
             int attempts = 3;
             while (!ip_addr && 0 < --attempts)
             {

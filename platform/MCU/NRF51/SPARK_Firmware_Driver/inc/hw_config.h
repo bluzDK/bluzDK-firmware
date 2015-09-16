@@ -110,7 +110,7 @@ uint32_t OTA_FlashAddress(void);
 uint32_t OTA_FlashLength(void);
 void FLASH_Begin(uint32_t sFLASH_Address, uint32_t fileSize);
 uint32_t FLASH_PagesMask(uint32_t fileSize);
-uint16_t FLASH_Update(uint8_t *pBuffer, uint32_t bufferSize);
+uint16_t FLASH_Update(const uint8_t *pBuffer, uint32_t address, uint32_t bufferSize);
 void FLASH_End(void);
 
 /* Exported functions ------------------------------------------------------- */

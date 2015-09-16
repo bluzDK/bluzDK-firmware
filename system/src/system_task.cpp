@@ -304,20 +304,28 @@ void manage_cloud_connection(bool force_events)
 
 void Spark_Idle_Events(bool force_events/*=false*/)
 {
+    DEBUG("Notify WD");
     HAL_Notify_WDT();
 
+    DEBUG("ON_EVENT_DELTA");
     ON_EVENT_DELTA();
     spark_loop_total_millis = 0;
 
+    DEBUG("Manage Serial Flasher");
     manage_serial_flasher();
 
+    DEBUG("Manage Network Connections");
     manage_network_connection();
 
+    DEBUG("Manage Smart Config");
     manage_smart_config();
 
+    DEBUG("Manage IP Config");
     manage_ip_config();
 
+    DEBUG("Manage Cloud COnnections");
     CLOUD_FN(manage_cloud_connection(force_events), (void)0);
+    DEBUG("Spark Idle Fin!");
 }
 
 

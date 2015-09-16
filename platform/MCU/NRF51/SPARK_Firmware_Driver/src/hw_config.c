@@ -8,7 +8,7 @@
 uint32_t NbrOfPage = 0;
 uint16_t Flash_Update_Index = 0;
 uint32_t External_Flash_Address = 0;
-static uint32_t External_Flash_Start_Address = 0;
+uint32_t External_Flash_Start_Address = 0;
 
 void blinkLED(int times)
 {
@@ -130,16 +130,16 @@ uint32_t FLASH_PagesMask(uint32_t fileSize)
     return numPages;
 }
 
-uint16_t FLASH_Update(uint8_t *pBuffer, uint32_t bufferSize)
+uint16_t FLASH_Update(const uint8_t *pBuffer, uint32_t address, uint32_t bufferSize)
 {
-    uint8_t *writeBuffer = pBuffer;
+    const uint8_t *writeBuffer = pBuffer;
     uint8_t readBuffer[bufferSize];
 
     /* Write Data Buffer to SPI Flash memory */
-    sFLASH_WriteBuffer(writeBuffer, External_Flash_Address, bufferSize);
+    sFLASH_WriteBuffer(writeBuffer, address, bufferSize);
 
     /* Read Data Buffer from SPI Flash memory */
-    sFLASH_ReadBuffer(readBuffer, External_Flash_Address, bufferSize);
+    sFLASH_ReadBuffer(readBuffer, address, bufferSize);
 
     /* Is the Data Buffer successfully programmed to SPI Flash memory */
     if (0 == memcmp(writeBuffer, readBuffer, bufferSize))
