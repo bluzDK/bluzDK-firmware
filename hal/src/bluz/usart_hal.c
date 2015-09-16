@@ -35,6 +35,7 @@
 #include "app_uart.h"
 #include "nrf51_callbacks.h"
 #include "pinmap_impl.h"
+#include "simple_uart.h"
 
 void HAL_USART_Init(HAL_USART_Serial serial, Ring_Buffer *rx_buffer, Ring_Buffer *tx_buffer)
 {
@@ -77,24 +78,24 @@ void HAL_USART_Begin(HAL_USART_Serial serial, uint32_t baud)
     
     int err_code;
     const app_uart_comm_params_t comm_params =
-          {
-              PIN_MAP[RX].gpio_pin,
-              PIN_MAP[TX].gpio_pin,
-              11, /*random unused pin*/
-              20, /*random unused pin*/
-              APP_UART_FLOW_CONTROL_DISABLED,
-              false,
-              nrfBaudRate
-          };
+      {
+          PIN_MAP[RX].gpio_pin,
+          PIN_MAP[TX].gpio_pin,
+          11, /*random unused pin*/
+          20, /*random unused pin*/
+          APP_UART_FLOW_CONTROL_DISABLED,
+          false,
+          nrfBaudRate
+      };
 
-        APP_UART_FIFO_INIT(&comm_params,
-                             256,
-                             256,
-                             uart_error_handle,
-                             APP_IRQ_PRIORITY_LOW,
-                             err_code);
+    APP_UART_FIFO_INIT(&comm_params,
+                         256,
+                         256,
+                         uart_error_handle,
+                         APP_IRQ_PRIORITY_LOW,
+                         err_code);
 
-        APP_ERROR_CHECK(err_code);
+    APP_ERROR_CHECK(err_code);
 }
 
 void HAL_USART_End(HAL_USART_Serial serial)
@@ -131,7 +132,7 @@ void HAL_USART_Flush_Data(HAL_USART_Serial serial)
 
 bool HAL_USART_Is_Enabled(HAL_USART_Serial serial)
 {
-    return false;
+    return true;
 }
 
 void HAL_USART_Half_Duplex(HAL_USART_Serial serial, bool Enable)
