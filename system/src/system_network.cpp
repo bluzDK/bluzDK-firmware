@@ -71,6 +71,7 @@ int wifi_add_profile_callback(const char *ssid, const char *password,
  *******************************************************************************/
 void Start_Smart_Config(void)
 {
+    bool started = SPARK_WLAN_STARTED;
     WLAN_SMART_CONFIG_FINISHED = 0;
     WLAN_SMART_CONFIG_STOP = 0;
     WLAN_SERIAL_CONFIG_DONE = 0;
@@ -158,7 +159,7 @@ void Start_Smart_Config(void)
     if (signaling)
         LED_Signaling_Start();
 
-    WLAN_LISTEN_ON_FAILED_CONNECT = wlan_smart_config_finalize();
+    WLAN_LISTEN_ON_FAILED_CONNECT = started && wlan_smart_config_finalize();
 
     if (WLAN_SMART_CONFIG_FINISHED)
     {
@@ -169,7 +170,10 @@ void Start_Smart_Config(void)
     system_notify_event(wifi_listen_end, millis()-start);
 
     WLAN_SMART_CONFIG_START = 0;
-    network_connect(0, 0, 0, NULL);
+    if (started)
+        network_connect(0, 0, 0, NULL);
+    else
+        network_off(0, 0, 0, NULL);
 }
 
 
@@ -192,7 +196,7 @@ void HAL_WLAN_notify_connected()
 
 void HAL_WLAN_notify_disconnected()
 {
-    cloud_disconnect();
+    cloud_disconnect(false);    // don't close the socket on the callback since this causes a lockup on the Core
     if (WLAN_CONNECTED)     /// unsolicited disconnect
     {
       //Breathe blue if established connection gets disconnected
@@ -202,7 +206,7 @@ void HAL_WLAN_notify_disconnected()
         ARM_WLAN_WD(DISCONNECT_TO_RECONNECT);
       }
       SPARK_LED_FADE = 1;
-          LED_SetRGBColor(RGB_COLOR_BLUE);
+      LED_SetRGBColor(RGB_COLOR_BLUE);
       LED_On(LED_RGB);
     }
     else if (!WLAN_SMART_CONFIG_START)
@@ -298,6 +302,7 @@ void network_connect(network_handle_t network, uint32_t flags, uint32_t param, v
             WLAN_CONNECTING = 1;
             LED_SetRGBColor(RGB_COLOR_GREEN);
             LED_On(LED_RGB);
+            ARM_WLAN_WD(CONNECT_TO_ADDRESS_MAX);    // reset the network if it doesn't connect within the timeout
             wlan_connect_finalize();
         }
 
