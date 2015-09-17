@@ -151,20 +151,9 @@ void sys_evt_dispatch(uint32_t sys_evt)
 void data_write_handler(scs_t * p_lbs, uint8_t *data, uint16_t length)
 {
     DEBUG("Received Data from Gateway!");
-    //TO DO: This needs to feed data into Spark Utilities library
-    uint16_t serviceID = (data[0] << 8) | data[1];
-    dataManagementFeedData(serviceID, length-2, data+2);
 
-    
-    //    BLESocketFeedData(data, length);
-//    if (length == 40) {
-//        if (!handShook) {
-//            doHandshake = true;
-//        }
-//    } else {
-//        simple_uart_putstring("checking if we should run the loop  \n");
-//        if (cloudConnected && !Spark_Communication_Loop()) {
-//            simple_uart_putstring("Caught an error when looping  \n");
-//        }
-//    }
+//    uint16_t serviceID = (data[0] << 8) | data[1];
+//    dataManagementFeedData(serviceID, length-2, data+2);
+    uint16_t serviceID = 0x01;
+    dataManagementFeedData(serviceID, length, data);
 }

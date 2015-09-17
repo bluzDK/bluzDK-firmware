@@ -2,6 +2,7 @@
 #include "data_management_layer.h"
 #include "debug.h"
 #include <cstring>
+#include <stdio.h>
 
 Socket::Socket() { id=-1;inUse=false; bufferLength=bufferStart=0; }
 
@@ -55,22 +56,19 @@ int32_t Socket::send(const void* data, uint32_t len)
 }
 int32_t Socket::receive(void* data, uint32_t len, unsigned long _timeout)
 {
-    DEBUG("Requesting data of size %d", len);
-    
     int bytesToCopy = len;
     if (len > bufferLength) {
         //they are asking for too much data
         bytesToCopy = bufferLength;
     }
     
-    memcpy(data, buffer+bytesToCopy, bytesToCopy);
+    memcpy(data, buffer+bufferStart, bytesToCopy);
     bufferStart += bytesToCopy;
     bufferLength -= bytesToCopy;
     
     if (bufferLength == 0) {
         bufferStart = 0;
     }
-    DEBUG("Copied over this many bytes %d", bytesToCopy);
     return bytesToCopy;
 }
 int32_t Socket::close()
@@ -79,7 +77,7 @@ int32_t Socket::close()
     return 1;
 }
 
-int32_t Socket::feed(void* data, uint32_t len)
+int32_t Socket::feed(uint8_t* data, uint32_t len)
 {
     if (bufferLength+len > SOCKET_BUFFER_SIZE) {
         //can't put all this data in.
@@ -89,5 +87,12 @@ int32_t Socket::feed(void* data, uint32_t len)
     memcpy(buffer+bufferStart, data, len);
     bufferLength+=len;
     DEBUG("Copied data to socket buffer of size %d", len);
+    
+    char str[len];
+    for (uint32_t i = 0; i < len; i++) {
+        sprintf(str+i, "%02X", buffer[i+bufferStart]);
+    }
+    DEBUG("Data equal: %s", str);
+    
     return 0;
 }

@@ -39,19 +39,15 @@ unsigned HAL_device_ID(uint8_t* dest, unsigned destLen)
         return 12;
     }
     
-    DEBUG("about to try...");
     dest[0] = 0xb1;
     dest[1] = 0xe2;
     
     //now, we have a 16-bit integer stored in 0x3F000, so let's read that
     char buf[2];
-    DEBUG("memcpy...");
     memcpy(buf, (const void *)0x3F000, 2);
-    DEBUG("memcpy done...");
     dest[2] = buf[1];
     dest[3] = buf[0];
     
-    DEBUG("copying registers...");
     //finally, add the nrf51 device ID's as the last 8 bytes, in order: DEVICEID[1] DEVICEID[0]
     dest[4] = (NRF_FICR->DEVICEID[1] & 0xFF);
     dest[5] = (NRF_FICR->DEVICEID[1] & 0xFF00) >> 8;
@@ -62,8 +58,7 @@ unsigned HAL_device_ID(uint8_t* dest, unsigned destLen)
     dest[9] = (NRF_FICR->DEVICEID[0] & 0xFF00) >> 8;
     dest[10] = (NRF_FICR->DEVICEID[0] & 0xFF0000) >> 16;
     dest[11] = (NRF_FICR->DEVICEID[0] & 0xFF000000) >> 24;
-    DEBUG("copying registers done...");
-            
+        
     return 12;
 }
 

@@ -23,7 +23,7 @@ public:
     int32_t receive(void* buffer, uint32_t len, unsigned long _timeout);
     int32_t close();
     
-    int32_t feed(void* buffer, uint32_t len);
+    int32_t feed(uint8_t* buffer, uint32_t len);
     
     static const int32_t SOCKET_BUFFER_SIZE = 1024;
     bool inUse;

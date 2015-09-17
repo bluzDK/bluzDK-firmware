@@ -114,6 +114,7 @@ void app_setup_and_loop_passive(void)
                     ERROR("Error when calling Spark Communication Loop");
                 }
             } else {
+                HAL_Delay_Milliseconds(2000);
                 DEBUG("Calling Spark Connect");
                 int err_code = Spark_Connect();
                 if (err_code) {
