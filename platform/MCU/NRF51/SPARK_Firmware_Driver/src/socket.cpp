@@ -4,7 +4,7 @@
 #include <cstring>
 #include <stdio.h>
 
-Socket::Socket() { id=-1;inUse=false; bufferLength=bufferStart=0; }
+Socket::Socket() { id=-1;inUse=false; bufferLength=0;bufferStart=0; }
 
 int32_t Socket::init(uint8_t family, uint8_t type, uint8_t protocol, uint16_t port, uint32_t nif)
 {
@@ -63,6 +63,19 @@ int32_t Socket::receive(void* data, uint32_t len, unsigned long _timeout)
     }
     
     memcpy(data, buffer+bufferStart, bytesToCopy);
+    
+    if (bytesToCopy > 0) {
+        DEBUG("Copied data in receive of size %d!", bytesToCopy);
+        int strLength=0;
+        char str[len*2];
+        uint8_t* ptr = (uint8_t*)data;
+        for (int i = 0; i < bytesToCopy; i++) {
+            sprintf(str+strLength, "%02X", ptr[i]);
+            strLength+=2;
+        }
+        DEBUG("Data equal: %s", str);
+    }
+    
     bufferStart += bytesToCopy;
     bufferLength -= bytesToCopy;
     
@@ -87,12 +100,6 @@ int32_t Socket::feed(uint8_t* data, uint32_t len)
     memcpy(buffer+bufferStart, data, len);
     bufferLength+=len;
     DEBUG("Copied data to socket buffer of size %d", len);
-    
-    char str[len];
-    for (uint32_t i = 0; i < len; i++) {
-        sprintf(str+i, "%02X", buffer[i+bufferStart]);
-    }
-    DEBUG("Data equal: %s", str);
     
     return 0;
 }

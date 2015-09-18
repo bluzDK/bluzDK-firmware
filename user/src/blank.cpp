@@ -52,14 +52,12 @@ void loop() {
 //    }
     
     //Snake
-//    while (1) {
-//        for (int i = 0; i < 18; i++) {
-//            digitalWrite(leds[i], HIGH);
-//            if (i > 0) {
-//                digitalWrite(leds[i-1], LOW);
-//            }
-//            HAL_Delay_Milliseconds(100);
+//    for (int i = 0; i < 18; i++) {
+//        digitalWrite(leds[i], HIGH);
+//        if (i > 0) {
+//            digitalWrite(leds[i-1], LOW);
 //        }
-//        digitalWrite(leds[17], LOW);
+//        HAL_Delay_Milliseconds(100);
 //    }
+//    digitalWrite(leds[17], LOW);
 }
