@@ -47,6 +47,11 @@ uint32_t HAL_OTA_FlashLength()
 
 uint16_t HAL_OTA_ChunkSize()
 {
+    return 1024;
+}
+
+uint16_t HAL_OTA_SessionTimeout()
+{
     return 0;
 }
 

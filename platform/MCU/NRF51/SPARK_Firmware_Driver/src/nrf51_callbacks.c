@@ -1,6 +1,5 @@
 #include "nrf51_callbacks.h"
 #include "data_management_layer.h"
-#include "debug.h"
 
 void uart_error_handle(app_uart_evt_t * p_event)
 {
@@ -41,7 +40,6 @@ void millis_timer_timeout(void * p_context)
  */
 void on_ble_evt(ble_evt_t * p_ble_evt)
 {
-    DEBUG("Received BLE Event!");
     uint32_t                         err_code;
     static ble_gap_evt_auth_status_t m_auth_status;
     ble_gap_enc_info_t *             p_enc_info;
@@ -150,7 +148,6 @@ void sys_evt_dispatch(uint32_t sys_evt)
 
 void data_write_handler(scs_t * p_lbs, uint8_t *data, uint16_t length)
 {
-    DEBUG("Received Data from Gateway!");
 
 //    uint16_t serviceID = (data[0] << 8) | data[1];
 //    dataManagementFeedData(serviceID, length-2, data+2);

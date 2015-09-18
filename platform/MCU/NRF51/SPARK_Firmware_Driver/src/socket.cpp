@@ -41,7 +41,7 @@ int32_t Socket::connect(uint32_t sockid, const sockaddr_b *addr, long addrlen)
 }
 int32_t Socket::send(const void* data, uint32_t len)
 {
-    DEBUG("Sending data of size %d!", len);
+    DEBUG("Sending on socket %d data of size %d!", id, len);
 //    uint8_t dataPlusID[len+2];
 //    dataPlusID[0] = (id & 0xFF00) >> 8;
 //    dataPlusID[1] = id & 0xFF;
@@ -64,24 +64,18 @@ int32_t Socket::receive(void* data, uint32_t len, unsigned long _timeout)
     
     memcpy(data, buffer+bufferStart, bytesToCopy);
     
-    if (bytesToCopy > 0) {
-        DEBUG("Copied data in receive of size %d!", bytesToCopy);
-        int strLength=0;
-        char str[len*2];
-        uint8_t* ptr = (uint8_t*)data;
-        for (int i = 0; i < bytesToCopy; i++) {
-            sprintf(str+strLength, "%02X", ptr[i]);
-            strLength+=2;
-        }
-        DEBUG("Data equal: %s", str);
-    }
-    
     bufferStart += bytesToCopy;
     bufferLength -= bytesToCopy;
     
     if (bufferLength == 0) {
         bufferStart = 0;
     }
+    
+    
+    if (bytesToCopy > 0) {
+        DEBUG("Socket data was received from id %d, read %d bytes. Leaving us %d bytes left", id, bytesToCopy, bufferLength);
+    }
+    
     return bytesToCopy;
 }
 int32_t Socket::close()
@@ -99,7 +93,7 @@ int32_t Socket::feed(uint8_t* data, uint32_t len)
     
     memcpy(buffer+bufferStart, data, len);
     bufferLength+=len;
-    DEBUG("Copied data to socket buffer of size %d", len);
+    DEBUG("Fed %d bytes to socket id %d, leaving it with %d bytes", len, id, bufferLength);
     
     return 0;
 }

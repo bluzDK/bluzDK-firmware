@@ -85,11 +85,6 @@ void app_setup_and_loop_passive(void)
     //setup BLE stack
     HAL_Network_Init();
     
-#ifndef SPARK_NO_CLOUD
-    //Initialize spark protocol callbacks for all System modes
-    Spark_Protocol_Init();
-#endif
-
     //call user setup function, device may or may not be connected
     setup();
     
@@ -121,11 +116,13 @@ void app_setup_and_loop_passive(void)
                     ERROR("Error when calling Spark Connect");
                 }
                 HAL_Delay_Milliseconds(2000);
+                Spark_Protocol_Init();
                 DEBUG("Calling Spark Handshake");
                 err_code = Spark_Handshake();
                 if (err_code) {
                     ERROR("Error when calling Spark Handshake");
                 }
+                DEBUG("Handshake Complete");
                 CLOUD_CONNECTED = true;
             }
         }

@@ -350,13 +350,20 @@ int Spark_Handshake(void)
 
         ultoa(HAL_OTA_ChunkSize(), buf, 10);
         Particle.publish("spark/hardware/ota_chunk_size", buf, 60, PRIVATE);
+        
+#ifdef BLUZ
+        ultoa(HAL_OTA_SessionTimeout(), buf, 10);
+        Particle.publish("spark/device/session/timeout", buf, 60, PRIVATE);
+#endif
 
         if (!HAL_core_subsystem_version(buf, sizeof (buf)))
         {
             Particle.publish("spark/" SPARK_SUBSYSTEM_EVENT_NAME, buf, 60, PRIVATE);
         }
 
+#ifndef BLUZ
         Multicast_Presence_Announcement();
+#endif
         spark_protocol_send_subscriptions(sp);
         // important this comes at the end since it requires a response from the cloud.
         spark_protocol_send_time_request(sp);

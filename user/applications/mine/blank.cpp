@@ -22,33 +22,13 @@
 uint8_t leds[18] = {D0, D1, D2, D3, D4, D5, D6, D7, A0, A1, A2, A3, A4, A5, A6, A7, RX, TX};
 Serial1DebugOutput debugOutput;          // default is 9600 and log everything
 
-int answer = 42;
-bool sentOnce = false;
-int blinkLED(String command)
-{
-    for (int i = 0; i < 3; i++) {
-        digitalWrite(D7, HIGH);
-        HAL_Delay_Milliseconds(500);
-        digitalWrite(D7, LOW);
-        HAL_Delay_Milliseconds(500);
-    }
-    if (!sentOnce) {
-        Spark.publish("SendIntroTweet", "Not Done");
-        sentOnce = true;
-    }
-    return 1;
-}
-
 /* executes once at startup */
 void setup() {
+//    Serial1.begin(9600);
     DEBUG("hello world");
-    pinMode(D7, OUTPUT);
-
-    Spark.variable("answer", &answer, INT);
-    Spark.function("blink", blinkLED);
+//    pinMode(D7, OUTPUT);
+//    Serial1.begin(9600);
     
-    
-    //For Snake
 //    for (int i = 0; i < 18; i++) {
 //        pinMode(leds[i], OUTPUT);
 //    }
@@ -56,8 +36,21 @@ void setup() {
 
 /* executes continuously after setup() runs */
 void loop() {
+//    Serial1.println("hello baby");
+//    Serial1.println("hello baby");
+//    HAL_Delay_Milliseconds(1000);
     
-//    System.sleep(SLEEP_MODE_DEEP);
+    System.sleep(SLEEP_MODE_DEEP);
+    
+//    char *str = "hello";
+//    while (1) {
+////        digitalWrite(D7, LOW);
+////        HAL_Delay_Milliseconds(500);
+////        digitalWrite(D7, HIGH);
+//        HAL_Delay_Milliseconds(500);
+//        Serial1.write(0x69);
+//    }
+    
     //Snake
 //    for (int i = 0; i < 18; i++) {
 //        digitalWrite(leds[i], HIGH);
