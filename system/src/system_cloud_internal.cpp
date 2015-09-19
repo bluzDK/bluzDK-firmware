@@ -152,6 +152,15 @@ void Spark_Process_Events()
         SPARK_CLOUD_CONNECTED = 0;
         SPARK_CLOUD_SOCKETED = 0;
     }
+    
+//#ifdef BLUZ
+//    //bluz, when using the proper config, doesn't have the luxury of running loops constantly, the device should go to sleep
+//    //we need to make sure the Spark events are all processed before continuing
+//    while (socket_bytes_available(sparkSocket) > 0) {
+//        Spark_Process_Events();
+//    }
+//#endif
+    
 }
 
 // Returns number of bytes sent or -1 if an error occurred

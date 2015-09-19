@@ -66,6 +66,8 @@
 //On-Board Flash Addresses
 #define CORE_FW_ADDRESS			        ((uint32_t)0x08005000)
 
+uint32_t system_millseconds;
+
 //BLE State Information
 typedef enum {
     BLE_ADVERTISING,
@@ -104,6 +106,7 @@ void app_sched_execute(void);
 //useful functions
 void blinkLED(int times);
 void heartBeat(void);
+uint32_t system_millis(void);
 
 //Flash functions
 uint32_t OTA_FlashAddress(void);

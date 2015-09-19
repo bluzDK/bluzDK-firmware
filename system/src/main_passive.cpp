@@ -73,6 +73,9 @@ void app_setup_and_loop_passive(void)
     //Set some Particle flags to bypass functionality we don't need
     WLAN_SMART_CONFIG_START = 0;
     WLAN_SMART_CONFIG_STOP = 1;
+    SPARK_CLOUD_SOCKETED = 0;
+    SPARK_CLOUD_CONNECTED = 0;
+    
     
     
     //setup all peripherals
@@ -95,18 +98,20 @@ void app_setup_and_loop_passive(void)
         //Execute user application loop
         DECLARE_SYS_HEALTH(ENTERED_Loop);
         if (system_mode()!=SAFE_MODE) {
-            DEBUG("Entering User Loop");
+//            DEBUG("Entering User Loop");
             loop();
             DECLARE_SYS_HEALTH(RAN_Loop);
-            DEBUG("Exited User Loop");
+//            DEBUG("Exited User Loop");
         }
         
         //we may not be connected. if not, don't try to manage anything cloud related
         if (HAL_Network_Connection()){
             if (CLOUD_CONNECTED) {
-                DEBUG("Calling Spark Comm Loop");
+//                DEBUG("Calling Spark Comm Loop");
+//                Spark_Process_Events();
                 if (!Spark_Communication_Loop()) {
-                    ERROR("Error when calling Spark Communication Loop");
+                    ERROR("Error when calling Spark Comm Loop");
+                    CLOUD_CONNECTED = false;
                 }
             } else {
                 HAL_Delay_Milliseconds(2000);
@@ -115,6 +120,8 @@ void app_setup_and_loop_passive(void)
                 if (err_code) {
                     ERROR("Error when calling Spark Connect");
                 }
+                SPARK_CLOUD_SOCKETED = 1;
+                
                 HAL_Delay_Milliseconds(2000);
                 Spark_Protocol_Init();
                 DEBUG("Calling Spark Handshake");
@@ -124,6 +131,7 @@ void app_setup_and_loop_passive(void)
                 }
                 DEBUG("Handshake Complete");
                 CLOUD_CONNECTED = true;
+                SPARK_CLOUD_CONNECTED = 1;
             }
         }
     }

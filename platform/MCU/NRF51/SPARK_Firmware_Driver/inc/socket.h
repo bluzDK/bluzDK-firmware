@@ -22,6 +22,7 @@ public:
     int32_t send(const void* buffer, uint32_t len);
     int32_t receive(void* buffer, uint32_t len, unsigned long _timeout);
     int32_t close();
+    int32_t bytes_available();
     
     int32_t feed(uint8_t* buffer, uint32_t len);
     

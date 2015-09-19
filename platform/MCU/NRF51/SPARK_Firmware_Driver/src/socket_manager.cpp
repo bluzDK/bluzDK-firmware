@@ -41,6 +41,11 @@ int32_t SocketManager::close(uint32_t sockid)
     sockets[sockid].close();
     return 1;
 }
+
+int32_t SocketManager::bytes_available(uint32_t sockid)
+{
+    return sockets[sockid].bytes_available();
+}
 int32_t SocketManager::active_status(uint32_t sockid)
 {
     if (sockets[sockid].inUse)

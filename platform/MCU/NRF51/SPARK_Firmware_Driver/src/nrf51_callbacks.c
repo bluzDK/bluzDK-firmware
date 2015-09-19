@@ -32,6 +32,7 @@ void millis_timer_timeout(void * p_context)
 {
     //TO DO
     //This will get called every ms from the RTC, keep track of time
+    system_millseconds++;
 }
 
 /**@brief Function for handling the Application's BLE Stack events.

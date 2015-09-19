@@ -87,6 +87,9 @@ sock_result_t socket_sendto(sock_handle_t sd, const void* buffer, socklen_t len,
     return 0;
 }
 
+sock_result_t socket_bytes_available(sock_handle_t sd) {
+    return SocketManager::instance()->bytes_available(sd);
+}
 
 const sock_handle_t SOCKET_INVALID = (sock_handle_t)-1;
 

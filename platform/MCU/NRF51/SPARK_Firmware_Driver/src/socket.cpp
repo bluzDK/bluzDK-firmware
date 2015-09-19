@@ -84,6 +84,11 @@ int32_t Socket::close()
     return 1;
 }
 
+int32_t Socket::bytes_available()
+{
+    return bufferLength;
+}
+
 int32_t Socket::feed(uint8_t* data, uint32_t len)
 {
     if (bufferLength+len > SOCKET_BUFFER_SIZE) {

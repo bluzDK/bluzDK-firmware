@@ -4,6 +4,7 @@
 #include "sst25vf_spi.h"
 #include "data_management_layer.h"
 #include "socket_manager.h"
+#include "debug.h"
 
 uint32_t NbrOfPage = 0;
 uint16_t Flash_Update_Index = 0;
@@ -36,6 +37,11 @@ void heartBeat(void)
     }
 }
 
+uint32_t system_millis(void)
+{
+    return system_millseconds;
+}
+
 /**@brief Function for error handling, which is called when an error has occurred.
  *
  * @warning This handler is an example only and does not fit a final product. You need to analyze
@@ -47,6 +53,8 @@ void heartBeat(void)
  */
 void app_error_handler(uint32_t error_code, uint32_t line_num, const uint8_t * p_file_name)
 {
+    DEBUG("Hit an app error of code %d", error_code);
+    DEBUG("Error happened on line number %d in file %s", line_num, p_file_name);
     //SOS Call
     for (int i = 0; i < 3; i++) {
         nrf_gpio_pin_set(BOARD_LED_PIN);
@@ -189,7 +197,7 @@ void timers_init(void)
 {
       uint32_t err_code;
     // Initialize timer module, making it use the scheduler
-    APP_TIMER_INIT(APP_TIMER_PRESCALER, APP_TIMER_MAX_TIMERS, APP_TIMER_OP_QUEUE_SIZE, true);
+    APP_TIMER_INIT(APP_TIMER_PRESCALER, APP_TIMER_MAX_TIMERS, APP_TIMER_OP_QUEUE_SIZE, false);
     err_code = app_timer_create(&millis_timer, APP_TIMER_MODE_REPEATED, millis_timer_timeout);
     APP_ERROR_CHECK(err_code);
 }
