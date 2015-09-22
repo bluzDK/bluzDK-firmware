@@ -54,10 +54,11 @@ static void on_write(scs_t * p_scs, ble_evt_t * p_ble_evt)
     		p_scs->data_write_handler(p_scs, (uint8_t*)&readBuffer, readBufferLength);
     		readBufferLength = 0;
     	} else {
-    		for (int i = 0; i < p_evt_write->len; i++) {
-    			readBuffer[readBufferLength+i] = p_evt_write->data[i];
-    		}
-    		readBufferLength += p_evt_write->len;
+//    		for (int i = 0; i < p_evt_write->len; i++) {
+//    			readBuffer[readBufferLength+i] = p_evt_write->data[i];
+//    		}
+            memcpy(readBuffer+readBufferLength, p_evt_write->data, p_evt_write->len);
+            readBufferLength += p_evt_write->len;
     	}
     }
 }

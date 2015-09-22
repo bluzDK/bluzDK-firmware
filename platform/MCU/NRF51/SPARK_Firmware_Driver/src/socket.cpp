@@ -56,15 +56,19 @@ int32_t Socket::send(const void* data, uint32_t len)
 }
 int32_t Socket::receive(void* data, uint32_t len, unsigned long _timeout)
 {
+    if (bufferLength > 0) {
+        DEBUG("When entering receive, buffer length is %d and buffer start is %d", bufferLength, bufferStart);
+    }
+    
     int bytesToCopy = len;
     if (len > bufferLength) {
         //they are asking for too much data
         bytesToCopy = bufferLength;
     }
     
-    memcpy(data, buffer+bufferStart, bytesToCopy);
-    
+    int startTemp = bufferStart;
     bufferStart += bytesToCopy;
+    memcpy(data, buffer+startTemp, bytesToCopy);
     bufferLength -= bytesToCopy;
     
     if (bufferLength == 0) {
@@ -73,7 +77,7 @@ int32_t Socket::receive(void* data, uint32_t len, unsigned long _timeout)
     
     
     if (bytesToCopy > 0) {
-        DEBUG("Socket data was received from id %d, read %d bytes. Leaving us %d bytes left", id, bytesToCopy, bufferLength);
+        DEBUG("Socket data was received from id %d, read %d bytes. Leaving us %d bytes left, starting at %d", id, bytesToCopy, bufferLength, bufferStart);
     }
     
     return bytesToCopy;
@@ -96,9 +100,9 @@ int32_t Socket::feed(uint8_t* data, uint32_t len)
         return -1;
     }
     
-    memcpy(buffer+bufferStart, data, len);
+    memcpy(buffer+bufferStart+bufferLength, data, len);
     bufferLength+=len;
-    DEBUG("Fed %d bytes to socket id %d, leaving it with %d bytes", len, id, bufferLength);
+//    DEBUG("Fed %d bytes to socket id %d, leaving it with %d bytes", len, id, bufferLength);
     
     return 0;
 }

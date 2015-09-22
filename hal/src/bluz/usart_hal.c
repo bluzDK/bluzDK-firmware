@@ -101,7 +101,7 @@ void HAL_USART_Begin(HAL_USART_Serial serial, uint32_t baud)
 
 void HAL_USART_End(HAL_USART_Serial serial)
 {
-    app_uart_close(0);
+//    app_uart_close(0);
 }
 
 uint32_t HAL_USART_Write_Data(HAL_USART_Serial serial, uint8_t data)
@@ -117,9 +117,9 @@ int32_t HAL_USART_Available_Data(HAL_USART_Serial serial)
 
 int32_t HAL_USART_Read_Data(HAL_USART_Serial serial)
 {
-    uint8_t* byte = NULL;
-    app_uart_get(byte);
-    return *byte;
+//    uint8_t* byte = NULL;
+//    app_uart_get(byte);
+//    return *byte;
 }
 
 int32_t HAL_USART_Peek_Data(HAL_USART_Serial serial)
@@ -129,7 +129,7 @@ int32_t HAL_USART_Peek_Data(HAL_USART_Serial serial)
 
 void HAL_USART_Flush_Data(HAL_USART_Serial serial)
 {
-    app_uart_flush();
+//    app_uart_flush();
 }
 
 bool HAL_USART_Is_Enabled(HAL_USART_Serial serial)

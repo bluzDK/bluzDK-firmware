@@ -111,7 +111,7 @@ void app_setup_and_loop_passive(void)
 //                Spark_Process_Events();
                 if (!Spark_Communication_Loop()) {
                     ERROR("Error when calling Spark Comm Loop");
-                    CLOUD_CONNECTED = false;
+//                    CLOUD_CONNECTED = false;
                 }
             } else {
                 HAL_Delay_Milliseconds(2000);
