@@ -56,7 +56,10 @@ void setup() {
 
 /* executes continuously after setup() runs */
 void loop() {
-    
+//    digitalWrite(D7, HIGH);
+//    HAL_Delay_Milliseconds(500);
+//    digitalWrite(D7, LOW);
+//    HAL_Delay_Milliseconds(500);
 //    HAL_Delay_Milliseconds(1000);
 //    DEBUG("System milliseconds: ");
 //    DEBUG("%d", millis());

@@ -94,7 +94,8 @@ void advertising_init(void);
 void conn_params_init(void);
 void sec_params_init(void);
 void advertising_start(void);
-void timers_start(void);
+uint32_t timers_start(void);
+uint32_t timers_stop(void);
 
 //Data Services Functions
 void data_service_init(void);

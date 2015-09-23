@@ -1,6 +1,7 @@
 #include "socket.h"
 #include "data_management_layer.h"
 #include "debug.h"
+#include "registered_data_services.h"
 #include <cstring>
 #include <stdio.h>
 
@@ -21,37 +22,46 @@ int32_t Socket::connect(uint32_t sockid, const sockaddr_b *addr, long addrlen)
 {
     id = sockid;
     //format to tell the gateway to open a socket is: <sockid><family><type><protocol><port><address>
-    uint8_t data[9+addrlen];
-    data[0] = (sockid & 0xFF000000) >> 24;
-    data[1] = (sockid & 0xFF0000) >> 16;
+    uint8_t data[11+addrlen];
+    //first, the service ID
+    data[0] = (SOCKET_DATA_SERVICE & 0xFF00) >> 8;
+    data[1] = SOCKET_DATA_SERVICE & 0xFF;
+    
+    //next, the socket ID
     data[2] = (sockid & 0xFF00) >> 8;
     data[3] = sockid & 0xFF;
     
-    data[4] = family;
-    data[5] = type;
-    data[6] = protocol;
+    //then the connection code
+    data[4] = (SOCKET_CONNECT & 0xFF00) >> 8;
+    data[5] = SOCKET_CONNECT & 0xFF;
     
-    data[7] = (port & 0xFF00) >> 8;
-    data[8] = port & 0xFF;
+    data[6] = family;
+    data[7] = type;
+    data[8] = protocol;
     
-    memcpy(data+9, addr, addrlen);
+    data[9] = (port & 0xFF00) >> 8;
+    data[10] = port & 0xFF;
     
-    DataManagementLayer::sendData(9+addrlen, data);
+    memcpy(data+11, addr, addrlen);
+    
+    DataManagementLayer::sendData(11+addrlen, data);
     return 0;
 }
 int32_t Socket::send(const void* data, uint32_t len)
 {
     DEBUG("Sending on socket %d data of size %d!", id, len);
-//    uint8_t dataPlusID[len+2];
-//    dataPlusID[0] = (id & 0xFF00) >> 8;
-//    dataPlusID[1] = id & 0xFF;
-//    
-//    memcpy(dataPlusID+2, data, len);
+    uint8_t dataPlusID[len+4];
+    dataPlusID[0] = (SOCKET_DATA_SERVICE & 0xFF00) >> 8;
+    dataPlusID[1] = SOCKET_DATA_SERVICE & 0xFF;
+    dataPlusID[2] = (id & 0xFF00) >> 8;
+    dataPlusID[3] = id & 0xFF;
     
-    uint8_t dataPlusID[len];
-    memcpy(dataPlusID, data, len);
+    memcpy(dataPlusID+4, data, len);
     
-    DataManagementLayer::sendData(len, dataPlusID);
+//    uint8_t dataPlusID[len];
+//    memcpy(dataPlusID, data, len);
+    
+    DataManagementLayer::sendData(len+4, dataPlusID);
     return len;
 }
 int32_t Socket::receive(void* data, uint32_t len, unsigned long _timeout)

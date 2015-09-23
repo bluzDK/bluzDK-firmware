@@ -66,12 +66,10 @@ int32_t SocketManager::getServiceID()
 }
 int32_t SocketManager::DataCallback(uint8_t *data, int16_t length)
 {
-//    uint16_t socketID = (data[0] << 8) | data[1];
-    uint16_t socketID = 0;
+    uint16_t socketID = (data[0] << 8) | data[1];
     if (sockets[socketID].inUse)
     {
-//        sockets[socketID].feed(data+2, length-2);
-        sockets[socketID].feed(data, length);
+        sockets[socketID].feed(data+2, length-2);
     }
     return -1;
 }

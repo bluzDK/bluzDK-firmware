@@ -251,9 +251,14 @@ void gap_params_init(void)
     APP_ERROR_CHECK(err_code);
 }
 
-void timers_start(void)
+uint32_t timers_start(void)
 {
-    app_timer_start(millis_timer, TIME_KEPPER_INTERVAL, NULL);
+    return app_timer_start(millis_timer, TIME_KEPPER_INTERVAL, NULL);
+}
+
+uint32_t timers_stop(void)
+{
+    return app_timer_stop(millis_timer);
 }
 
 /**@brief Function for initializing the BLE stack.
@@ -350,7 +355,15 @@ void advertising_start(void)
  */
 void power_manage(void)
 {
+//    uint32_t err_code = timers_stop();
+//    APP_ERROR_CHECK(err_code);
+//    
+//    sd_nvic_ClearPendingIRQ(RTC1_IRQn);
+    
     uint32_t err_code = sd_app_evt_wait();
     APP_ERROR_CHECK(err_code);
+    
+//    err_code = timers_start();
+//    APP_ERROR_CHECK(err_code);
 }
 

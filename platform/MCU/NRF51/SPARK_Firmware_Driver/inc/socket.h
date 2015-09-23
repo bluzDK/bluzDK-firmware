@@ -6,6 +6,11 @@
 #include <stdint.h>
 #include "data_service.h"
 
+enum SOCKET_COMMANDS {
+    SOCKET_CONNECT,
+    SOCKET_DISCONNECT
+};
+
 typedef struct
 {
     uint16_t   sa_family;
