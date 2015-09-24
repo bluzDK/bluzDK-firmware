@@ -43,6 +43,7 @@
 #include "rgbled.h"
 #include "ledcontrol.h"
 #include "delay_hal.h"
+#include "timer_hal.h"
 
 /* Private typedef -----------------------------------------------------------*/
 
@@ -51,15 +52,26 @@
 /* Private macro -------------------------------------------------------------*/
 
 /* Private variables ---------------------------------------------------------*/
+uint16_t ledOffTime = 2000;
 static volatile uint32_t TimingLED;
 static volatile uint32_t TimingIWDGReload;
 static bool CLOUD_CONNECTED = false;
+uint32_t on_mseconds = 0;
 
 /* Extern variables ----------------------------------------------------------*/
 
 /* Private function prototypes -----------------------------------------------*/
 
 /* Private functions ---------------------------------------------------------*/
+extern "C" void HAL_SysTick_Handler(void) {
+    uint32_t current_millis = HAL_Timer_Get_Milli_Seconds();
+    if (current_millis % ledOffTime == 0) {
+        on_mseconds = current_millis;
+        LED_On(LED_RGB);
+    } else if (current_millis - on_mseconds > 150) {
+        LED_Off(LED_RGB);
+    }
+}
 
 /*******************************************************************************
  * Function Name  : main.
@@ -76,8 +88,6 @@ void app_setup_and_loop_passive(void)
     SPARK_CLOUD_SOCKETED = 0;
     SPARK_CLOUD_CONNECTED = 0;
     
-    
-    
     //setup all peripherals
     HAL_Core_Init();
     
@@ -87,6 +97,9 @@ void app_setup_and_loop_passive(void)
     
     //setup BLE stack
     HAL_Network_Init();
+    
+    LED_SetRGBColor(RGB_COLOR_GREEN);
+    LED_On(LED_RGB);
     
     //call user setup function, device may or may not be connected
     setup();
@@ -114,6 +127,7 @@ void app_setup_and_loop_passive(void)
 //                    CLOUD_CONNECTED = false;
                 }
             } else {
+                ledOffTime = 250;
                 HAL_Delay_Milliseconds(2000);
                 DEBUG("Calling Spark Connect");
                 int err_code = Spark_Connect();
@@ -127,11 +141,30 @@ void app_setup_and_loop_passive(void)
                 DEBUG("Calling Spark Handshake");
                 err_code = Spark_Handshake();
                 if (err_code) {
+                    LED_SetRGBColor(RGB_COLOR_MAGENTA);
                     ERROR("Error when calling Spark Handshake");
+                } else {
+                    LED_SetRGBColor(RGB_COLOR_CYAN);
+                    DEBUG("Handshake Complete");
+                    
+                    CLOUD_CONNECTED = true;
+                    SPARK_CLOUD_CONNECTED = 1;
+                    ledOffTime = 2000;
                 }
-                DEBUG("Handshake Complete");
-                CLOUD_CONNECTED = true;
-                SPARK_CLOUD_CONNECTED = 1;
+            }
+        } else {
+            if (CLOUD_CONNECTED) {
+                DEBUG("Connection Lost");
+                //we disconnected
+                CLOUD_CONNECTED = false;
+
+                WLAN_SMART_CONFIG_START = 0;
+                WLAN_SMART_CONFIG_STOP = 1;
+                SPARK_CLOUD_SOCKETED = 0;
+                SPARK_CLOUD_CONNECTED = 0;
+                
+                ledOffTime = 2000;
+                LED_SetRGBColor(RGB_COLOR_GREEN);
             }
         }
     }

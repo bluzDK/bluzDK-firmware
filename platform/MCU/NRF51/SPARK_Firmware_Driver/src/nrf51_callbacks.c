@@ -1,5 +1,6 @@
 #include "nrf51_callbacks.h"
 #include "data_management_layer.h"
+#include "core_hal.h"
 
 void uart_error_handle(app_uart_evt_t * p_event)
 {
@@ -33,6 +34,7 @@ void millis_timer_timeout(void * p_context)
     //TO DO
     //This will get called every ms from the RTC, keep track of time
     system_millseconds++;
+    HAL_SysTick_Handler();
 }
 
 /**@brief Function for handling the Application's BLE Stack events.
@@ -49,7 +51,6 @@ void on_ble_evt(ble_evt_t * p_ble_evt)
     switch (p_ble_evt->header.evt_id)
     {
         case BLE_GAP_EVT_CONNECTED:
-            nrf_gpio_pin_clear(BOARD_LED_PIN);
             m_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
             
             sd_ble_gap_address_get(address);
@@ -59,9 +60,6 @@ void on_ble_evt(ble_evt_t * p_ble_evt)
             
         case BLE_GAP_EVT_DISCONNECTED:
             m_conn_handle = BLE_CONN_HANDLE_INVALID;
-            
-            err_code = app_button_disable();
-            APP_ERROR_CHECK(err_code);
             
             advertising_start();
             state = BLE_ADVERTISING;
@@ -101,7 +99,6 @@ void on_ble_evt(ble_evt_t * p_ble_evt)
         case BLE_GAP_EVT_TIMEOUT:
             if (p_ble_evt->evt.gap_evt.params.timeout.src == BLE_GAP_TIMEOUT_SRC_ADVERTISEMENT)
             {
-                nrf_gpio_pin_clear(BOARD_LED_PIN);
                 
                 // Configure buttons with sense level low as wakeup source.
                 nrf_gpio_cfg_sense_input(BOARD_BUTTON,

@@ -9,6 +9,8 @@ Socket::Socket() { id=-1;inUse=false; bufferLength=0;bufferStart=0; }
 
 int32_t Socket::init(uint8_t family, uint8_t type, uint8_t protocol, uint16_t port, uint32_t nif)
 {
+    bufferLength=0;
+    bufferStart=0;
     inUse = true;
     this->family = family;
     this->type = type;

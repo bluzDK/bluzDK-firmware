@@ -12,6 +12,13 @@ CSRC +=
 # enumerate target cpp files
 CPPSRC += $(call target_files,src/,*.cpp)
 
+#ifdef BLUZ
+$(call (echo $CPPSRC))
+file := src/main.cpp
+empty :=
+CPPSRC := $(subst $(file),$(empty),$(CPPSRC))
+#endif
+
 # ASM source files included in this build.
 ASRC +=
 

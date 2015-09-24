@@ -57,7 +57,10 @@ STM32_Pin_Info PIN_MAP[TOTAL_PINS] =
   { 13, PIN_MODE_NONE, false },
   { 12, PIN_MODE_NONE, false }, /*RX*/
   { 8, PIN_MODE_NONE, false }, /*TX*/
-  { 7, PIN_MODE_NONE, false } /*BTN*/
+  { 7, PIN_MODE_NONE, false }, /*BTN*/
+  { 19, PIN_MODE_NONE, false }, /*RGBR*/
+  { 18, PIN_MODE_NONE, false }, /*RGBG*/
+  { 17, PIN_MODE_NONE, false }, /*RGBB*/
 };
 
 STM32_Pin_Info* HAL_Pin_Map() {

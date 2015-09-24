@@ -5,37 +5,12 @@
 #include "data_management_layer.h"
 #include "socket_manager.h"
 #include "debug.h"
+#include "rgbled.h"
 
 uint32_t NbrOfPage = 0;
 uint16_t Flash_Update_Index = 0;
 uint32_t External_Flash_Address = 0;
 uint32_t External_Flash_Start_Address = 0;
-
-void blinkLED(int times)
-{
-    for (int i = 0; i < times; i++) {
-        nrf_gpio_pin_set(BOARD_LED_PIN);
-        nrf_delay_ms(300);
-        nrf_gpio_pin_clear(BOARD_LED_PIN);
-        nrf_delay_ms(300);
-    }
-    nrf_delay_ms(600);
-}
-
-void heartBeat(void)
-{
-    for (;;) {
-        nrf_gpio_pin_set(BOARD_LED_PIN);
-        nrf_delay_ms(100);
-        nrf_gpio_pin_clear(BOARD_LED_PIN);
-        nrf_delay_ms(100);
-        nrf_gpio_pin_set(BOARD_LED_PIN);
-        nrf_delay_ms(100);
-        nrf_gpio_pin_clear(BOARD_LED_PIN);
-        nrf_delay_ms(100);
-        nrf_delay_ms(600);
-    }
-}
 
 uint32_t system_millis(void)
 {
@@ -55,35 +30,38 @@ void app_error_handler(uint32_t error_code, uint32_t line_num, const uint8_t * p
 {
     DEBUG("Hit an app error of code %d", error_code);
     DEBUG("Error happened on line number %d in file %s", line_num, p_file_name);
-    //SOS Call
-    for (int i = 0; i < 3; i++) {
-        nrf_gpio_pin_set(BOARD_LED_PIN);
-        nrf_delay_ms(100);
-        nrf_gpio_pin_clear(BOARD_LED_PIN);
-        nrf_delay_ms(100);
-    }
-    nrf_delay_ms(250);
-    for (int i = 0; i < 3; i++) {
-        nrf_gpio_pin_set(BOARD_LED_PIN);
+    LED_SetRGBColor(RGB_COLOR_RED);
+    for (int count = 0; count < 2; count++) {
+        //SOS Call
+        for (int i = 0; i < 3; i++) {
+            LED_On(LED_RGB);
+            nrf_delay_ms(100);
+            LED_Off(LED_RGB);
+            nrf_delay_ms(100);
+        }
         nrf_delay_ms(250);
-        nrf_gpio_pin_clear(BOARD_LED_PIN);
+        for (int i = 0; i < 3; i++) {
+            LED_On(LED_RGB);
+            nrf_delay_ms(250);
+            LED_Off(LED_RGB);
+            nrf_delay_ms(250);
+        }
         nrf_delay_ms(250);
+        for (int i = 0; i < 3; i++) {
+            LED_On(LED_RGB);
+            nrf_delay_ms(100);
+            LED_Off(LED_RGB);
+            nrf_delay_ms(100);
+        }
+        nrf_delay_ms(1000);
+        for (int i = 0; i < error_code; i++) {
+            LED_On(LED_RGB);
+            nrf_delay_ms(250);
+            LED_Off(LED_RGB);
+            nrf_delay_ms(250);
+        }
+        nrf_delay_ms(3000);
     }
-    nrf_delay_ms(250);
-    for (int i = 0; i < 3; i++) {
-        nrf_gpio_pin_set(BOARD_LED_PIN);
-        nrf_delay_ms(100);
-        nrf_gpio_pin_clear(BOARD_LED_PIN);
-        nrf_delay_ms(100);
-    }
-    nrf_delay_ms(1000);
-    for (int i = 0; i < error_code; i++) {
-        nrf_gpio_pin_set(BOARD_LED_PIN);
-        nrf_delay_ms(250);
-        nrf_gpio_pin_clear(BOARD_LED_PIN);
-        nrf_delay_ms(250);
-    }
-    nrf_delay_ms(3000);
     
     
     // On assert, the system can only recover with a reset.
@@ -191,7 +169,13 @@ void FLASH_End(void)
 //HW Init Functions
 void leds_init(void)
 {
-    nrf_gpio_cfg_output(BOARD_LED_PIN);
+    nrf_gpio_cfg_output(RGB_LED_PIN_RED);
+    nrf_gpio_cfg_output(RGB_LED_PIN_GREEN);
+    nrf_gpio_cfg_output(RGB_LED_PIN_BLUE);
+    
+    nrf_gpio_pin_set(RGB_LED_PIN_RED);
+    nrf_gpio_pin_set(RGB_LED_PIN_GREEN);
+    nrf_gpio_pin_set(RGB_LED_PIN_BLUE);
 }
 void timers_init(void)
 {
@@ -348,7 +332,6 @@ void advertising_start(void)
     
     err_code = sd_ble_gap_adv_start(&adv_params);
     APP_ERROR_CHECK(err_code);
-    nrf_gpio_pin_set(BOARD_LED_PIN);
 }
 
 /**@brief Function for the Power manager.

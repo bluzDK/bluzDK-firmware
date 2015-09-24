@@ -42,10 +42,9 @@
 #define BUTTON_PULL    NRF_GPIO_PIN_PULLUP
 
 //Board LED's and buttons
-#define BOARD_LED_PIN          			30                                       /**< Main LED on the board. */
-#define RGB_LED_PIN_NO_1          		19                                       /**< Pin one for the RGB LED. */
-#define RGB_LED_PIN_NO_2          		18                                       /**< Pin one for the RGB LED. */
-#define RGB_LED_PIN_NO_3          		17                                       /**< Pin one for the RGB LED. */
+#define RGB_LED_PIN_RED          		19                                       /**< Pin one for the RGB LED. */
+#define RGB_LED_PIN_GREEN          		18                                       /**< Pin one for the RGB LED. */
+#define RGB_LED_PIN_BLUE          		17                                       /**< Pin one for the RGB LED. */
 #define BOARD_BUTTON          			7                                        /**< Main LED on the board. */
 
 //Flash SPI address
@@ -75,7 +74,7 @@ typedef enum {
     BLE_CONNECTED,
 } BLE_STATE;
 
-BLE_STATE state;
+volatile BLE_STATE state;
 
 //HW Init Functions
 void leds_init(void);
