@@ -317,21 +317,6 @@ void Spark_Protocol_Init(void)
         HAL_device_ID(id, id_length);
         spark_protocol_init(sp, (const char*) id, keys, callbacks, descriptor);
         
-        uint8_t realID[12] = {0xb1, 0xe2, 0x00, 0x2b, 0x16, 0x4d, 0xa9, 0x9b, 0x7d, 0xea, 0xdb, 0x45};
-        bool equal = true;
-        for (int i = 0; i < 12; i++)
-        {
-            if (realID[i] != id[i]) {
-                equal = false;
-                break;
-            }
-        }
-        if (equal) {
-            DEBUG("We have the right ID");
-        } else {
-            DEBUG("We don't have the right ID!!!");
-        }
-
         Particle.subscribe("spark", SystemEvents);
     }
 }

@@ -52,7 +52,7 @@
 /* Private macro -------------------------------------------------------------*/
 
 /* Private variables ---------------------------------------------------------*/
-uint16_t ledOffTime = 2000;
+volatile uint16_t ledOffTime = 2000;
 static volatile uint32_t TimingLED;
 static volatile uint32_t TimingIWDGReload;
 static bool CLOUD_CONNECTED = false;

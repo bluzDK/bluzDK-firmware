@@ -80,6 +80,14 @@ uint32_t OTA_FlashLength()
     return FLASH_MAX_SIZE;
 }
 
+uint16_t FLASH_GetDeviceInt(void)
+{
+    uint8_t byte1 = sFLASH_ReadSingleByte(FLASH_DEVICE_INT);
+    uint8_t byte2 = sFLASH_ReadSingleByte(FLASH_DEVICE_INT+0x01);
+    
+    return (byte1 << 8)  |  byte2;
+}
+
 void FLASH_Begin(uint32_t sFLASH_Address, uint32_t fileSize)
 {
     //OTA_FLASHED_Status_SysFlag = 0x0000;
@@ -197,6 +205,11 @@ void buttons_init(void)
     };
     
     APP_BUTTON_INIT(buttons, sizeof(buttons) / sizeof(buttons[0]), BUTTON_DETECTION_DELAY, true);
+}
+
+void external_flash_init(void)
+{
+    sFLASH_Init();
 }
 
 /**@brief Function for the Event Scheduler initialization.

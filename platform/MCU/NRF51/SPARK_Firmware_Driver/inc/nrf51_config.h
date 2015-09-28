@@ -4,9 +4,12 @@
 #include "app_gpiote.h"
 #include "nrf_gpiote.h"
 #include "softdevice_handler.h"
-#include "ble_conn_params.h"
+//#include "ble_conn_params.h"
 #include "ble_scs.h"
 #include "ble_advdata.h"
+
+#ifndef __NRF51_CONFIG_H
+#define __NRF51_CONFIG_H
 
 #define APP_TIMER_PRESCALER             0                                           /**< Value of the RTC1 PRESCALER register. */
 #define APP_TIMER_MAX_TIMERS            6						                    /**< Maximum number of simultaneously created timers. */
@@ -41,3 +44,8 @@ ble_gap_sec_params_t m_sec_params; /**< Security requirements for this applicati
 //handles
 scs_t m_scs;
 uint16_t m_conn_handle; /**< Handle of the current connection. */
+
+//system variables
+uint32_t system_millseconds;
+
+#endif

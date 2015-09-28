@@ -29,6 +29,8 @@
 #include <time.h>
 #include "device_keys.h"
 
+#include "debug.h"
+
 #ifndef PRODUCT_ID
 #define PRODUCT_ID (0xffff)
 #endif
@@ -191,7 +193,7 @@ bool SparkProtocol::event_loop(void)
       system_tick_t millis_since_last_message = callbacks.millis() - last_message_millis;
       if (expecting_ping_ack)
       {
-        if (10000 < millis_since_last_message)
+        if (20000 < millis_since_last_message)
         {
           // timed out, disconnect
           expecting_ping_ack = false;
@@ -242,7 +244,7 @@ int SparkProtocol::blocking_send(const unsigned char *buf, int length)
     }
     else
     {
-      if (20000 < (callbacks.millis() - _millis))
+      if (40000 < (callbacks.millis() - _millis))
       {
         // timed out, disconnect
         serial_dump("blocking send timeout");
@@ -276,7 +278,7 @@ int SparkProtocol::blocking_receive(unsigned char *buf, int length)
     }
     else
     {
-      if (20000 < (callbacks.millis() - _millis))
+      if (40000 < (callbacks.millis() - _millis))
       {
         // timed out, disconnect
           serial_dump("receive timeout");
@@ -299,6 +301,8 @@ CoAPMessageType::Enum
   memcpy(iv_receive, next_iv, 16);
 
   char path = buf[ 5 + (buf[0] & 0x0F) ];
+    
+  DEBUG("Recieved CoAP code %d and path %c", CoAP::code(buf), path);
 
   switch (CoAP::code(buf))
   {
@@ -1451,6 +1455,7 @@ bool SparkProtocol::handle_received_message(void)
   message.response = msg_to_send;
   message.response_len = QUEUE_SIZE-len;
 
+  DEBUG("Received CoAP message of type %d", message_type);
   switch (message_type)
   {
     case CoAPMessageType::DESCRIBE:

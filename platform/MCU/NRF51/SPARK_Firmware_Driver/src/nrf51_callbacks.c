@@ -127,7 +127,7 @@ void on_ble_evt(ble_evt_t * p_ble_evt)
 void ble_evt_dispatch(ble_evt_t * p_ble_evt)
 {
     on_ble_evt(p_ble_evt);
-    ble_conn_params_on_ble_evt(p_ble_evt);
+//    ble_conn_params_on_ble_evt(p_ble_evt);
     scs_on_ble_evt(&m_scs, p_ble_evt);
 }
 
@@ -147,8 +147,8 @@ void sys_evt_dispatch(uint32_t sys_evt)
 void data_write_handler(scs_t * p_lbs, uint8_t *data, uint16_t length)
 {
 
-    uint16_t serviceID = (data[0] << 8) | data[1];
-    dataManagementFeedData(serviceID, length-2, data+2);
+    uint16_t serviceID = 0x00 | data[0];
+    dataManagementFeedData(serviceID, length-1, data+1);
 //    uint16_t serviceID = 0x01;
 //    dataManagementFeedData(serviceID, length, data);
 }

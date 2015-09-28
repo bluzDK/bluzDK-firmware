@@ -4,6 +4,17 @@
 #include <stdint.h>
 #include "data_service.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+//#include "hw_config.h"
+
+#ifdef __cplusplus
+}
+#endif
+
+
 static const int32_t MAX_NUMBER_OF_SERVICES = 32;
 #ifdef __cplusplus
 extern "C" {

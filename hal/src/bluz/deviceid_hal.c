@@ -23,15 +23,12 @@
  ******************************************************************************
  */
 
-
 #include "deviceid_hal.h"
-#include "debug.h"
 #include <stddef.h>
-#include <cstring>
-
-extern "C" {
 #include "nrf51.h"
-}
+
+#undef STATIC_ASSERT
+#include "hw_config.h"
 
 unsigned HAL_device_ID(uint8_t* dest, unsigned destLen)
 {
@@ -42,11 +39,10 @@ unsigned HAL_device_ID(uint8_t* dest, unsigned destLen)
     dest[0] = 0xb1;
     dest[1] = 0xe2;
     
-    //now, we have a 16-bit integer stored in 0x3F000, so let's read that
-    char buf[2];
-    memcpy(buf, (const void *)0x3F000, 2);
-    dest[2] = buf[1];
-    dest[3] = buf[0];
+    //now, we have a 16-bit integer stored in 0x1000, so let's read that
+    uint16_t deviceInt = FLASH_GetDeviceInt();
+    dest[2] = (deviceInt & 0xFF);
+    dest[3] = (deviceInt & 0xFF00) >> 8;
     
     //finally, add the nrf51 device ID's as the last 8 bytes, in order: DEVICEID[1] DEVICEID[0]
     dest[4] = (NRF_FICR->DEVICEID[1] & 0xFF);

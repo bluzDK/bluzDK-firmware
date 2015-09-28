@@ -6,7 +6,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include "socket.h"
-#include "socket_hal.h"
+
+static const uint8_t SOCKET_INACTIVE = 1;
+static const uint8_t SOCKET_ACTIVE = 0;
 
 class SocketManager : public DataService
 {

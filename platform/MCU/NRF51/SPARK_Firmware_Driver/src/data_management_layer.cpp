@@ -1,10 +1,8 @@
 #include <stdint.h>
 #include <cstdlib>
 #include "data_management_layer.h"
-
 extern "C" {
-#include "ble_scs.h"
-#include "nrf51_config.h"
+#include "particle_data_service.h"
 }
 
 int16_t DataManagementLayer::dataServicesRegistered = 0;
@@ -32,7 +30,7 @@ void DataManagementLayer::sendData(int16_t length, uint8_t *data)
 {
 //a bit of a hack for now, should HAL this out, but it'll work for the time being
 #ifdef BLUZ
-    scs_data_send(&m_scs, data, length);
+    particle_service_send_data(data, length);
 #endif
 }
 

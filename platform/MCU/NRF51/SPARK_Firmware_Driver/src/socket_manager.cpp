@@ -50,11 +50,11 @@ int32_t SocketManager::active_status(uint32_t sockid)
 {
     if (sockets[sockid].inUse)
     {
-        return SOCKET_STATUS_ACTIVE;
+        return SOCKET_ACTIVE;
     }
     else
     {
-        return SOCKET_STATUS_INACTIVE;
+        return SOCKET_INACTIVE;
     }
 }
 
@@ -66,10 +66,10 @@ int32_t SocketManager::getServiceID()
 }
 int32_t SocketManager::DataCallback(uint8_t *data, int16_t length)
 {
-    uint16_t socketID = (data[0] << 8) | data[1];
+    uint16_t socketID = 0x00 | data[0];
     if (sockets[socketID].inUse)
     {
-        sockets[socketID].feed(data+2, length-2);
+        sockets[socketID].feed(data+1, length-1);
     }
     return -1;
 }

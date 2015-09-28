@@ -52,18 +52,16 @@ int32_t Socket::connect(uint32_t sockid, const sockaddr_b *addr, long addrlen)
 int32_t Socket::send(const void* data, uint32_t len)
 {
     DEBUG("Sending on socket %d data of size %d!", id, len);
-    uint8_t dataPlusID[len+4];
-    dataPlusID[0] = (SOCKET_DATA_SERVICE & 0xFF00) >> 8;
-    dataPlusID[1] = SOCKET_DATA_SERVICE & 0xFF;
-    dataPlusID[2] = (id & 0xFF00) >> 8;
-    dataPlusID[3] = id & 0xFF;
+    uint8_t dataPlusID[len+2];
+    dataPlusID[0] = SOCKET_DATA_SERVICE & 0xFF;
+    dataPlusID[1] = id & 0xFF;
     
-    memcpy(dataPlusID+4, data, len);
+    memcpy(dataPlusID+2, data, len);
     
 //    uint8_t dataPlusID[len];
 //    memcpy(dataPlusID, data, len);
     
-    DataManagementLayer::sendData(len+4, dataPlusID);
+    DataManagementLayer::sendData(len+2, dataPlusID);
     return len;
 }
 int32_t Socket::receive(void* data, uint32_t len, unsigned long _timeout)
@@ -78,9 +76,8 @@ int32_t Socket::receive(void* data, uint32_t len, unsigned long _timeout)
         bytesToCopy = bufferLength;
     }
     
-    int startTemp = bufferStart;
+    memcpy(data, buffer+bufferStart, bytesToCopy);
     bufferStart += bytesToCopy;
-    memcpy(data, buffer+startTemp, bytesToCopy);
     bufferLength -= bytesToCopy;
     
     if (bufferLength == 0) {

@@ -48,10 +48,10 @@
 #define BOARD_BUTTON          			7                                        /**< Main LED on the board. */
 
 //Flash SPI address
-#define SPIM1_SCK_PIN       24u     /**< SPI clock GPIO pin number. */
-#define SPIM1_MOSI_PIN      23u     /**< SPI Master Out Slave In GPIO pin number. */
-#define SPIM1_MISO_PIN      22u     /**< SPI Master In Slave Out GPIO pin number. */
-#define SPIM1_SS_PIN        21u     /**< SPI Slave Select GPIO pin number. */
+#define SPIM1_SCK_PIN       10u     /**< SPI clock GPIO pin number. */
+#define SPIM1_MOSI_PIN      9u     /**< SPI Master Out Slave In GPIO pin number. */
+#define SPIM1_MISO_PIN      14u     /**< SPI Master In Slave Out GPIO pin number. */
+#define SPIM1_SS_PIN        15u     /**< SPI Slave Select GPIO pin number. */
 
 //FLash addresses
 #define FLASH_FW_STATUS 0x0100
@@ -59,13 +59,13 @@
 #define FLASH_FW_LENGTH2 0x0102
 #define FLASH_FW_LENGTH3 0x0103
 
+#define FLASH_DEVICE_INT 0x1000
+
 #define FLASH_FW_ADDRESS 0x01A000
 #define FLASH_LENGTH 0x040000
 
 //On-Board Flash Addresses
 #define CORE_FW_ADDRESS			        ((uint32_t)0x08005000)
-
-uint32_t system_millseconds;
 
 //BLE State Information
 typedef enum {
@@ -81,6 +81,7 @@ void leds_init(void);
 void timers_init(void);
 void gpiote_init(void);
 void buttons_init(void);
+void external_flash_init(void);
 void gap_params_init(void);
 void scheduler_init(void);
 
@@ -109,6 +110,7 @@ void heartBeat(void);
 uint32_t system_millis(void);
 
 //Flash functions
+uint16_t FLASH_GetDeviceInt(void);
 uint32_t OTA_FlashAddress(void);
 uint32_t OTA_FlashLength(void);
 void FLASH_Begin(uint32_t sFLASH_Address, uint32_t fileSize);
