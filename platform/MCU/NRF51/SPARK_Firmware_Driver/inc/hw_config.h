@@ -53,6 +53,11 @@
 #define SPIM1_MISO_PIN      14u     /**< SPI Master In Slave Out GPIO pin number. */
 #define SPIM1_SS_PIN        15u     /**< SPI Slave Select GPIO pin number. */
 
+#define SPIM0_SCK_PIN   3u
+#define SPIM0_MOSI_PIN  1u
+#define SPIM0_MISO_PIN  2u
+#define SPIM0_SS_PIN    4u
+
 //FLash addresses
 #define FLASH_FW_STATUS 0x0100
 #define FLASH_FW_LENGTH1 0x0101
@@ -69,6 +74,7 @@
 
 //BLE State Information
 typedef enum {
+    BLE_OFF,
     BLE_ADVERTISING,
     BLE_SLEEPING,
     BLE_CONNECTED,
@@ -94,6 +100,7 @@ void advertising_init(void);
 void conn_params_init(void);
 void sec_params_init(void);
 void advertising_start(void);
+void advertising_stop(void);
 uint32_t timers_start(void);
 uint32_t timers_stop(void);
 

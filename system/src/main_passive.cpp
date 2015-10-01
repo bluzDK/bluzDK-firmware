@@ -166,6 +166,13 @@ void app_setup_and_loop_passive(void)
                 ledOffTime = 2000;
                 LED_SetRGBColor(RGB_COLOR_GREEN);
             }
+            if (!HAL_Is_Advertising()) {
+                ledOffTime = 2000;
+                LED_SetRGBColor(RGB_COLOR_BLUE);
+            } else {
+                ledOffTime = 2000;
+                LED_SetRGBColor(RGB_COLOR_GREEN);
+            }
         }
     }
 }

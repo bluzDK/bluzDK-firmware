@@ -332,19 +332,35 @@ void advertising_init(void)
 void advertising_start(void)
 {
     uint32_t             err_code;
-    ble_gap_adv_params_t adv_params;
     
-    // Start advertising
-    memset(&adv_params, 0, sizeof(adv_params));
-    
-    adv_params.type        = BLE_GAP_ADV_TYPE_ADV_IND;
-    adv_params.p_peer_addr = NULL;
-    adv_params.fp          = BLE_GAP_ADV_FP_ANY;
-    adv_params.interval    = APP_ADV_INTERVAL;
-    adv_params.timeout     = APP_ADV_TIMEOUT_IN_SECONDS;
-    
-    err_code = sd_ble_gap_adv_start(&adv_params);
-    APP_ERROR_CHECK(err_code);
+    if (state != BLE_ADVERTISING) {
+        ble_gap_adv_params_t adv_params;
+        
+        // Start advertising
+        memset(&adv_params, 0, sizeof(adv_params));
+        
+        adv_params.type        = BLE_GAP_ADV_TYPE_ADV_IND;
+        adv_params.p_peer_addr = NULL;
+        adv_params.fp          = BLE_GAP_ADV_FP_ANY;
+        adv_params.interval    = APP_ADV_INTERVAL;
+        adv_params.timeout     = APP_ADV_TIMEOUT_IN_SECONDS;
+        
+        err_code = sd_ble_gap_adv_start(&adv_params);
+        APP_ERROR_CHECK(err_code);
+        state = BLE_ADVERTISING;
+    }
+}
+
+/**@brief Function for stopping advertising.
+ */
+void advertising_stop(void)
+{
+    uint32_t             err_code;
+    if (state == BLE_ADVERTISING) {
+        err_code = sd_ble_gap_adv_stop();
+        APP_ERROR_CHECK(err_code);
+        state = BLE_OFF;
+    }
 }
 
 /**@brief Function for the Power manager.

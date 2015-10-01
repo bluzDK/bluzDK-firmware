@@ -116,6 +116,7 @@ uint32_t HAL_Core_Compute_CRC32(const uint8_t *pBuffer, uint32_t bufferSize);
 void HAL_Network_Init(void);
 void HAL_Events_Manage(void);
 bool HAL_Network_Connection(void);
+bool HAL_Is_Advertising(void);
 
 typedef enum _BootloaderFlag_t {
     BOOTLOADER_FLAG_VERSION,

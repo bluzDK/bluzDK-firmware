@@ -43,10 +43,17 @@ int blinkLED(String command)
 void setup() {
     DEBUG("hello world");
     pinMode(D7, OUTPUT);
+    pinMode(A2, OUTPUT);
 
     Spark.variable("answer", &answer, INT);
     Spark.function("blink", blinkLED);
     
+    SPI.begin();
+    SPI.setBitOrder(LSBFIRST);
+    SPI.setClockDivider(SPI_CLOCK_DIV128);
+    SPI.setDataMode(SPI_MODE0);
+    
+    BLE.stopAdvertising();
     
     //For Snake
 //    for (int i = 0; i < 18; i++) {
@@ -64,7 +71,17 @@ void loop() {
 //    DEBUG("System milliseconds: ");
 //    DEBUG("%d", millis());
     
+    if (millis() == 10000) {
+        BLE.startAdvertising();
+    }
+    
     System.sleep(SLEEP_MODE_DEEP);
+    if (millis() % 100 == 0) {
+//        DEBUG("SPI Send");
+        digitalWrite(A2, LOW);
+        SPI.transfer(0x55);
+        digitalWrite(A2, HIGH);
+    }
     //Snake
 //    for (int i = 0; i < 18; i++) {
 //        digitalWrite(leds[i], HIGH);

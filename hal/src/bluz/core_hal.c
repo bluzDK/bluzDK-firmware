@@ -62,6 +62,11 @@ bool HAL_Network_Connection(void)
     return state == BLE_CONNECTED;
 }
 
+bool HAL_Is_Advertising(void)
+{
+    return state == BLE_ADVERTISING;
+}
+
 /*******************************************************************************
  * Function Name  : HAL_Core_Config.
  * Description    : Called in startup routine, before calling C++ constructors.
