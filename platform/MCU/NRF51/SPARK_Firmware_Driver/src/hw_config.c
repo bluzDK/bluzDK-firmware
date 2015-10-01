@@ -305,7 +305,7 @@ void advertising_init(void)
     uint32_t      err_code;
     ble_advdata_t advdata;
     ble_advdata_t scanrsp;
-    uint8_t       flags = BLE_GAP_ADV_FLAGS_LE_ONLY_LIMITED_DISC_MODE;
+    uint8_t       flags = BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE;
     
     ble_uuid_t adv_uuids[] = {{BLE_SCS_UUID_SERVICE, m_scs.uuid_type}};
     
@@ -343,7 +343,7 @@ void advertising_start(void)
         adv_params.p_peer_addr = NULL;
         adv_params.fp          = BLE_GAP_ADV_FP_ANY;
         adv_params.interval    = APP_ADV_INTERVAL;
-        adv_params.timeout     = APP_ADV_TIMEOUT_IN_SECONDS;
+        adv_params.timeout     = APP_ADV_NO_TIMEOUT;
         
         err_code = sd_ble_gap_adv_start(&adv_params);
         APP_ERROR_CHECK(err_code);

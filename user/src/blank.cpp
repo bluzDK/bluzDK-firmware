@@ -73,6 +73,8 @@ void loop() {
     
     if (millis() == 10000) {
         BLE.startAdvertising();
+    } else if (millis() == 20000) {
+        BLE.stopAdvertising();
     }
     
     System.sleep(SLEEP_MODE_DEEP);
