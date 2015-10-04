@@ -1,7 +1,6 @@
 #include "app_scheduler.h"
 #include "app_timer.h"
 #include "app_timer_appsh.h"
-#include "app_button.h"
 #include "nrf_gpiote.h"
 #include "softdevice_handler.h"
 //#include "ble_conn_params.h"

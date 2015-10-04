@@ -29,7 +29,9 @@
 #define __SST25VF_SPI_H
 
 /* Includes ------------------------------------------------------------------*/
-#include "hw_config.h"
+#include <stdint.h>
+#include <stdbool.h>
+#include "hw_layout.h"
 
 /* SST25 SPI Flash supported commands */
 #define sFLASH_CMD_RDSR					0x05		/* Read Status Register */

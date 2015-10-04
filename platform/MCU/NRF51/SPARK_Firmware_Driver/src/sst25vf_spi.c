@@ -27,6 +27,9 @@
 /* Includes ------------------------------------------------------------------*/
 #include "sst25vf_spi.h"
 #include "spi_master.h"
+#include "nrf_gpio.h"
+#include "nrf_error.h"
+#include "app_util_platform.h"
 
 /* Local function forward declarations ---------------------------------------*/
 static void sFLASH_WriteByte(uint32_t WriteAddr, uint8_t byte);

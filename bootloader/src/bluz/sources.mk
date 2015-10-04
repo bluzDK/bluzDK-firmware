@@ -1,3 +1,0 @@
-BOOTLOADER_SRC_BLUZ_PATH = $(BOOTLOADER_MODULE_PATH)/src/bluz
-
-CSRC += $(call target_files,$(BOOTLOADER_SRC_BLUZ_PATH)/,*.c)
