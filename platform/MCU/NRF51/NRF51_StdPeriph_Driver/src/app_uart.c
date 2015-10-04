@@ -12,10 +12,10 @@
 
 #include "app_uart.h"
 #include "nrf.h"
-#include "nrf_gpio.h"
 #include "app_error.h"
 #include "app_util.h"
-#include "app_gpiote.h"
+#include "nrf_gpio.h"
+#include "nrf_drv_gpiote.h"
 
 #define FIFO_LENGTH(F) (F.write_pos - F.read_pos) /**< Macro to calculate length of a FIFO. */
 #define UART_INSTANCE_GPIOTE_BASE 0x00FF          /**< Define the base for UART instance ID when flow control is used. The userid from GPIOTE will be used with padded 0xFF at LSB for easy converting the instance id to GPIOTE id. */
@@ -39,15 +39,13 @@ typedef enum
     ON_UART_PUT,   /**< Event: Application wants to transmit data. */
     ON_TX_READY,   /**< Event: Data has been transmitted on the uart and line is available. */
     ON_UART_CLOSE, /**< Event: The UART module are being stopped. */
-} app_uart_state_events_t;
+} app_uart_state_event_t;
 
 static uint8_t  m_tx_byte;                /**< TX Byte placeholder for next byte to transmit. */
 static uint16_t m_rx_byte = BYTE_INVALID; /**< RX Byte placeholder for last received byte. */
 
 
 static uint8_t                    m_instance_counter = 1;     /**< Instance counter for each caller using the UART module. The GPIOTE user id is mapped directly for callers using HW Flow Control. */
-static app_gpiote_user_id_t       m_gpiote_uid;               /**< GPIOTE id for currently active caller to the UART module. */
-static uint32_t                   m_pin_cts_mask;             /**< CTS pin mask for UART module. */
 static app_uart_event_handler_t   m_event_handler;            /**< Event handler function. */
 static volatile app_uart_states_t m_current_state = UART_OFF; /**< State of the state machine. */
 
@@ -188,7 +186,7 @@ static void on_uart_close(void)
  *
  * @param[in]  event    Event that has occurred.
  */
-static void on_uart_event(app_uart_state_events_t event)
+static void on_uart_event(app_uart_state_event_t event)
 {
     switch (event)
     {
@@ -218,46 +216,17 @@ static void on_uart_event(app_uart_state_events_t event)
     }
 }
 
-
-/**@brief Function for handling the GPIOTE event.
- *
- * @param[in] event_pins_low_to_high   Mask telling which pin(s) generated an event from low->high.
- * @param[in] event_pins_high_to_low   Mask telling which pin(s) generated an event from high->low.
+/**@brief Function for the GPIOTE event handler.
  */
-static void gpiote_uart_event_handler(uint32_t event_pins_low_to_high,
-                                      uint32_t event_pins_high_to_low)
+static void gpiote_uart_event_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
 {
-    if ((event_pins_high_to_low & event_pins_low_to_high & m_pin_cts_mask) != 0)
-    {
-        // We have an indication from GPIOTE that the CTS pin has toggled high->low and low->high.
-        // If this occurs, we must read the active pins in the GPIOTE module ourself.
-        uint32_t active_pins;
-        uint32_t err_code;
-
-        err_code = app_gpiote_pins_state_get(m_gpiote_uid, &active_pins);
-
-        if (err_code != NRF_SUCCESS)
-        {
-            // Pin reading was not possible, even though an event from GPIOTE was received that the
-            // CTS pin toggled. If pin double toggled but status cannot be fetched we silently
-            // return and keep the current UART status as-is.
-            return;
-        }
-        event_pins_low_to_high &= active_pins;
-        event_pins_high_to_low &= ~active_pins;
-    }
-
-    if ((event_pins_high_to_low & m_pin_cts_mask) != 0)
-    {
-        on_uart_event(ON_CTS_LOW);
-    }
-    else if ((event_pins_low_to_high & m_pin_cts_mask) != 0)
+    if (nrf_drv_gpiote_in_is_set(pin))
     {
         on_uart_event(ON_CTS_HIGH);
     }
     else
     {
-        // Do nothing, as the CTS pin didn't toggle.
+        on_uart_event(ON_CTS_LOW);
     }
 }
 
@@ -354,9 +323,6 @@ uint32_t app_uart_init(const app_uart_comm_params_t * p_comm_params,
                        uint16_t                     * p_app_uart_uid)
 {
     uint32_t err_code;
-    uint32_t gpiote_high_pins;
-    uint32_t gpiote_pin_low_high_mask = 0;
-    uint32_t gpiote_pin_high_low_mask = 0;
 
     m_current_state = UART_OFF;
     m_event_handler = event_handler;
@@ -386,9 +352,22 @@ uint32_t app_uart_init(const app_uart_comm_params_t * p_comm_params,
 
     if (p_comm_params->flow_control == APP_UART_FLOW_CONTROL_LOW_POWER)
     {
+        if (!nrf_drv_gpiote_is_init())
+        {
+            err_code = nrf_drv_gpiote_init();
+            if (err_code != NRF_SUCCESS)
+            {
+                return err_code;
+            }
+        }
+
         // Configure hardware flow control.
-        nrf_gpio_cfg_output(p_comm_params->rts_pin_no);
-        NRF_GPIO->OUT = 1 << p_comm_params->rts_pin_no;
+        nrf_drv_gpiote_out_config_t rts_config = GPIOTE_CONFIG_OUT_SIMPLE(true);
+        err_code = nrf_drv_gpiote_out_init(p_comm_params->rts_pin_no, &rts_config);
+        if (err_code != NRF_SUCCESS)
+        {
+            return err_code;
+        }
 
         NRF_UART0->PSELCTS = UART_PIN_DISCONNECTED;
         NRF_UART0->PSELRTS = p_comm_params->rts_pin_no;
@@ -398,79 +377,38 @@ uint32_t app_uart_init(const app_uart_comm_params_t * p_comm_params,
         // For the UART we want to detect both low->high and high->low transitions in order to
         // know when to activate/de-activate the TX/RX in the UART.
         // Configure pin.
-        m_pin_cts_mask = (1 << p_comm_params->cts_pin_no);
-        nrf_gpio_cfg_sense_input(p_comm_params->cts_pin_no,
-                                 NRF_GPIO_PIN_PULLUP,
-                                 NRF_GPIO_PIN_SENSE_LOW);
-
-        gpiote_pin_low_high_mask = (1 << p_comm_params->cts_pin_no);
-        gpiote_pin_high_low_mask = (1 << p_comm_params->cts_pin_no);
-
-        if (*p_app_uart_uid == UART_INSTANCE_ID_INVALID)
-        {
-            err_code = app_gpiote_user_register(&m_gpiote_uid,
-                                                gpiote_pin_low_high_mask,
-                                                gpiote_pin_high_low_mask,
-                                                gpiote_uart_event_handler);
-
-            if (err_code != NRF_SUCCESS)
-            {
-                return err_code;
-            }
-            *p_app_uart_uid = (m_gpiote_uid << 8) | UART_INSTANCE_GPIOTE_BASE;
-        }
-        else if (*p_app_uart_uid < UART_INSTANCE_GPIOTE_BASE)
-        {
-            return NRF_ERROR_INVALID_PARAM;
-        }
-        else
-        {
-            m_gpiote_uid = ((*p_app_uart_uid) >> 8) & UART_INSTANCE_GPIOTE_BASE;
-        }
-
-        err_code = app_gpiote_pins_state_get(m_gpiote_uid, &gpiote_high_pins);
-
+        nrf_drv_gpiote_in_config_t cts_config = GPIOTE_CONFIG_IN_SENSE_TOGGLE(false);
+        err_code = nrf_drv_gpiote_in_init(p_comm_params->cts_pin_no, &cts_config, gpiote_uart_event_handler);
         if (err_code != NRF_SUCCESS)
         {
             return err_code;
         }
 
-        err_code = app_gpiote_user_enable(m_gpiote_uid);
-
-        if (err_code != NRF_SUCCESS)
-        {
-            return err_code;
-        }
+        nrf_drv_gpiote_in_event_enable(p_comm_params->cts_pin_no, true);
 
         // UART CTS pin is active when low.
-        if ((gpiote_high_pins & (1 << p_comm_params->cts_pin_no)) == 0)
+        if (nrf_drv_gpiote_in_is_set(p_comm_params->cts_pin_no))
         {
-            on_uart_event(ON_CTS_LOW);
+            on_uart_event(ON_CTS_HIGH);
         }
         else
         {
-            on_uart_event(ON_CTS_HIGH);
+            on_uart_event(ON_CTS_LOW);
         }
     }
     else if (p_comm_params->flow_control == APP_UART_FLOW_CONTROL_ENABLED)
     {
-        if (*p_app_uart_uid == UART_INSTANCE_ID_INVALID)
-        {
-            *p_app_uart_uid = m_instance_counter++;
-        }
-
         uart_standard_flow_control_init(p_comm_params);
         m_current_state = UART_READY;
     }
     else
     {
-        if (*p_app_uart_uid == UART_INSTANCE_ID_INVALID)
-        {
-            *p_app_uart_uid = m_instance_counter++;
-        }
-
         uart_no_flow_control_init();
         m_current_state = UART_READY;
+    }
+    if (*p_app_uart_uid == UART_INSTANCE_ID_INVALID)
+    {
+        *p_app_uart_uid = m_instance_counter++;
     }
 
     // Enable UART interrupt
@@ -539,23 +477,15 @@ uint32_t app_uart_get_connection_state(app_uart_connection_state_t * p_conn_stat
 
 uint32_t app_uart_close(uint16_t app_uart_uid)
 {
-    uint16_t gpiote_uid;
-
     if (app_uart_uid < UART_INSTANCE_GPIOTE_BASE)
     {
         on_uart_event(ON_UART_CLOSE);
         return NRF_SUCCESS;
     }
 
-    gpiote_uid = (app_uart_uid >> 8) & UART_INSTANCE_GPIOTE_BASE;
-
-    if (gpiote_uid != m_gpiote_uid)
-    {
-        return NRF_ERROR_INVALID_PARAM;
-    }
-
     on_uart_event(ON_UART_CLOSE);
 
-    return app_gpiote_user_disable(m_gpiote_uid);
+    nrf_drv_gpiote_in_uninit(NRF_UART0->PSELCTS);
+    return NRF_SUCCESS;
 }
 

@@ -53,7 +53,7 @@ void setup() {
     SPI.setClockDivider(SPI_CLOCK_DIV128);
     SPI.setDataMode(SPI_MODE0);
     
-    BLE.stopAdvertising();
+//    BLE.stopAdvertising();
     
     //For Snake
 //    for (int i = 0; i < 18; i++) {
@@ -71,11 +71,11 @@ void loop() {
 //    DEBUG("System milliseconds: ");
 //    DEBUG("%d", millis());
     
-    if (millis() == 10000) {
-        BLE.startAdvertising();
-    } else if (millis() == 20000) {
-        BLE.stopAdvertising();
-    }
+//    if (millis() == 10000) {
+//        BLE.startAdvertising();
+//    } else if (millis() == 20000) {
+//        BLE.stopAdvertising();
+//    }
     
     System.sleep(SLEEP_MODE_DEEP);
     if (millis() % 100 == 0) {

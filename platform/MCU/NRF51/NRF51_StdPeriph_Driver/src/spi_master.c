@@ -16,8 +16,6 @@
 #include "nrf51_bitfields.h"
 #include "spi_master.h"
 
-#define SPI_MASTER_1_ENABLE 1
-
 #if defined(SPI_MASTER_0_ENABLE) || defined(SPI_MASTER_1_ENABLE)
 
 typedef struct
@@ -192,20 +190,19 @@ static __INLINE void spi_master_send_initial_bytes(
     volatile spi_master_instance_t * const p_spi_instance)
 {
     APP_ERROR_CHECK_BOOL(p_spi_instance != NULL);
+    
+    uint8_t * p_tx_buffer = p_spi_instance->p_tx_buffer;
+    uint16_t tx_length = p_spi_instance->tx_length;
+    uint16_t tx_index = p_spi_instance->tx_index;
 
-    p_spi_instance->p_nrf_spi->TXD = ((p_spi_instance->p_tx_buffer != NULL) &&
-                                      (p_spi_instance->tx_index < p_spi_instance->tx_length)) ?
-                                     p_spi_instance->p_tx_buffer[p_spi_instance->tx_index] :
-                                     SPI_DEFAULT_TX_BYTE;
-    (p_spi_instance->tx_index)++;
-
-
-    if (p_spi_instance->tx_index < p_spi_instance->max_length)
+    p_spi_instance->p_nrf_spi->TXD = ((p_tx_buffer != NULL) && (tx_index  < tx_length)) ?
+                                     p_tx_buffer[tx_index] : SPI_DEFAULT_TX_BYTE;
+    tx_index = ++(p_spi_instance->tx_index);
+     
+    if (tx_index < p_spi_instance->max_length)
     {
-        p_spi_instance->p_nrf_spi->TXD = ((p_spi_instance->p_tx_buffer != NULL) &&
-                                          (p_spi_instance->tx_index < p_spi_instance->tx_length)) ?
-                                         p_spi_instance->p_tx_buffer[p_spi_instance->tx_index] :
-                                         SPI_DEFAULT_TX_BYTE;
+        p_spi_instance->p_nrf_spi->TXD = ((p_tx_buffer != NULL) && (tx_index < tx_length)) ?
+                                         p_tx_buffer[tx_index] : SPI_DEFAULT_TX_BYTE;
         (p_spi_instance->tx_index)++;
     }
 }
@@ -216,7 +213,7 @@ static __INLINE void spi_master_send_initial_bytes(
 static __INLINE void spi_master_send_recv_irq(volatile spi_master_instance_t * const p_spi_instance)
 {
     APP_ERROR_CHECK_BOOL(p_spi_instance != NULL);
-
+    
     p_spi_instance->bytes_count++;
 
     if (!p_spi_instance->started_flag)
@@ -226,27 +223,33 @@ static __INLINE void spi_master_send_recv_irq(volatile spi_master_instance_t * c
                               SPI_MASTER_EVT_TRANSFER_STARTED,
                               p_spi_instance->bytes_count);
     }
-
+    
     uint8_t rx_byte = p_spi_instance->p_nrf_spi->RXD;
-
-    if ((p_spi_instance->p_rx_buffer != NULL) &&
-        (p_spi_instance->rx_index < p_spi_instance->rx_length))
+    
+    uint8_t * p_rx_buffer = p_spi_instance->p_rx_buffer;
+    uint16_t rx_length    = p_spi_instance->rx_length;
+    uint16_t rx_index     = p_spi_instance->rx_index;
+    
+    if ((p_rx_buffer != NULL) && (rx_index < rx_length))
     {
-        p_spi_instance->p_rx_buffer[p_spi_instance->rx_index++] = rx_byte;
+        p_rx_buffer[p_spi_instance->rx_index++] = rx_byte;
     }
-
-    if (p_spi_instance->tx_index < p_spi_instance->max_length)
+    
+    uint8_t * p_tx_buffer = p_spi_instance->p_tx_buffer;
+    uint16_t tx_length    = p_spi_instance->tx_length;
+    uint16_t tx_index     = p_spi_instance->tx_index;
+    uint16_t max_length   = p_spi_instance->max_length;
+    
+    if (tx_index < max_length)
     {
-        p_spi_instance->p_nrf_spi->TXD = ((p_spi_instance->p_tx_buffer != NULL) &&
-                                          (p_spi_instance->tx_index < p_spi_instance->tx_length)) ?
-                                         p_spi_instance->p_tx_buffer[p_spi_instance->tx_index] :
-                                         SPI_DEFAULT_TX_BYTE;
+        p_spi_instance->p_nrf_spi->TXD = ((p_tx_buffer != NULL) && (tx_index < tx_length)) ?
+                                         p_tx_buffer[tx_index] : SPI_DEFAULT_TX_BYTE;
         (p_spi_instance->tx_index)++;
     }
-
-    if (p_spi_instance->bytes_count >= p_spi_instance->max_length)
+    
+    if (p_spi_instance->bytes_count >= max_length)
     {
-        //nrf_gpio_pin_set(p_spi_instance->pin_slave_select);
+//        nrf_gpio_pin_set(p_spi_instance->pin_slave_select);
 
         uint16_t transmited_bytes = p_spi_instance->tx_index;
 
@@ -256,7 +259,6 @@ static __INLINE void spi_master_send_recv_irq(volatile spi_master_instance_t * c
         p_spi_instance->state = SPI_MASTER_STATE_IDLE;
 
         spi_master_signal_evt(p_spi_instance, SPI_MASTER_EVT_TRANSFER_COMPLETED, transmited_bytes);
-
     }
 }
 #endif //defined(SPI_MASTER_0_ENABLE) || defined(SPI_MASTER_1_ENABLE)
@@ -312,9 +314,6 @@ uint32_t spi_master_open(const spi_master_hw_instance_t    spi_master_hw_instanc
 
     p_spi_instance->p_nrf_spi->FREQUENCY = p_spi_master_config->SPI_Freq;
 
-    //TO DO: Does this line need to be here?
-    //p_spi_instance->irq_type = p_spi_master_config->SPI_PriorityIRQ;
-
     p_spi_instance->p_nrf_spi->CONFIG =
         (uint32_t)(p_spi_master_config->SPI_CONFIG_CPHA << SPI_CONFIG_CPHA_Pos) |
         (p_spi_master_config->SPI_CONFIG_CPOL << SPI_CONFIG_CPOL_Pos) |
@@ -323,7 +322,6 @@ uint32_t spi_master_open(const spi_master_hw_instance_t    spi_master_hw_instanc
     /* Clear waiting interrupts and events */
     p_spi_instance->p_nrf_spi->EVENTS_READY = 0;
 
-    //APP_ERROR_CHECK(sd_nvic_ClearPendingIRQ(p_spi_instance->irq_type));
     APP_ERROR_CHECK(sd_nvic_ClearPendingIRQ(p_spi_instance->irq_type));
     APP_ERROR_CHECK(sd_nvic_SetPriority(p_spi_instance->irq_type, p_spi_master_config->SPI_PriorityIRQ));
 
@@ -456,7 +454,7 @@ uint32_t spi_master_send_recv(const spi_master_hw_instance_t spi_master_hw_insta
                                    &(p_spi_instance->rx_length),
                                    &(p_spi_instance->rx_index));
 
-            //nrf_gpio_pin_clear(p_spi_instance->pin_slave_select);
+//            nrf_gpio_pin_clear(p_spi_instance->pin_slave_select);
             spi_master_send_initial_bytes(p_spi_instance);
         }
         else

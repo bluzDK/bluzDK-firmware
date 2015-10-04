@@ -46,10 +46,8 @@
 #include <stdio.h>
 #include "app_error.h"
 #include "app_util.h"
-#include "app_scheduler.h"
 #include "compiler_abstraction.h"
 
-#define APP_TIMER_SCHED_EVT_SIZE     sizeof(app_timer_event_t)  /**< Size of button events being passed through the scheduler (is to be used for computing the maximum size of scheduler events). */
 #define APP_TIMER_CLOCK_FREQ         32768                      /**< Clock frequency of the RTC timer used to implement the app timer module. */
 #define APP_TIMER_MIN_TIMEOUT_TICKS  5                          /**< Minimum value of the timeout_ticks parameter of app_timer_start(). */
 
@@ -133,14 +131,13 @@ typedef enum
  *                              timer tick rate. Set to 0 for no prescaling.
  * @param[in]  MAX_TIMERS       Maximum number of timers that can be created at any given time.
  * @param[in]  OP_QUEUES_SIZE   Size of queues holding timer operations that are pending execution.
- * @param[in]  USE_SCHEDULER    TRUE if the application is using the event scheduler,
- *                              FALSE otherwise.
+ * @param[in]  SCHEDULER_FUNC   Pointer to scheduler event handler
  *
  * @note Since this macro allocates a buffer, it must only be called once (it is OK to call it
  *       several times as long as it is from the same location, e.g. to do a reinitialization).
  */
 /*lint -emacro(506, APP_TIMER_INIT) */ /* Suppress "Constant value Boolean */
-#define APP_TIMER_INIT(PRESCALER, MAX_TIMERS, OP_QUEUES_SIZE, USE_SCHEDULER)                       \
+#define APP_TIMER_INIT(PRESCALER, MAX_TIMERS, OP_QUEUES_SIZE, SCHEDULER_FUNC)                      \
     do                                                                                             \
     {                                                                                              \
         static uint32_t APP_TIMER_BUF[CEIL_DIV(APP_TIMER_BUF_SIZE((MAX_TIMERS),                    \
@@ -150,7 +147,7 @@ typedef enum
                                            (MAX_TIMERS),                                           \
                                            (OP_QUEUES_SIZE) + 1,                                   \
                                            APP_TIMER_BUF,                                          \
-                                           (USE_SCHEDULER) ? app_timer_evt_schedule : NULL);       \
+                                           SCHEDULER_FUNC);                                        \
         APP_ERROR_CHECK(ERR_CODE);                                                                 \
     } while (0)
 
@@ -264,36 +261,6 @@ uint32_t app_timer_cnt_get(uint32_t * p_ticks);
 uint32_t app_timer_cnt_diff_compute(uint32_t   ticks_to,
                                     uint32_t   ticks_from,
                                     uint32_t * p_ticks_diff);
-
-
-// Type and functions for connecting the timer to the scheduler:
-
-/**@cond NO_DOXYGEN */
-typedef struct
-{
-    app_timer_timeout_handler_t timeout_handler;
-    void *                      p_context;
-} app_timer_event_t;
-
-static __INLINE void app_timer_evt_get(void * p_event_data, uint16_t event_size)
-{
-    app_timer_event_t * p_timer_event = (app_timer_event_t *)p_event_data;
-    
-    APP_ERROR_CHECK_BOOL(event_size == sizeof(app_timer_event_t));
-    p_timer_event->timeout_handler(p_timer_event->p_context);
-}
-
-static __INLINE uint32_t app_timer_evt_schedule(app_timer_timeout_handler_t timeout_handler,
-                                                void *                      p_context)
-{
-    app_timer_event_t timer_event;
-
-    timer_event.timeout_handler = timeout_handler;
-    timer_event.p_context       = p_context;
-    
-    return app_sched_event_put(&timer_event, sizeof(timer_event), app_timer_evt_get);
-}
-/**@endcond */
 
 #endif // APP_TIMER_H__
 

@@ -28,7 +28,6 @@
 #include "ble.h"
 #include "nrf_sdm.h"
 #include "app_error.h"
-#include "app_scheduler.h"
 #include "app_util.h"
 
 #define BLE_STACK_EVT_MSG_BUF_SIZE       (sizeof(ble_evt_t) + (GATT_MTU_SIZE_DEFAULT))     /**< Size of BLE event message buffer. This will be provided to the SoftDevice while fetching an event. */

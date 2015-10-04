@@ -6,6 +6,8 @@
 #include "socket_manager.h"
 #include "debug.h"
 #include "rgbled.h"
+#include "device_manager.h"
+#include "pstorage.h"
 
 uint32_t NbrOfPage = 0;
 uint16_t Flash_Update_Index = 0;
@@ -195,16 +197,19 @@ void timers_init(void)
 }
 void gpiote_init(void)
 {
-    APP_GPIOTE_INIT(APP_GPIOTE_MAX_USERS);
+    //Commented out when moved to SDK 9.0, which moces away from app_gpiote to nrf_drv_gpiote
+    //Do we need to do anything anymore?
+//    APP_GPIOTE_INIT(APP_GPIOTE_MAX_USERS);
 }
 void buttons_init(void)
 {
-    static app_button_cfg_t buttons[] =
-    {
-        {BOARD_BUTTON, false, BUTTON_PULL, button_event_handler}
-    };
-    
-    APP_BUTTON_INIT(buttons, sizeof(buttons) / sizeof(buttons[0]), BUTTON_DETECTION_DELAY, true);
+    //When upgrading to SDK9.0, we disabled APP_GPIOTE, on which this depends. Not sure we need it, so removing it for now.
+//    static app_button_cfg_t buttons[] =
+//    {
+//        {BOARD_BUTTON, false, BUTTON_PULL, button_event_handler}
+//    };
+//    
+//    APP_BUTTON_INIT(buttons, sizeof(buttons) / sizeof(buttons[0]), BUTTON_DETECTION_DELAY, true);
 }
 
 void external_flash_init(void)
@@ -217,6 +222,53 @@ void external_flash_init(void)
 void scheduler_init(void)
 {
     APP_SCHED_INIT(SCHED_MAX_EVENT_DATA_SIZE, SCHED_QUEUE_SIZE);
+}
+
+/**@brief Function for the Device Manager initialization.
+ */
+void device_manager_init(void)
+{
+    uint32_t                err_code;
+    dm_init_param_t         init_data;
+    dm_application_param_t  register_param;
+    bool                	bonds_delete = false;
+    
+    // Initialize peer device handle.
+    err_code = dm_handle_initialize(&m_bonded_peer_handle);
+    APP_ERROR_CHECK(err_code);
+    //blink(1);
+    
+    // Initialize persistent storage module.
+    err_code = pstorage_init();
+    APP_ERROR_CHECK(err_code);
+    //blink(2);
+    
+    // Clear all bonded centrals if the "delete all bonds" button is pushed.
+    //SO STUPID! Youmust hand the index of the button from the Init call data structure, not just the pin number
+    //It is 8 by the way
+//    err_code = app_button_is_pushed(8, &bonds_delete);
+//    APP_ERROR_CHECK(err_code);
+    //    blink(3);
+    init_data.clear_persistent_data = bonds_delete;
+    
+    err_code = dm_init(&init_data);
+    APP_ERROR_CHECK(err_code);
+    //blink(4);
+    
+    memset(&register_param.sec_param, 0, sizeof(ble_gap_sec_params_t));
+    
+    register_param.sec_param.bond         = SEC_PARAM_BOND;
+    register_param.sec_param.mitm         = SEC_PARAM_MITM;
+    register_param.sec_param.io_caps      = SEC_PARAM_IO_CAPABILITIES;
+    register_param.sec_param.oob          = SEC_PARAM_OOB;
+    register_param.sec_param.min_key_size = SEC_PARAM_MIN_KEY_SIZE;
+    register_param.sec_param.max_key_size = SEC_PARAM_MAX_KEY_SIZE;
+    register_param.evt_handler            = device_manager_evt_handler;
+    register_param.service_type           = DM_PROTOCOL_CNTXT_GATT_SRVR_ID;
+    
+    err_code = dm_register(&m_app_handle, &register_param);
+    //blink(5);
+    APP_ERROR_CHECK(err_code);
 }
 
 /**@brief Function for the GAP initialization.
@@ -305,7 +357,6 @@ void advertising_init(void)
     uint32_t      err_code;
     ble_advdata_t advdata;
     ble_advdata_t scanrsp;
-    uint8_t       flags = BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE;
     
     ble_uuid_t adv_uuids[] = {{BLE_SCS_UUID_SERVICE, m_scs.uuid_type}};
     
@@ -314,8 +365,7 @@ void advertising_init(void)
     
     advdata.name_type               = BLE_ADVDATA_FULL_NAME;
     advdata.include_appearance      = true;
-    advdata.flags.size              = sizeof(flags);
-    advdata.flags.p_data            = &flags;
+    advdata.flags                   = BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE;
     
     memset(&scanrsp, 0, sizeof(scanrsp));
     scanrsp.uuids_complete.uuid_cnt = sizeof(adv_uuids) / sizeof(adv_uuids[0]);

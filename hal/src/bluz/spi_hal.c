@@ -22,7 +22,6 @@
   License along with this library; if not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************
  */
-#define SPI_MASTER_0_ENABLE
 
 /* Includes ------------------------------------------------------------------*/
 #include "spi_hal.h"
@@ -80,7 +79,7 @@ void HAL_SPI_Begin(HAL_SPI_Interface spi, uint16_t pin)
 
 void HAL_SPI_End(HAL_SPI_Interface spi)
 {
-    spi_master_close(SPI_MASTER_1);
+    spi_master_close(SPI_MASTER_0);
 }
 
 void HAL_SPI_Set_Bit_Order(HAL_SPI_Interface spi, uint8_t order)

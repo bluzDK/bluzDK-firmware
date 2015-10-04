@@ -28,6 +28,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#define SPI_MASTER_0_ENABLE 1
+#define SPI_MASTER_1_ENABLE 1
+
 #define SPI_PIN_DISCONNECTED 0xFFFFFFFF /**< A value used to the PIN deinitialization. */
 #define SPI_DEFAULT_TX_BYTE  0x00       /**< Default byte (used to clock transmission
                                              from slave to the master) */
@@ -92,9 +95,9 @@ typedef enum
     SPI_MASTER_0,   /**< A instance of NRF_SPI0. */
      #endif
 
-     //#ifdef SPI_MASTER_1_ENABLE
+     #ifdef SPI_MASTER_1_ENABLE
     SPI_MASTER_1,   /**< A instance of NRF_SPI1. */
-     //#endif
+     #endif
 
     SPI_MASTER_HW_ENABLED_COUNT /**< A number of enabled instances of the SPI master. */
 } spi_master_hw_instance_t;

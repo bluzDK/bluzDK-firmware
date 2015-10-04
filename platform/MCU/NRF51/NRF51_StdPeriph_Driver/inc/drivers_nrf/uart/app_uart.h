@@ -140,9 +140,9 @@ typedef void (* app_uart_event_handler_t) (app_uart_evt_t * p_app_uart_event);
         static uint8_t     tx_buf[TX_BUF_SIZE];                                                    \
                                                                                                    \
         buffers.rx_buf      = rx_buf;                                                              \
-        buffers.rx_buf_size = sizeof (rx_buf);                                                      \
+        buffers.rx_buf_size = sizeof (rx_buf);                                                     \
         buffers.tx_buf      = tx_buf;                                                              \
-        buffers.tx_buf_size = sizeof (tx_buf);                                                      \
+        buffers.tx_buf_size = sizeof (tx_buf);                                                     \
         ERR_CODE = app_uart_init(P_COMM_PARAMS, &buffers, EVT_HANDLER, IRQ_PRIO, &APP_UART_UID);   \
     } while (0)
 
@@ -191,8 +191,8 @@ typedef void (* app_uart_event_handler_t) (app_uart_evt_t * p_app_uart_event);
  * @retval      NRF_ERROR_INVALID_LENGTH  If a provided buffer is not a power of two.
  * @retval      NRF_ERROR_NULL            If one of the provided buffers is a NULL pointer.
  *
- * Those errors are propagated by the UART module to the caller upon registration when Hardware Flow
- * Control is enabled. When Hardware Flow Control is not used, those errors cannot occur.
+ * The below errors are propagated by the UART module to the caller upon registration when Hardware
+ * Flow Control is enabled. When Hardware Flow Control is not used, these errors cannot occur.
  * @retval      NRF_ERROR_INVALID_STATE   The GPIOTE module is not in a valid state when registering
  *                                        the UART module as a user.
  * @retval      NRF_ERROR_INVALID_PARAM   The UART module provides an invalid callback function when
@@ -226,7 +226,7 @@ uint32_t app_uart_get(uint8_t * p_byte);
  *
  * @param[in] byte   Byte to be transmitted on the UART.
  *
- * @retval NRF_SUCCESS        If the byte was succesfully put on the TX buffer for transmission.
+ * @retval NRF_SUCCESS        If the byte was successfully put on the TX buffer for transmission.
  * @retval NRF_ERROR_NO_MEM   If no more space is available in the TX buffer.
  *                            NRF_ERROR_NO_MEM may occur if flow control is enabled and CTS signal
  *                            is high for a long period and the buffer fills up.
@@ -253,7 +253,7 @@ uint32_t app_uart_put(uint8_t byte);
  *
  * @param[out] p_connection_state    Current connection state of the UART.
  *
- * @retval NRF_SUCCESS  The connection state was succesfully retrieved.
+ * @retval NRF_SUCCESS  The connection state was successfully retrieved.
  */
 uint32_t app_uart_get_connection_state(app_uart_connection_state_t * p_connection_state);
 

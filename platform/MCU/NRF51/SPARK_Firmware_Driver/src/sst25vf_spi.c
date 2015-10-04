@@ -603,6 +603,7 @@ int sFLASH_WriteSingleByte(uint32_t FLASH_Address, uint8_t byteToSend)
 {
 	//sFLASH_EraseSector(FLASH_Address);
 	sFLASH_WriteByte(FLASH_Address, byteToSend);
+    return 0;
 }
 
 uint8_t sFLASH_ReadSingleByte(uint32_t FLASH_Address)

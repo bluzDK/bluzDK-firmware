@@ -31,7 +31,6 @@
 #undef MISO
 #undef SS
 #include "nrf_gpio.h"
-#include "nrf_adc.h"
 
 /* Private typedef ----------------------------------------------------------*/
 
@@ -106,7 +105,7 @@ void HAL_Pin_Mode(pin_t pin, PinMode setMode)
             break;
             
         case AN_INPUT:        //Used internally for ADC Input
-            nrf_adc_init(ADC_RES_10bit, PIN_MAP[pin].gpio_pin, ADC_INT_DISABLED);
+            
             PIN_MAP[pin].pin_mode = AN_INPUT;
             break;
             

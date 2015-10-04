@@ -7,19 +7,21 @@
 TARGET_STDPERIPH_SRC_PATH = $(TARGET_STDPERIPH_PATH)/src
 
 # C source files included in this build.
-CSRC += $(TARGET_STDPERIPH_SRC_PATH)/app_button.c
+# CSRC += $(TARGET_STDPERIPH_SRC_PATH)/app_button.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/app_error.c
-CSRC += $(TARGET_STDPERIPH_SRC_PATH)/app_gpiote.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/app_scheduler.c
+CSRC += $(TARGET_STDPERIPH_SRC_PATH)/device_manager_peripheral.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/app_timer.c
-CSRC += $(TARGET_STDPERIPH_SRC_PATH)/app_uart_fifo.c
+CSRC += $(TARGET_STDPERIPH_SRC_PATH)/app_trace.c
+CSRC += $(TARGET_STDPERIPH_SRC_PATH)/app_uart.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/app_fifo.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/ble_advdata.c
 # CSRC += $(TARGET_STDPERIPH_SRC_PATH)/ble_conn_params.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/ble_debug_assert_handler.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/nrf_delay.c
+CSRC += $(TARGET_STDPERIPH_SRC_PATH)/nrf_drv_common.c
+CSRC += $(TARGET_STDPERIPH_SRC_PATH)/nrf_drv_gpiote.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/pstorage.c
-CSRC += $(TARGET_STDPERIPH_SRC_PATH)/simple_uart.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/softdevice_handler.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/spi_master.c
 

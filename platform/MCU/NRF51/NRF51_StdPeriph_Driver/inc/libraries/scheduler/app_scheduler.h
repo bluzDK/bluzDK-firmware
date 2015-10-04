@@ -39,7 +39,7 @@
  *     scheduler's queue. The app_sched_execute() function will pull this event and call its
  *     handler in the main context.
  *
- * @if (SD_S110 && !SD_S310)
+ * @if (PERIPHERAL)
  * For an example usage of the scheduler, see the implementations of
  * @ref ble_sdk_app_hids_mouse and @ref ble_sdk_app_hids_keyboard.
  * @endif
@@ -52,6 +52,7 @@
 
 #include <stdint.h>
 #include "app_error.h"
+#include "app_util.h"
 
 #define APP_SCHED_EVENT_HEADER_SIZE 8       /**< Size of app_scheduler.event_header_t (only for use inside APP_SCHED_BUF_SIZE()). */
 

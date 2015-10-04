@@ -38,7 +38,6 @@
 #include "app_util_platform.h"
 #include "system_tick_hal.h"
 
-#define SPI_MASTER_1_ENABLE				1
 #define BUTTON_PULL    NRF_GPIO_PIN_PULLUP
 
 //Board LED's and buttons
@@ -89,6 +88,7 @@ void gpiote_init(void);
 void buttons_init(void);
 void external_flash_init(void);
 void gap_params_init(void);
+void device_manager_init(void);
 void scheduler_init(void);
 
 //BLE Stack Functions

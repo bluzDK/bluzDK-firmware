@@ -43,6 +43,7 @@ void HAL_Network_Init(void)
 {
     ble_stack_init();
     scheduler_init();
+    device_manager_init();
     gap_params_init();
     services_init();
     advertising_init();

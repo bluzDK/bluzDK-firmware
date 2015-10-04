@@ -14,7 +14,13 @@
 #include "nrf_error.h"
 #include "app_util.h"
 
-#define FIFO_LENGTH (p_fifo->write_pos - p_fifo->read_pos)  /**< Macro for calculating the FIFO length. */
+static __INLINE uint32_t fifo_length(app_fifo_t * p_fifo)
+{
+  uint32_t tmp = p_fifo->read_pos;
+  return p_fifo->write_pos - tmp;
+}
+
+#define FIFO_LENGTH fifo_length(p_fifo)  /**< Macro for calculating the FIFO length. */
 
 
 uint32_t app_fifo_init(app_fifo_t * p_fifo, uint8_t * p_buf, uint16_t buf_size)

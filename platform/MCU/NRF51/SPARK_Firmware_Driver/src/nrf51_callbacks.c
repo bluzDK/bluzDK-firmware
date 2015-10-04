@@ -43,9 +43,9 @@ void millis_timer_timeout(void * p_context)
  */
 void on_ble_evt(ble_evt_t * p_ble_evt)
 {
-    uint32_t                         err_code;
-    static ble_gap_evt_auth_status_t m_auth_status;
-    ble_gap_enc_info_t *             p_enc_info;
+//    uint32_t                         err_code;
+//    static ble_gap_evt_auth_status_t m_auth_status;
+//    ble_gap_enc_info_t *             p_enc_info;
     ble_gap_addr_t* address = 0;
     
     switch (p_ble_evt->header.evt_id)
@@ -64,39 +64,39 @@ void on_ble_evt(ble_evt_t * p_ble_evt)
             advertising_start();
             break;
             
-        case BLE_GAP_EVT_SEC_PARAMS_REQUEST:
-            err_code = sd_ble_gap_sec_params_reply(m_conn_handle,
-                                                   BLE_GAP_SEC_STATUS_SUCCESS,
-                                                   &m_sec_params);
-            APP_ERROR_CHECK(err_code);
-            break;
-            
-        case BLE_GATTS_EVT_SYS_ATTR_MISSING:
-            err_code = sd_ble_gatts_sys_attr_set(m_conn_handle, NULL, 0);
-            APP_ERROR_CHECK(err_code);
-            break;
-            
-        case BLE_GAP_EVT_AUTH_STATUS:
-            m_auth_status = p_ble_evt->evt.gap_evt.params.auth_status;
-            break;
-            
-        case BLE_GAP_EVT_SEC_INFO_REQUEST:
-            p_enc_info = &m_auth_status.periph_keys.enc_info;
-            if (p_enc_info->div == p_ble_evt->evt.gap_evt.params.sec_info_request.div)
-            {
-                err_code = sd_ble_gap_sec_info_reply(m_conn_handle, p_enc_info, NULL);
-                APP_ERROR_CHECK(err_code);
-            }
-            else
-            {
-                // No keys found for this device
-                err_code = sd_ble_gap_sec_info_reply(m_conn_handle, NULL, NULL);
-                APP_ERROR_CHECK(err_code);
-            }
-            break;
+//        case BLE_GAP_EVT_SEC_PARAMS_REQUEST:
+//            err_code = sd_ble_gap_sec_params_reply(m_conn_handle,
+//                                                   BLE_GAP_SEC_STATUS_SUCCESS,
+//                                                   &m_sec_params, NULL);
+//            APP_ERROR_CHECK(err_code);
+//            break;
+//            
+//        case BLE_GATTS_EVT_SYS_ATTR_MISSING:
+//            err_code = sd_ble_gatts_sys_attr_set(m_conn_handle, NULL, 0, 0);
+//            APP_ERROR_CHECK(err_code);
+//            break;
+//            
+//        case BLE_GAP_EVT_AUTH_STATUS:
+//            m_auth_status = p_ble_evt->evt.gap_evt.params.auth_status;
+//            break;
+//            
+//        case BLE_GAP_EVT_SEC_INFO_REQUEST:
+//            p_enc_info = &m_auth_status.periph_keys.enc_info;
+//            if (p_enc_info->div == p_ble_evt->evt.gap_evt.params.sec_info_request.div)
+//            {
+//                err_code = sd_ble_gap_sec_info_reply(m_conn_handle, p_enc_info, NULL);
+//                APP_ERROR_CHECK(err_code);
+//            }
+//            else
+//            {
+//                // No keys found for this device
+//                err_code = sd_ble_gap_sec_info_reply(m_conn_handle, NULL, NULL);
+//                APP_ERROR_CHECK(err_code);
+//            }
+//            break;
             
         case BLE_GAP_EVT_TIMEOUT:
-            if (p_ble_evt->evt.gap_evt.params.timeout.src == BLE_GAP_TIMEOUT_SRC_ADVERTISEMENT)
+            if (p_ble_evt->evt.gap_evt.params.timeout.src == BLE_GAP_TIMEOUT_SRC_ADVERTISING)
             {
                 
                 // Configure buttons with sense level low as wakeup source.
@@ -149,4 +149,25 @@ void data_write_handler(scs_t * p_lbs, uint8_t *data, uint16_t length)
     dataManagementFeedData(serviceID, length-1, data+1);
 //    uint16_t serviceID = 0x01;
 //    dataManagementFeedData(serviceID, length, data);
+}
+
+/**@brief Function for handling the Device Manager events.
+ *
+ * @param[in]   p_evt   Data associated to the device manager event.
+ */
+uint32_t device_manager_evt_handler(dm_handle_t const    * p_handle,
+                                           dm_event_t const     * p_event,
+                                           ret_code_t           event_result)
+{
+    APP_ERROR_CHECK(event_result);
+    
+    switch(p_event->event_id)
+    {
+        case DM_EVT_DEVICE_CONTEXT_LOADED: // Fall through.
+        case DM_EVT_SECURITY_SETUP_COMPLETE:
+            m_bonded_peer_handle = (*p_handle);
+            break;
+    }
+    
+    return NRF_SUCCESS;
 }
