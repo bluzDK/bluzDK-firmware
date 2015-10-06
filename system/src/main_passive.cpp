@@ -65,11 +65,13 @@ uint32_t on_mseconds = 0;
 /* Private functions ---------------------------------------------------------*/
 extern "C" void HAL_SysTick_Handler(void) {
     uint32_t current_millis = HAL_Timer_Get_Milli_Seconds();
-    if (current_millis % ledOffTime == 0) {
-        on_mseconds = current_millis;
-        LED_On(LED_RGB);
-    } else if (current_millis - on_mseconds > 150) {
-        LED_Off(LED_RGB);
+    if (!LED_RGB_IsOverRidden()) {
+        if (current_millis % ledOffTime == 0) {
+            on_mseconds = current_millis;
+            LED_On(LED_RGB);
+        } else if (current_millis - on_mseconds > 150) {
+            LED_Off(LED_RGB);
+        }
     }
 }
 
