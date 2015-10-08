@@ -21,6 +21,9 @@ Debug/*
 # Release folder
 Release/*
 
+# bootloader build
+bootloader/src/bluz/_build/
+
 # build folder
 *.map
 *.lst

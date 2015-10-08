@@ -136,7 +136,13 @@ extern "C" {
     void pinSetFast(pin_t _pin);
     void pinReadFast(pin_t _pin);
 #else
+<<<<<<< HEAD
 #error "*** MCU architecture not supported by this library. ***"
+=======
+    #warning "*** MCU architecture not supported by the fastPin library. ***"
+    #define pinSetFast(pin) digitalWrite(pin, HIGH)
+    #define pinResetFast(pin) digitalWrite(pin, LOW)
+>>>>>>> 5f8c7946cab3b930e9fb16021139373f61bb1293
 #endif
     
 #endif //USE_BIT_BAND

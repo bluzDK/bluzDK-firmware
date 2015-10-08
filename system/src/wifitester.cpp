@@ -29,6 +29,7 @@
 #include "core_hal.h"
 #include "spark_wiring_version.h"
 #include "string_convert.h"
+#include "system_cloud_internal.h"
 
 #if MODULAR_FIRMWARE
 // The usual wiring implementations are dependent upon I2C, SPI and other global instances. Rewriting the GPIO functions to talk directly to the HAL

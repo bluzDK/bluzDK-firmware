@@ -85,8 +85,6 @@ extern "C" void HAL_SysTick_Handler(void) {
 void app_setup_and_loop_passive(void)
 {
     //Set some Particle flags to bypass functionality we don't need
-    WLAN_SMART_CONFIG_START = 0;
-    WLAN_SMART_CONFIG_STOP = 1;
     SPARK_CLOUD_SOCKETED = 0;
     SPARK_CLOUD_CONNECTED = 0;
     
@@ -160,8 +158,6 @@ void app_setup_and_loop_passive(void)
                 //we disconnected
                 CLOUD_CONNECTED = false;
 
-                WLAN_SMART_CONFIG_START = 0;
-                WLAN_SMART_CONFIG_STOP = 1;
                 SPARK_CLOUD_SOCKETED = 0;
                 SPARK_CLOUD_CONNECTED = 0;
                 

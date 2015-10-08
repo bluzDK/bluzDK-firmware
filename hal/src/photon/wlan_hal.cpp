@@ -188,6 +188,10 @@ wlan_result_t wlan_connect_finalize()
                 break;
         }
     }
+    else
+    {
+        wiced_network_down(WICED_STA_INTERFACE);
+    }
     // DHCP happens synchronously
     HAL_WLAN_notify_dhcp(!result);
     wiced_network_up_cancel = 0;
@@ -195,12 +199,26 @@ wlan_result_t wlan_connect_finalize()
 }
 
 int wlan_select_antenna_impl(WLanSelectAntenna_TypeDef antenna);
-static WLanSelectAntenna_TypeDef antennaSelection = ANT_INTERNAL;
-inline int wlan_refresh_antenna() { return wlan_select_antenna_impl(antennaSelection); }
+
+
+WLanSelectAntenna_TypeDef fetch_antenna_selection()
+{
+    uint8_t result = *(const uint8_t*)dct_read_app_data(DCT_ANTENNA_SELECTION_OFFSET);
+    if (result==0xFF)
+        result = ANT_INTERNAL;  // default
+    return WLanSelectAntenna_TypeDef(result);
+}
+
+void save_antenna_selection(WLanSelectAntenna_TypeDef selection)
+{
+    dct_write_app_data(&selection, DCT_ANTENNA_SELECTION_OFFSET, DCT_ANTENNA_SELECTION_SIZE);
+}
+
+inline int wlan_refresh_antenna() { return wlan_select_antenna_impl(fetch_antenna_selection()); }
 
 int wlan_select_antenna(WLanSelectAntenna_TypeDef antenna)
 {
-    antennaSelection = antenna;
+    save_antenna_selection(antenna);
     return wiced_wlan_connectivity_initialized() ? wlan_refresh_antenna() : 0;
 }
 
@@ -385,7 +403,7 @@ wiced_result_t add_wiced_wifi_credentials(const char *ssid, uint16_t ssidLen, co
         initialize_dct(wifi_config);
 
         // shuffle all slots along
-        memcpy(wifi_config->stored_ap_list+1, wifi_config->stored_ap_list, sizeof(wiced_config_ap_entry_t)*(CONFIG_AP_LIST_SIZE-1));
+        memmove(wifi_config->stored_ap_list+1, wifi_config->stored_ap_list, sizeof(wiced_config_ap_entry_t)*(CONFIG_AP_LIST_SIZE-1));
 
         const int empty = 0;
         wiced_config_ap_entry_t& entry = wifi_config->stored_ap_list[empty];
