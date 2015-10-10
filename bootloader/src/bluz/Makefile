@@ -51,7 +51,7 @@ $(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/src/dfu_transport_b
 $(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/src/hci_mem_pool.c) \
 $(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/src/nrf_assert.c) \
 $(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/src/nrf_delay.c) \
-$(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/src/pstorage_raw.c) \
+$(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/src/pstorage.c) \
 $(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/src/spi_master.c) \
 $(abspath ../../../platform/MCU/NRF51/SPARK_Firmware_Driver/src/sst25vf_spi.c) \
 $(abspath dfu_ble_svc.c) \
