@@ -256,11 +256,13 @@ int main(void)
     
     //For now, until you implement the full bootloader
     ble_stack_init(true);
+    scheduler_init();
     
     //init external flash then check if update is ready
     sFLASH_Init();
     uint8_t byte0 = sFLASH_ReadSingleByte(FLASH_FW_STATUS);
     if (byte0 == 0x01) {
+        nrf_gpio_pin_clear(RGB_LED_PIN_BLUE);
         //we have an app waiting for us. let's first find out the length
         uint32_t fw_len = 0;
         uint8_t byte1 = sFLASH_ReadSingleByte(FLASH_FW_LENGTH1);
@@ -294,7 +296,6 @@ int main(void)
         app_sched_execute();
         
         APP_ERROR_CHECK(err_code);
-        
         //now read from SPI Flash one page at a time and copy over to internal flash
         uint8_t buf[PSTORAGE_FLASH_PAGE_SIZE];
         uint32_t addr = FLASH_FW_ADDRESS;
@@ -317,6 +318,7 @@ int main(void)
         }
         sFLASH_EraseSector(FLASH_FW_STATUS);
         sFLASH_WriteSingleByte(FLASH_FW_STATUS, 0x00);
+        nrf_gpio_pin_set(RGB_LED_PIN_BLUE);
     }
     //TO DO: Temporary for now, just boot directly into the app.
     //Really, we should go on and see if they want to enter boot mode, then take FW and keys through DFU
