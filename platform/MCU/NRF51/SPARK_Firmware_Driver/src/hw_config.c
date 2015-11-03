@@ -16,7 +16,12 @@ uint32_t External_Flash_Start_Address = 0;
 
 uint32_t system_millis(void)
 {
-    return system_millseconds;
+    return system_milliseconds;
+}
+
+uint32_t system_micros(void)
+{
+    return ((uint32_t)(NRF_RTC1->COUNTER) / APP_TIMER_CLOCK_FREQ) * 1000000;
 }
 
 /**@brief Function for error handling, which is called when an error has occurred.
@@ -194,6 +199,22 @@ void timers_init(void)
     APP_TIMER_INIT(APP_TIMER_PRESCALER, APP_TIMER_MAX_TIMERS, APP_TIMER_OP_QUEUE_SIZE, false);
     err_code = app_timer_create(&millis_timer, APP_TIMER_MODE_REPEATED, millis_timer_timeout);
     APP_ERROR_CHECK(err_code);
+    
+    //start a Timer for uSec resolution
+    //TO DO - Do we want this? It keeps the HFCLK running which crushes battery life. Current implentation uses LFCLK
+//    micros_timer.p_reg = NRF_TIMER1;
+//    micros_timer.irq = TIMER1_IRQn;
+//    micros_timer.instance_id = TIMER1_INSTANCE_INDEX;
+//    
+//    err_code = nrf_drv_timer_init(&micros_timer, NULL, micros_timer_timeout);
+//    APP_ERROR_CHECK(err_code);
+//    
+//    uint32_t time_ticks =  nrf_drv_timer_us_to_ticks(&micros_timer, 100);
+//    DEBUG("System Ticks per millisecond: %d", time_ticks);
+//
+//    nrf_drv_timer_extended_compare(
+//                                   &micros_timer, NRF_TIMER_CC_CHANNEL1, time_ticks, NRF_TIMER_SHORT_COMPARE1_CLEAR_MASK, true);
+//    nrf_drv_timer_enable(&micros_timer);
 }
 void gpiote_init(void)
 {
@@ -421,10 +442,10 @@ void power_manage(void)
 //    APP_ERROR_CHECK(err_code);
 //    
 //    sd_nvic_ClearPendingIRQ(RTC1_IRQn);
-    
+//    nrf_drv_timer_disable(&micros_timer);
     uint32_t err_code = sd_app_evt_wait();
     APP_ERROR_CHECK(err_code);
-    
+//    nrf_drv_timer_enable(&micros_timer);
 //    err_code = timers_start();
 //    APP_ERROR_CHECK(err_code);
 }

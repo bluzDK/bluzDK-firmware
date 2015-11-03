@@ -86,6 +86,7 @@ void app_sched_execute(void);
 void blinkLED(int times);
 void heartBeat(void);
 uint32_t system_millis(void);
+uint32_t system_micros(void);
 
 //Flash functions
 uint16_t FLASH_GetDeviceInt(void);

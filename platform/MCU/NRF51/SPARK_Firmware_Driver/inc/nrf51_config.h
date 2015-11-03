@@ -3,6 +3,7 @@
 #include "app_timer_appsh.h"
 #include "nrf_gpiote.h"
 #include "softdevice_handler.h"
+#include "nrf_drv_timer.h"
 //#include "ble_conn_params.h"
 #include "ble_scs.h"
 #include "ble_advdata.h"
@@ -46,6 +47,7 @@
 
 //timers
 app_timer_id_t millis_timer;
+nrf_drv_timer_t micros_timer;
 
 //parameters
 ble_gap_sec_params_t m_sec_params; /**< Security requirements for this application. */
@@ -55,7 +57,8 @@ scs_t m_scs;
 uint16_t m_conn_handle; /**< Handle of the current connection. */
 
 //system variables
-uint32_t system_millseconds;
+uint32_t system_milliseconds;
+uint32_t system_microseconds;
 
 //device manager
 dm_application_instance_t         m_app_handle;                                  /**< Application identifier allocated by device manager. */

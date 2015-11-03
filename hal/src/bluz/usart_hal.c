@@ -39,6 +39,7 @@
 void HAL_USART_Init(HAL_USART_Serial serial, Ring_Buffer *rx_buffer, Ring_Buffer *tx_buffer)
 {
 }
+bool uartConfigured = false;
 void HAL_USART_Begin(HAL_USART_Serial serial, uint32_t baud)
 {
     uint32_t nrfBaudRate = UART_BAUDRATE_BAUDRATE_Baud38400;
@@ -93,15 +94,18 @@ void HAL_USART_Begin(HAL_USART_Serial serial, uint32_t baud)
                          err_code);
 
     APP_ERROR_CHECK(err_code);
+    uartConfigured = true;
 }
 
 void HAL_USART_End(HAL_USART_Serial serial)
 {
     app_uart_close(0);
+    uartConfigured = false;
 }
 
 uint32_t HAL_USART_Write_Data(HAL_USART_Serial serial, uint8_t data)
 {
+    if (!uartConfigured) {return -1;}
     while (app_uart_put(data) == NRF_ERROR_NO_MEM) { }
     return 1;
 }
@@ -113,6 +117,7 @@ int32_t HAL_USART_Available_Data(HAL_USART_Serial serial)
 
 int32_t HAL_USART_Read_Data(HAL_USART_Serial serial)
 {
+    if (!uartConfigured) {return -1;}
     uint8_t* byte = NULL;
     app_uart_get(byte);
     return *byte;

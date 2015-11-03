@@ -44,7 +44,7 @@
  */
 system_tick_t HAL_Timer_Get_Micro_Seconds(void)
 {
-    return 0;
+    return system_micros();
 }
 
 /*
@@ -52,5 +52,5 @@ system_tick_t HAL_Timer_Get_Micro_Seconds(void)
  */
 system_tick_t HAL_Timer_Get_Milli_Seconds(void)
 {
-    return system_millis();;
+    return system_millis();
 }
