@@ -21,7 +21,7 @@ uint32_t system_millis(void)
 
 uint32_t system_micros(void)
 {
-    return ((uint32_t)(NRF_RTC1->COUNTER) / APP_TIMER_CLOCK_FREQ) * 1000000;
+    return ((NRF_RTC1->COUNTER * 1.0) / (APP_TIMER_CLOCK_FREQ * 1.0)) * 1000000.0;
 }
 
 /**@brief Function for error handling, which is called when an error has occurred.
