@@ -1,12 +1,32 @@
-/* Copyright (c) 2014 Nordic Semiconductor. All Rights Reserved.
+/*
+ * Copyright (c) Nordic Semiconductor ASA
+ * All rights reserved.
  *
- * The information contained herein is property of Nordic Semiconductor ASA.
- * Terms and conditions of usage are described in detail in NORDIC
- * SEMICONDUCTOR STANDARD SOFTWARE LICENSE AGREEMENT.
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
  *
- * Licensees are granted free, non-transferable use of the information. NO
- * WARRANTY of ANY KIND is provided. This heading must NOT be removed from
- * the file.
+ *   1. Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ *   2. Redistributions in binary form must reproduce the above copyright notice, this
+ *   list of conditions and the following disclaimer in the documentation and/or
+ *   other materials provided with the distribution.
+ *
+ *   3. Neither the name of Nordic Semiconductor ASA nor the names of other
+ *   contributors to this software may be used to endorse or promote products
+ *   derived from this software without specific prior written permission.
+ *
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
 
@@ -54,18 +74,20 @@ static __INLINE void spi_master_send_recv_irq(volatile spi_master_instance_t * c
 
 #endif //SPI_MASTER_0_ENABLE || SPI_MASTER_1_ENABLE
 
+
+//Had to modify this driver from basic Nordic one as there are conflicts with SPI0 and TWI0
 #ifdef SPI_MASTER_0_ENABLE
 /**
  * @brief SPI0 interrupt handler.
  */
-void SPI0_TWI0_IRQHandler(void)
+void nrf_drv_spi0_int_handler(void)
 {
     if ((NRF_SPI0->EVENTS_READY == 1) && (NRF_SPI0->INTENSET & SPI_INTENSET_READY_Msk))
     {
         NRF_SPI0->EVENTS_READY = 0;
-
+        
         volatile spi_master_instance_t * p_spi_instance = spi_master_get_instance(SPI_MASTER_0);
-
+        
         spi_master_send_recv_irq(p_spi_instance);
     }
 }
@@ -73,16 +95,16 @@ void SPI0_TWI0_IRQHandler(void)
 
 #ifdef SPI_MASTER_1_ENABLE
 /**
- * @brief SPI0 interrupt handler.
+ * @brief SPI1 interrupt handler. Changed from the default driver to handle TWI1/SPI1 conflicts
  */
 void SPI1_TWI1_IRQHandler(void)
 {
     if ((NRF_SPI1->EVENTS_READY == 1) && (NRF_SPI1->INTENSET & SPI_INTENSET_READY_Msk))
     {
         NRF_SPI1->EVENTS_READY = 0;
-
+        
         volatile spi_master_instance_t * p_spi_instance = spi_master_get_instance(SPI_MASTER_1);
-
+        
         spi_master_send_recv_irq(p_spi_instance);
     }
 }

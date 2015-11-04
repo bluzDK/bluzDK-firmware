@@ -15,6 +15,7 @@
 #define SPIM1_MISO_PIN      14u     /**< SPI Master In Slave Out GPIO pin number. */
 #define SPIM1_SS_PIN        15u     /**< SPI Slave Select GPIO pin number. */
 
+//SPI Pins
 #define SPIM0_SCK_PIN   3u
 #define SPIM0_MOSI_PIN  1u
 #define SPIM0_MISO_PIN  2u
