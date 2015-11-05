@@ -1,12 +1,32 @@
-/* Copyright (c) 2015 Nordic Semiconductor. All Rights Reserved.
+/*
+ * Copyright (c) Nordic Semiconductor ASA
+ * All rights reserved.
  *
- * The information contained herein is property of Nordic Semiconductor ASA.
- * Terms and conditions of usage are described in detail in NORDIC
- * SEMICONDUCTOR STANDARD SOFTWARE LICENSE AGREEMENT.
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
  *
- * Licensees are granted free, non-transferable use of the information. NO
- * WARRANTY of ANY KIND is provided. This heading must NOT be removed from
- * the file.
+ *   1. Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ *   2. Redistributions in binary form must reproduce the above copyright notice, this
+ *   list of conditions and the following disclaimer in the documentation and/or
+ *   other materials provided with the distribution.
+ *
+ *   3. Neither the name of Nordic Semiconductor ASA nor the names of other
+ *   contributors to this software may be used to endorse or promote products
+ *   derived from this software without specific prior written permission.
+ *
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
 
@@ -40,14 +60,13 @@
 #define TIMER0_INSTANCE_INDEX      0
 #endif
 
-#define TIMER1_ENABLED 0
+#define TIMER1_ENABLED 1
 
 #if (TIMER1_ENABLED == 1)
 #define TIMER1_CONFIG_FREQUENCY    NRF_TIMER_FREQ_16MHz
 #define TIMER1_CONFIG_MODE         TIMER_MODE_MODE_Timer
 #define TIMER1_CONFIG_BIT_WIDTH    TIMER_BITMODE_BITMODE_16Bit
 #define TIMER1_CONFIG_IRQ_PRIORITY APP_IRQ_PRIORITY_LOW
-
 #define TIMER1_INSTANCE_INDEX      (TIMER0_ENABLED)
 #endif
  
@@ -103,25 +122,25 @@
 
 #if (TWI0_ENABLED == 1)
 #define TWI0_CONFIG_FREQUENCY    NRF_TWI_FREQ_100K
-#define TWI0_CONFIG_SCL          0
-#define TWI0_CONFIG_SDA          1
-#define TWI0_CONFIG_IRQ_PRIORITY APP_IRQ_PRIORITY_HIGH
+#define TWI0_CONFIG_SDA  21
+#define TWI0_CONFIG_SCL  22
+#define TWI0_CONFIG_IRQ_PRIORITY APP_IRQ_PRIORITY_LOW
 
 #define TWI0_INSTANCE_INDEX      0
 #endif
 
 #define TWI1_ENABLED 0
-
 #if (TWI1_ENABLED == 1)
-#define TWI1_CONFIG_FREQUENCY NRF_TWI_FREQ_250K
-#define TWI1_CONFIG_SCL          0
-#define TWI1_CONFIG_SDA          1
+#define TWI1_CONFIG_FREQUENCY NRF_TWI_FREQ_100K
+#define TWI1_CONFIG_SDA  0
+#define TWI1_CONFIG_SCL  1
 #define TWI1_CONFIG_IRQ_PRIORITY APP_IRQ_PRIORITY_LOW
 
 #define TWI1_INSTANCE_INDEX      (TWI0_ENABLED)
 #endif
 
 #define TWI_COUNT                (TWI0_ENABLED+TWI1_ENABLED)
+
 
 /* QDEC */
 #define QDEC_ENABLED 0

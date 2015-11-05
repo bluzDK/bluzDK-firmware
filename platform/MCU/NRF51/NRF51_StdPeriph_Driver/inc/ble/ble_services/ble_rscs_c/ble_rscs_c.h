@@ -1,21 +1,33 @@
-#ifndef BLE_RSCS_C_H__
-#define BLE_RSCS_C_H__
-
-#include <stdint.h>
-#include <stdbool.h>
-#include "ble.h"
-
-/**
- * @defgroup ble_sdk_srv_rscs_c Running Speed and Cadence Service Client
- * @{
- * @ingroup ble_sdk_srv
+/*
+ * Copyright (c) Nordic Semiconductor ASA
+ * All rights reserved.
  *
- * @details  This module contains the APIs and types exposed by the Running Speed and Cadence
- *           Service Client module. These APIs and types can be used by the application to perform
- *           discovery of Running Speed and Cadence Service at the peer and interact with it.
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
  *
- * @note     The application must propagate BLE stack events to this module by calling
- *           ble_rscs_c_on_ble_evt().
+ *   1. Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ *   2. Redistributions in binary form must reproduce the above copyright notice, this
+ *   list of conditions and the following disclaimer in the documentation and/or
+ *   other materials provided with the distribution.
+ *
+ *   3. Neither the name of Nordic Semiconductor ASA nor the names of other
+ *   contributors to this software may be used to endorse or promote products
+ *   derived from this software without specific prior written permission.
+ *
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
  */
 
 /**@brief RSCS Client event type. */
