@@ -54,7 +54,7 @@ void HAL_I2C_Begin(HAL_I2C_Interface i2c, I2C_Mode mode, uint8_t address, void* 
 
 void HAL_I2C_End(HAL_I2C_Interface i2c, void* reserved)
 {
-    nrf_drv_twi_enable(&p_twi_instance); // Disable the TWI instance
+    nrf_drv_twi_disable(&p_twi_instance); // Disable the TWI instance
     nrf_drv_twi_uninit(&p_twi_instance); // Uninit the TWI instance
 }
 
@@ -87,7 +87,9 @@ void HAL_I2C_Begin_Transmission(HAL_I2C_Interface i2c, uint8_t address,void* res
 
 uint8_t HAL_I2C_End_Transmission(HAL_I2C_Interface i2c, uint8_t stop,void* reserved)
 {
-    return nrf_drv_twi_tx(&p_twi_instance, dataAddress, dataOutBuffer, dataOutBufferSize, !stop) == NRF_SUCCESS;
+    uint8_t err_code = nrf_drv_twi_tx(&p_twi_instance, dataAddress, dataOutBuffer, dataOutBufferSize, !stop);
+    dataOutBufferSize = 0;
+    return err_code;
 }
 
 
@@ -104,7 +106,7 @@ int32_t HAL_I2C_Available_Data(HAL_I2C_Interface i2c,void* reserved)
 
 int32_t HAL_I2C_Read_Data(HAL_I2C_Interface i2c,void* reserved)
 {
-    return dataInBuffer[dataInBufferSize++];
+    return dataInBuffer[dataInBufferStart++];
 }
 
 int32_t HAL_I2C_Peek_Data(HAL_I2C_Interface i2c,void* reserved)

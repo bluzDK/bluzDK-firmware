@@ -38,13 +38,13 @@ void nrf_drv_twi0_int_handler(void);
 
 void SPI0_TWI0_IRQHandler(void)
 {
-    if (NRF_SPI0->ENABLE) {
+    if (NRF_TWI0->ENABLE) {
+        nrf_drv_twi0_int_handler();
+    } else if (NRF_SPI0->ENABLE) {
         if ((NRF_SPI0->EVENTS_READY == 1) && (NRF_SPI0->INTENSET & SPI_INTENSET_READY_Msk))
         {
             NRF_SPI0->EVENTS_READY = 0;
             nrf_drv_spi0_int_handler();
         }
-    } else if (NRF_TWI0->ENABLE) {
-        nrf_drv_twi0_int_handler();
-    }
+    } 
 }
