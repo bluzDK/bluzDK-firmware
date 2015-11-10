@@ -77,7 +77,11 @@ uint32_t HAL_I2C_Request_Data(HAL_I2C_Interface i2c, uint8_t address, uint8_t qu
 {
     dataInBufferStart = 0;
     dataInBufferSize = quantity;
-    return nrf_drv_twi_rx(&p_twi_instance, address, dataInBuffer, quantity, false);
+    if (nrf_drv_twi_rx(&p_twi_instance, address, dataInBuffer, quantity, !stop) == NRF_SUCCESS) {
+        return quantity;
+    } else {
+        return 0;
+    }
 }
 
 void HAL_I2C_Begin_Transmission(HAL_I2C_Interface i2c, uint8_t address,void* reserved)
