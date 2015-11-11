@@ -18,6 +18,7 @@ CSRC += $(TARGET_STDPERIPH_SRC_PATH)/app_fifo.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/ble_advdata.c
 # CSRC += $(TARGET_STDPERIPH_SRC_PATH)/ble_conn_params.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/ble_debug_assert_handler.c
+CSRC += $(TARGET_STDPERIPH_SRC_PATH)/ble_radio_notification.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/nrf_delay.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/nrf_drv_common.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/nrf_drv_gpiote.c

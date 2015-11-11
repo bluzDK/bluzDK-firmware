@@ -17,6 +17,7 @@ INCLUDE_DIRS += $(TARGET_STDPERIPH_PATH)/inc/drivers_nrf/uart
 INCLUDE_DIRS += $(TARGET_STDPERIPH_PATH)/inc/softdevice/common/softdevice_handler
 INCLUDE_DIRS += $(TARGET_STDPERIPH_PATH)/inc/ble/common
 INCLUDE_DIRS += $(TARGET_STDPERIPH_PATH)/inc/ble/device_manager
+INCLUDE_DIRS += $(TARGET_STDPERIPH_PATH)/inc/ble/ble_radio_notification
 INCLUDE_DIRS += $(TARGET_STDPERIPH_PATH)/inc/ble/device_manager/config
 INCLUDE_DIRS += $(TARGET_STDPERIPH_PATH)/inc/ble/ble_error_log
 INCLUDE_DIRS += $(TARGET_STDPERIPH_PATH)/inc/ble/ble_debug_assert_handler

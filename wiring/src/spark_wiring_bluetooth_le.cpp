@@ -32,3 +32,8 @@ void BLEClass::stopAdvertising()
 {
     HAL_BLE_Stop_Advertising();
 }
+
+int BLEClass::registerNotifications(void (*radio_callback)(bool radio_active))
+{
+    return HAL_BLE_Register_Radio_Notification(radio_callback);
+}

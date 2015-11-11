@@ -36,6 +36,8 @@ extern "C" {
     BLUETOOTH_LE_STATE HAL_BLE_GET_STATE(void);
     void HAL_BLE_Start_Advertising(void);
     void HAL_BLE_Stop_Advertising(void);
+    
+    int HAL_BLE_Register_Radio_Notification(void (*radio_callback)(bool radio_active));
 
 #ifdef __cplusplus
 }

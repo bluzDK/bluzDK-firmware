@@ -67,6 +67,8 @@ void advertising_stop(void);
 uint32_t timers_start(void);
 uint32_t timers_stop(void);
 
+int register_radio_callback(void (*radio_callback)(bool radio_active));
+
 //Data Services Functions
 void data_service_init(void);
 

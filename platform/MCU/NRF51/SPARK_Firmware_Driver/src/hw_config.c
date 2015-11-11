@@ -25,6 +25,7 @@
 #include "rgbled.h"
 #include "device_manager.h"
 #include "pstorage.h"
+#include "ble_radio_notification.h"
 
 uint32_t NbrOfPage = 0;
 uint16_t Flash_Update_Index = 0;
@@ -346,6 +347,11 @@ uint32_t timers_start(void)
 uint32_t timers_stop(void)
 {
     return app_timer_stop(millis_timer);
+}
+
+int register_radio_callback(void (*radio_callback)(bool radio_active))
+{
+    return ble_radio_notification_init(NRF_APP_PRIORITY_LOW,NRF_RADIO_NOTIFICATION_DISTANCE_800US,radio_callback);
 }
 
 /**@brief Function for initializing the BLE stack.

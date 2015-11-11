@@ -41,6 +41,10 @@ public:
     static void startAdvertising();
     static void stopAdvertising();
     
+    //notification handler
+    static int registerNotifications(void (*radio_callback)(bool radio_active));
+    
+    
 };
 
 extern BLEClass BLE;
