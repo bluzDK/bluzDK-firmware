@@ -18,6 +18,11 @@
 #include "spark_wiring_bluetooth_le.h"
 #include "core_hal.h"
 
+BLEState BLEClass::getState()
+{
+    return (BLEState)HAL_BLE_GET_STATE();
+}
+
 void BLEClass::startAdvertising()
 {
     HAL_BLE_Start_Advertising();
@@ -26,9 +31,4 @@ void BLEClass::startAdvertising()
 void BLEClass::stopAdvertising()
 {
     HAL_BLE_Stop_Advertising();
-}
-
-bool BLEClass::isAdvertising()
-{
-    return HAL_BLE_Is_Advertising();
 }

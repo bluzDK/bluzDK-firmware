@@ -16,8 +16,14 @@
  */
 
 /* Includes ------------------------------------------------------------------*/
+#include "bluetooth_le_hal.h"
 #include "hw_config.h"
 #include "spi_master.h"
+
+BLUETOOTH_LE_STATE HAL_BLE_GET_STATE(void)
+{
+    return state;
+}
 
 void HAL_BLE_Start_Advertising(void)
 {
@@ -26,8 +32,4 @@ void HAL_BLE_Start_Advertising(void)
 void HAL_BLE_Stop_Advertising(void)
 {
     advertising_stop();
-}
-bool HAL_BLE_Is_Advertising(void)
-{
-    return state == BLE_ADVERTISING;
 }

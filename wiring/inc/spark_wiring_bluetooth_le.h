@@ -21,17 +21,25 @@
 #include "spark_wiring.h"
 #include "spark_wiring_platform.h"
 #include "bluetooth_le_hal.h"
+    
+enum BLEState {
+    BLE_OFF,
+    BLE_ADVERTISING,
+    BLE_SLEEPING,
+    BLE_CONNECTED,
+};
 
 class BLEClass {
 private:
 
 public:
     BLEClass(void) {};
-
+    
+    static BLEState getState();
+    
     //advertising functions
     static void startAdvertising();
     static void stopAdvertising();
-    static bool isAdvertising(void);
     
 };
 
