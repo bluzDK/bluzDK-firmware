@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/spark/firmware.svg?branch=develop)](https://travis-ci.org/spark/firmware)
 
-# Particle Firmware for the Core and Photon
+# Particle Firmware for the Core, Photon and bluz
 
 This is the main source code repository of the Particle firmware libraries.
 
@@ -58,8 +58,11 @@ To get started building firmware locally, see [Getting Started](docs/gettingstar
 
 The firmware uses the GNU GCC toolchain for ARM Cortex-M processors, ARM's CMSIS libraries, STM32 standard peripheral libraries and Arduino's implementation of Wiring.
 
+bluz firmware also uses the latest SDK and SoftDevice from Nordic Semiconductor for the Bluetooth LE stack.
+
 On the Core: TI's CC3000 host driver libraries,
 On the photon: Broadcom's WICED WiFi SDK.
+On bluz: Nordic Semiconductor SDK v9.0 with s110 SoftDevice v8.0
 
 ### LICENSE
 
