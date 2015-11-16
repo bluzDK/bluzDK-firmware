@@ -17,6 +17,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "spi_hal.h"
+#include "pinmap_impl.h"
 #undef SCK
 #undef MOSI
 #undef MISO
@@ -67,6 +68,7 @@ void HAL_SPI_Init(HAL_SPI_Interface spi)
 void HAL_SPI_Begin(HAL_SPI_Interface spi, uint16_t pin)
 {
     HW_ZERO_CONFIG = HW0_SPI;
+    spi_config.SPI_Pin_SS = PIN_MAP[pin].gpio_pin;
     spi_master_open(SPI_MASTER_0, &spi_config);
     spi_master_evt_handler_reg(SPI_MASTER_0, spi0_master_event_handler);
 }
