@@ -26,6 +26,7 @@
 #include "hw_config.h"
 #include "hw_layout.h"
 #include "nrf_drv_twi.h"
+#include "nrf51_driver_config.h"
 
 const nrf_drv_twi_t     p_twi_instance = NRF_DRV_TWI_INSTANCE(0);
 nrf_drv_twi_config_t    p_twi_config = NRF_DRV_TWI_DEFAULT_CONFIG(0);
@@ -49,6 +50,7 @@ void HAL_I2C_Init(HAL_I2C_Interface i2c, void* reserved)
 
 void HAL_I2C_Begin(HAL_I2C_Interface i2c, I2C_Mode mode, uint8_t address, void* reserved)
 {
+    HW_ZERO_CONFIG = HW0_TWI;
     nrf_drv_twi_enable(&p_twi_instance); // Enable the TWI instance
 }
 

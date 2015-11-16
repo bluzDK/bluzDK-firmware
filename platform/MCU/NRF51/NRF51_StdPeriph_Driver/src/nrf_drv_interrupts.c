@@ -32,19 +32,16 @@
 
 #include "nrf_drv_twi.h"
 #include "spi_master.h"
+#include "nrf51_driver_config.h"
 
 void nrf_drv_spi0_int_handler(void);
 void nrf_drv_twi0_int_handler(void);
 
 void SPI0_TWI0_IRQHandler(void)
 {
-    if (NRF_TWI0->ENABLE) {
+    if (HW_ZERO_CONFIG == HW0_TWI) {
         nrf_drv_twi0_int_handler();
-    } else if (NRF_SPI0->ENABLE) {
-        if ((NRF_SPI0->EVENTS_READY == 1) && (NRF_SPI0->INTENSET & SPI_INTENSET_READY_Msk))
-        {
-            NRF_SPI0->EVENTS_READY = 0;
-            nrf_drv_spi0_int_handler();
-        }
+    } else if (HW_ZERO_CONFIG == HW0_SPI) {
+        nrf_drv_spi0_int_handler();
     } 
 }

@@ -23,6 +23,7 @@
 #undef SS
 #include "hw_config.h"
 #include "spi_master.h"
+#include "nrf51_driver_config.h"
 
 spi_master_config_t spi_config = SPI_MASTER_INIT_DEFAULT;
 volatile bool spi0_transmission_completed = false;
@@ -65,6 +66,7 @@ void HAL_SPI_Init(HAL_SPI_Interface spi)
 
 void HAL_SPI_Begin(HAL_SPI_Interface spi, uint16_t pin)
 {
+    HW_ZERO_CONFIG = HW0_SPI;
     spi_master_open(SPI_MASTER_0, &spi_config);
     spi_master_evt_handler_reg(SPI_MASTER_0, spi0_master_event_handler);
 }
