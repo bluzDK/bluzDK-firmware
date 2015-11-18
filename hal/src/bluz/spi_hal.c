@@ -68,7 +68,9 @@ void HAL_SPI_Init(HAL_SPI_Interface spi)
 void HAL_SPI_Begin(HAL_SPI_Interface spi, uint16_t pin)
 {
     HW_ZERO_CONFIG = HW0_SPI;
-    spi_config.SPI_Pin_SS = PIN_MAP[pin].gpio_pin;
+    if (pin != SPI_DEFAULT_SS) {
+        spi_config.SPI_Pin_SS = PIN_MAP[pin].gpio_pin;
+    }
     spi_master_open(SPI_MASTER_0, &spi_config);
     spi_master_evt_handler_reg(SPI_MASTER_0, spi0_master_event_handler);
 }
@@ -92,20 +94,20 @@ void HAL_SPI_Set_Data_Mode(HAL_SPI_Interface spi, uint8_t mode)
 {
     switch (mode) {
         case SPI_MODE0:
-            spi_config.SPI_CONFIG_CPOL = SPI_CONFIG_CPOL_ActiveLow;
-            spi_config.SPI_CONFIG_CPHA = SPI_CONFIG_CPHA_Trailing;
+            spi_config.SPI_CONFIG_CPOL = SPI_CONFIG_CPOL_ActiveHigh;
+            spi_config.SPI_CONFIG_CPHA = SPI_CONFIG_CPHA_Leading;
             break;
         case SPI_MODE1:
-            spi_config.SPI_CONFIG_CPOL = SPI_CONFIG_CPOL_ActiveLow;
-            spi_config.SPI_CONFIG_CPHA = SPI_CONFIG_CPHA_Leading;
-            break;
-        case SPI_MODE2:
             spi_config.SPI_CONFIG_CPOL = SPI_CONFIG_CPOL_ActiveHigh;
             spi_config.SPI_CONFIG_CPHA = SPI_CONFIG_CPHA_Trailing;
             break;
-        case SPI_MODE3:
-            spi_config.SPI_CONFIG_CPOL = SPI_CONFIG_CPOL_ActiveHigh;
+        case SPI_MODE2:
+            spi_config.SPI_CONFIG_CPOL = SPI_CONFIG_CPOL_ActiveLow;
             spi_config.SPI_CONFIG_CPHA = SPI_CONFIG_CPHA_Leading;
+            break;
+        case SPI_MODE3:
+            spi_config.SPI_CONFIG_CPOL = SPI_CONFIG_CPOL_ActiveLow;
+            spi_config.SPI_CONFIG_CPHA = SPI_CONFIG_CPHA_Trailing;
             break;
     }
     reset_spi_config();
@@ -143,7 +145,9 @@ void HAL_SPI_Set_Clock_Divider(HAL_SPI_Interface spi, uint8_t rate)
 
 uint16_t HAL_SPI_Send_Receive_Data(HAL_SPI_Interface spi, uint16_t data)
 {
-    uint8_t rx_data[0];
+    uint8_t rx_data[1];
+    rx_data[0] = 0x00;
+    
     spi0_transmission_completed = false;
     
     uint32_t err_code = spi_master_send_recv(SPI_MASTER_0, (uint8_t *)&data, 1, rx_data, 1);
