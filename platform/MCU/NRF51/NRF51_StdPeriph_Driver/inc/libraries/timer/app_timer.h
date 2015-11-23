@@ -127,6 +127,11 @@ typedef void (*app_timer_timeout_handler_t)(void * p_context);
 typedef uint32_t (*app_timer_evt_schedule_func_t) (app_timer_timeout_handler_t timeout_handler,
                                                    void *                      p_context);
 
+
+/**@brief Integer for keepping track of the RTC overflow events. */
+volatile uint8_t RTC_OVERFLOW_COUNT;
+
+
 /**@brief Timer modes. */
 typedef enum
 {

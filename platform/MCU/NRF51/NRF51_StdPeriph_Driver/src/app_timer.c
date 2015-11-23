@@ -175,8 +175,8 @@ static void rtc1_init(uint32_t prescaler)
  */
 static void rtc1_start(void)
 {
-    NRF_RTC1->EVTENSET = RTC_EVTEN_COMPARE0_Msk;
-    NRF_RTC1->INTENSET = RTC_INTENSET_COMPARE0_Msk;
+    NRF_RTC1->EVTENSET = RTC_EVTEN_OVRFLW_Msk | RTC_EVTEN_COMPARE0_Msk;
+    NRF_RTC1->INTENSET = RTC_INTENSET_OVRFLW_Msk | RTC_INTENSET_COMPARE0_Msk;
 
     NVIC_ClearPendingIRQ(RTC1_IRQn);
     NVIC_EnableIRQ(RTC1_IRQn);
@@ -194,8 +194,8 @@ static void rtc1_stop(void)
 {
     NVIC_DisableIRQ(RTC1_IRQn);
 
-    NRF_RTC1->EVTENCLR = RTC_EVTEN_COMPARE0_Msk;
-    NRF_RTC1->INTENCLR = RTC_INTENSET_COMPARE0_Msk;
+    NRF_RTC1->EVTENCLR = RTC_EVTEN_OVRFLW_Msk | RTC_EVTEN_COMPARE0_Msk;
+    NRF_RTC1->INTENCLR = RTC_INTENSET_OVRFLW_Msk | RTC_INTENSET_COMPARE0_Msk;
 
     NRF_RTC1->TASKS_STOP = 1;
     nrf_delay_us(MAX_RTC_TASKS_DELAY);
@@ -933,6 +933,11 @@ static uint32_t timer_stop_all_op_schedule(timer_user_id_t user_id)
  */
 void RTC1_IRQHandler(void)
 {
+    //keep track ov overflows
+    if (NRF_RTC1->EVENTS_OVRFLW) {
+        RTC_OVERFLOW_COUNT++;
+    }
+    
     // Clear all events (also unexpected ones)
     NRF_RTC1->EVENTS_COMPARE[0] = 0;
     NRF_RTC1->EVENTS_COMPARE[1] = 0;
@@ -962,6 +967,7 @@ uint32_t app_timer_init(uint32_t                      prescaler,
                         void *                        p_buffer,
                         app_timer_evt_schedule_func_t evt_schedule_func)
 {
+    RTC_OVERFLOW_COUNT = 0;
     int i;
 
     // Check that buffer is correctly aligned
