@@ -18,6 +18,8 @@
 
 #define SPI_FAST_DEFAULT_CONFIG {.pin_SCK = 1, .pin_MOSI = 2, .pin_MISO = 3, .pin_CSN = 4,  \
                                  .frequency = SPI_FREQ_1MBPS, .config.fields.mode = 0, .config.fields.bit_order = SPI_BITORDER_MSB_LSB}
+#define SPI_PIN_DISCONNECTED 0xFFFFFFFF /**< A value used to the PIN deinitialization. */
+
 
 /**
  *  SPI master operating frequency
@@ -100,6 +102,18 @@ typedef struct
  * @retval 0, if either init failed or slave did not respond to the test transfer
  */
 uint32_t* spi_master_init(SPI_module_number_t spi_num, SPI_config_t *spi_config);
+
+/**
+ * Disables given SPI master.
+ *
+ * Disconnects pins from the hardware SPI and disables the peripheral.
+ *
+ * @param module_number SPI master number (SPIModuleNumber) to close.
+ * @return
+ * @retval true if successfully closed
+ * @retval false if there were any errors closing the SPI master
+ */
+bool spi_master_disable(SPI_module_number_t spi_num);
 
 /**
  * Transmit/receive data over SPI bus.

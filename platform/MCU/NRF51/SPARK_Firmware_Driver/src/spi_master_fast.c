@@ -50,6 +50,17 @@ uint32_t* spi_master_init(SPI_module_number_t spi_num, SPI_config_t *spi_config)
     return (uint32_t *)spi_base[spi_num];
 }
 
+bool spi_master_disable(SPI_module_number_t spi_num)
+{
+    spi_base[spi_num]->ENABLE = (SPI_ENABLE_ENABLE_Disabled << SPI_ENABLE_ENABLE_Pos);
+    
+    spi_base[spi_num]->PSELSCK  = (uint32_t)SPI_PIN_DISCONNECTED;
+    spi_base[spi_num]->PSELMOSI = (uint32_t)SPI_PIN_DISCONNECTED;
+    spi_base[spi_num]->PSELMISO = (uint32_t)SPI_PIN_DISCONNECTED;
+    
+    return true;
+}
+
 bool spi_master_tx_rx(SPI_module_number_t spi_num, uint16_t transfer_size, const uint8_t *tx_data, uint8_t *rx_data)
 {
     volatile uint32_t *SPI_DATA_READY;

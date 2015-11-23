@@ -58,6 +58,7 @@ void HAL_SPI_Begin(HAL_SPI_Interface spi, uint16_t pin)
 void HAL_SPI_End(HAL_SPI_Interface spi)
 {
     //TO DO: Need an ending
+    spi_master_disable(SPI0);
 }
 
 void HAL_SPI_Set_Bit_Order(HAL_SPI_Interface spi, uint8_t order)
