@@ -42,6 +42,6 @@ void SPI0_TWI0_IRQHandler(void)
     if (HW_ZERO_CONFIG == HW0_TWI) {
         nrf_drv_twi0_int_handler();
     } else if (HW_ZERO_CONFIG == HW0_SPI) {
-        nrf_drv_spi0_int_handler();
-    } 
+//        nrf_drv_spi0_int_handler();
+    }
 }

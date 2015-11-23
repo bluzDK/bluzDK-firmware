@@ -15,6 +15,7 @@ CSRC += $(TARGET_SPARK_SRC_PATH)/sst25vf_spi.c
 CSRC += $(TARGET_SPARK_SRC_PATH)/system_nrf51.c
 CSRC += $(TARGET_SPARK_SRC_PATH)/nrf51_callbacks.c
 CSRC += $(TARGET_SPARK_SRC_PATH)/particle_data_service.c
+CSRC += $(TARGET_SPARK_SRC_PATH)/spi_master_fast.c
 
 #ifdef BLUZ
 

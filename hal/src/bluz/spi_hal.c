@@ -23,69 +23,49 @@
 #undef MISO
 #undef SS
 #include "hw_config.h"
-#include "spi_master.h"
+#include "spi_master_fast.h"
 #include "nrf51_driver_config.h"
 
-spi_master_config_t spi_config = SPI_MASTER_INIT_DEFAULT;
-volatile bool spi0_transmission_completed = false;
-
-void spi0_master_event_handler(spi_master_evt_t spi_master_evt)
-{
-    switch (spi_master_evt.evt_type)
-    {
-        case SPI_MASTER_EVT_TRANSFER_COMPLETED:
-            //Data transmission is ended successful. 'rx_buffer' has data received from SPI slave.
-            
-            spi0_transmission_completed = true;
-            break;
-            
-        default:
-            //No implementation needed.
-            break;
-    }
-}
+SPI_config_t spi_config =  {
+    .pin_SCK                 = SPIM0_SCK_PIN,
+    .pin_MOSI                = SPIM0_MOSI_PIN,
+    .pin_MISO                = SPIM0_MISO_PIN,
+    .pin_CSN                 = SPIM0_MOSI_PIN,
+    .frequency               = SPI_FREQ_1MBPS,
+    .config.fields.mode      = SPI_MODE0,
+    .config.fields.bit_order = SPI_BITORDER_MSB_LSB
+};
 
 void reset_spi_config(void)
 {
-    NRF_SPI0->ENABLE = (SPI_ENABLE_ENABLE_Disabled << SPI_ENABLE_ENABLE_Pos);
-    
-    NRF_SPI0->CONFIG = (uint32_t)(spi_config.SPI_CONFIG_CPHA << SPI_CONFIG_CPHA_Pos) | (spi_config.SPI_CONFIG_CPOL << SPI_CONFIG_CPOL_Pos) | (spi_config.SPI_CONFIG_ORDER << SPI_CONFIG_ORDER_Pos);
-    NRF_SPI0->FREQUENCY = spi_config.SPI_Freq;
-    
-    NRF_SPI0->ENABLE = (SPI_ENABLE_ENABLE_Enabled << SPI_ENABLE_ENABLE_Pos);
+    spi_master_init(SPI0, &spi_config);
 }
 
 void HAL_SPI_Init(HAL_SPI_Interface spi)
 {
-    spi_config.SPI_Pin_SCK = SPIM0_SCK_PIN;
-    spi_config.SPI_Pin_MISO = SPIM0_MISO_PIN;
-    spi_config.SPI_Pin_MOSI = SPIM0_MOSI_PIN;
-    spi_config.SPI_Pin_SS = SPIM0_SS_PIN;
-    spi_config.SPI_CONFIG_ORDER = SPI_CONFIG_ORDER_MsbFirst;
-    spi_config.SPI_PriorityIRQ = APP_IRQ_PRIORITY_HIGH;
+    
 }
 
 void HAL_SPI_Begin(HAL_SPI_Interface spi, uint16_t pin)
 {
     HW_ZERO_CONFIG = HW0_SPI;
     if (pin != SPI_DEFAULT_SS) {
-        spi_config.SPI_Pin_SS = PIN_MAP[pin].gpio_pin;
+        spi_config.pin_CSN = PIN_MAP[pin].gpio_pin;
     }
-    spi_master_open(SPI_MASTER_0, &spi_config);
-    spi_master_evt_handler_reg(SPI_MASTER_0, spi0_master_event_handler);
+    spi_master_init(SPI0, &spi_config);
 }
 
 void HAL_SPI_End(HAL_SPI_Interface spi)
 {
-    spi_master_close(SPI_MASTER_0);
+    //TO DO: Need an ending
 }
 
 void HAL_SPI_Set_Bit_Order(HAL_SPI_Interface spi, uint8_t order)
 {
     if (order == LSBFIRST) {
-        spi_config.SPI_CONFIG_ORDER = SPI_CONFIG_ORDER_LsbFirst;
+        spi_config.config.fields.bit_order = SPI_BITORDER_LSB_MSB;
     } else {
-        spi_config.SPI_CONFIG_ORDER = SPI_CONFIG_ORDER_MsbFirst;
+        spi_config.config.fields.bit_order = SPI_BITORDER_MSB_LSB;
     }
     reset_spi_config();
 }
@@ -94,20 +74,16 @@ void HAL_SPI_Set_Data_Mode(HAL_SPI_Interface spi, uint8_t mode)
 {
     switch (mode) {
         case SPI_MODE0:
-            spi_config.SPI_CONFIG_CPOL = SPI_CONFIG_CPOL_ActiveHigh;
-            spi_config.SPI_CONFIG_CPHA = SPI_CONFIG_CPHA_Leading;
+            spi_config.config.fields.mode = SPI_MODE_ZERO;
             break;
         case SPI_MODE1:
-            spi_config.SPI_CONFIG_CPOL = SPI_CONFIG_CPOL_ActiveHigh;
-            spi_config.SPI_CONFIG_CPHA = SPI_CONFIG_CPHA_Trailing;
+            spi_config.config.fields.mode = SPI_MODE_ONE;
             break;
         case SPI_MODE2:
-            spi_config.SPI_CONFIG_CPOL = SPI_CONFIG_CPOL_ActiveLow;
-            spi_config.SPI_CONFIG_CPHA = SPI_CONFIG_CPHA_Leading;
+            spi_config.config.fields.mode = SPI_MODE_TWO;
             break;
         case SPI_MODE3:
-            spi_config.SPI_CONFIG_CPOL = SPI_CONFIG_CPOL_ActiveLow;
-            spi_config.SPI_CONFIG_CPHA = SPI_CONFIG_CPHA_Trailing;
+            spi_config.config.fields.mode = SPI_MODE_THREE;
             break;
     }
     reset_spi_config();
@@ -118,25 +94,25 @@ void HAL_SPI_Set_Clock_Divider(HAL_SPI_Interface spi, uint8_t rate)
     switch (rate)
     {
         case SPI_CLOCK_DIV2:
-            spi_config.SPI_Freq = SPI_FREQUENCY_FREQUENCY_M8;
+            spi_config.frequency = SPI_FREQ_8MBPS;
             break;
         case SPI_CLOCK_DIV4:
-            spi_config.SPI_Freq = SPI_FREQUENCY_FREQUENCY_M4;
+            spi_config.frequency = SPI_FREQ_4MBPS;
             break;
         case SPI_CLOCK_DIV8:
-            spi_config.SPI_Freq = SPI_FREQUENCY_FREQUENCY_M2;
+            spi_config.frequency = SPI_FREQ_2MBPS;
             break;
         case SPI_CLOCK_DIV16:
-            spi_config.SPI_Freq = SPI_FREQUENCY_FREQUENCY_M1;
+            spi_config.frequency = SPI_FREQ_1MBPS;
             break;
         case SPI_CLOCK_DIV32:
-            spi_config.SPI_Freq = SPI_FREQUENCY_FREQUENCY_K500;
+            spi_config.frequency = SPI_FREQ_500KBPS;
             break;
         case SPI_CLOCK_DIV64:
-            spi_config.SPI_Freq = SPI_FREQUENCY_FREQUENCY_K250;
+            spi_config.frequency = SPI_FREQ_250KBPS;
             break;
         case SPI_CLOCK_DIV128:
-            spi_config.SPI_Freq = SPI_FREQUENCY_FREQUENCY_K125;
+            spi_config.frequency = SPI_FREQ_125KBPS;
             break;
             
     }
@@ -148,16 +124,7 @@ uint16_t HAL_SPI_Send_Receive_Data(HAL_SPI_Interface spi, uint16_t data)
     uint8_t rx_data[1];
     rx_data[0] = 0x00;
     
-    spi0_transmission_completed = false;
-    
-    uint32_t err_code = spi_master_send_recv(SPI_MASTER_0, (uint8_t *)&data, 1, rx_data, 1);
-    if (err_code == NRF_SUCCESS)
-    {
-        while(spi0_transmission_completed == false) { }
-    }
-    else {
-        
-    }
+    spi_master_tx_rx(SPI0, 1, (uint8_t *)&data, rx_data);
     return rx_data[0];
 }
 
