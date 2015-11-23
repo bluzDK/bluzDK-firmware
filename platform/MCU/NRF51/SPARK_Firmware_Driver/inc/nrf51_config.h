@@ -33,7 +33,7 @@
 #define APP_TIMER_MAX_TIMERS            6						                    /**< Maximum number of simultaneously created timers. */
 #define APP_TIMER_OP_QUEUE_SIZE         12                                          /**< Size of timer operation queues. */
 
-#define TIME_KEPPER_INTERVAL     		APP_TIMER_TICKS(1, APP_TIMER_PRESCALER)     /**< Keep track of time in roughly 1 second intervals. */
+#define TIME_KEPPER_INTERVAL     		APP_TIMER_TICKS(100, APP_TIMER_PRESCALER)     /**< Keep track of time in roughly 100 mSecond intervals. */
 
 #define APP_GPIOTE_MAX_USERS            1                                           /**< Maximum number of users of the GPIOTE handler. */
 
@@ -41,7 +41,7 @@
 
 #define IS_SRVC_CHANGED_CHARACT_PRESENT      0
 
-#define APP_ADV_INTERVAL                64                                          /**< The advertising interval (in units of 0.625 ms. This value corresponds to 40 ms). */
+#define APP_ADV_INTERVAL                160                                          /**< The advertising interval (in units of 0.625 ms. This value corresponds to 100 ms). */
 #define APP_ADV_TIMEOUT_IN_SECONDS      180                                         /**< The advertising timeout (in units of seconds). */
 #define APP_ADV_NO_TIMEOUT              0                                           /**< Disables advertising timeout. */
 

@@ -52,11 +52,11 @@
 /* Private macro -------------------------------------------------------------*/
 
 /* Private variables ---------------------------------------------------------*/
-volatile uint16_t ledOffTime = 2000;
+volatile uint16_t ledOffTime = 2000, ledOnTime = 200;
 static volatile uint32_t TimingLED;
 static volatile uint32_t TimingIWDGReload;
 static bool CLOUD_CONNECTED = false;
-uint32_t on_mseconds = 0;
+uint32_t on_mseconds = ledOnTime, off_mseconds = ledOnTime+ledOffTime;
 
 /* Extern variables ----------------------------------------------------------*/
 
@@ -66,10 +66,13 @@ uint32_t on_mseconds = 0;
 extern "C" void HAL_SysTick_Handler(void) {
     uint32_t current_millis = HAL_Timer_Get_Milli_Seconds();
     if (!LED_RGB_IsOverRidden()) {
-        if (current_millis % ledOffTime == 0) {
-            on_mseconds = current_millis;
+        if (current_millis > off_mseconds) {
+            DEBUG("LED ON");
             LED_On(LED_RGB);
-        } else if (current_millis - on_mseconds > 150) {
+            on_mseconds = ledOnTime+current_millis;
+            off_mseconds = ledOnTime+ledOffTime+current_millis;
+        } else if (current_millis > on_mseconds) {
+            DEBUG("LED OFF");
             LED_Off(LED_RGB);
         }
     }

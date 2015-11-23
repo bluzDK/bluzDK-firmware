@@ -50,7 +50,7 @@ void millis_timer_timeout(void * p_context)
 {
     //TO DO
     //This will get called every ms from the RTC, keep track of time
-    system_milliseconds++;
+//    system_milliseconds++;
     HAL_SysTick_Handler();
 }
 

@@ -34,7 +34,8 @@ uint32_t External_Flash_Start_Address = 0;
 
 uint32_t system_millis(void)
 {
-    return system_milliseconds;
+//    return system_milliseconds;
+    return ((NRF_RTC1->COUNTER * 1.0) / (APP_TIMER_CLOCK_FREQ * 1.0)) * 1000.0;
 }
 
 uint32_t system_micros(void)
