@@ -24,6 +24,7 @@
 #include "system_mode.h"
 #include "system_network.h"
 #include "system_network_internal.h"
+#include "system_update.h"
 #include "spark_macros.h"
 #include "string.h"
 #include "system_tick_hal.h"
@@ -32,6 +33,7 @@
 #include "delay_hal.h"
 #include "timer_hal.h"
 #include "rgbled.h"
+#include "service_debug.h"
 
 #include "spark_wiring_network.h"
 #include "spark_wiring_constants.h"
@@ -50,6 +52,8 @@ unsigned char wlan_profile_index;
 volatile uint8_t SPARK_LED_FADE = 1;
 
 volatile uint8_t Spark_Error_Count;
+volatile uint8_t SYSTEM_POWEROFF;
+
 
 void Network_Setup(bool threaded)
 {
@@ -91,7 +95,7 @@ void manage_network_connection()
     {
         if (SPARK_WLAN_STARTED)
         {
-            DEBUG("Resetting WLAN!");
+            WARN("!! Resetting WLAN due to %s", (WLAN_WD_TO()) ? "WLAN_WD_TO()":((SPARK_WLAN_RESET) ? "SPARK_WLAN_RESET" : "SPARK_WLAN_SLEEP"));
             auto was_sleeping = SPARK_WLAN_SLEEP;
             auto was_disconnected = network.manual_disconnect();
             cloud_disconnect();
@@ -107,6 +111,7 @@ void manage_network_connection()
     {
         if (!SPARK_WLAN_STARTED || (SPARK_CLOUD_CONNECT && !network.connected()))
         {
+            INFO("Network Connect: %s", (!SPARK_WLAN_STARTED) ? "!SPARK_WLAN_STARTED" : "SPARK_CLOUD_CONNECT && !network.connected()");
             network.connect();
         }
     }
@@ -204,14 +209,18 @@ void establish_cloud_connection()
         if (in_cloud_backoff_period())
             return;
 
+        INFO("Cloud: connecting");
         LED_On(LED_RGB);
-        if (Spark_Connect() >= 0)
+        int connect_result = Spark_Connect();
+        if (connect_result >= 0)
         {
             cfod_count = 0;
             SPARK_CLOUD_SOCKETED = 1;
+            INFO("Cloud socket connected");
         }
         else
         {
+            WARN("Cloud socket connection failed: %d", connect_result);
             SPARK_CLOUD_SOCKETED = 0;
             if (SPARK_WLAN_RESET)
                 return;
@@ -252,7 +261,7 @@ void handle_cloud_connection(bool force_events)
                     // RSA signature verification error, magenta
                     LED_SetRGBColor(RGB_COLOR_MAGENTA);
                 }
-
+                WARN("Cloud handshake failed, code=%d", err);
                 LED_On(LED_RGB);
                 // delay a little to be sure the user sees the LED color, since
                 // the socket may quickly disconnect and the connection retried, turning
@@ -264,12 +273,13 @@ void handle_cloud_connection(bool force_events)
             }
             else
             {
+                INFO("Cloud connected");
                 SPARK_CLOUD_CONNECTED = 1;
                 cloud_failed_connection_attempts = 0;
             }
         }
 
-        if (SPARK_FLASH_UPDATE || force_events || System.mode() != MANUAL)
+        if (SPARK_FLASH_UPDATE || force_events || System.mode() != MANUAL || system_thread_get_state(NULL)==spark::feature::ENABLED)
         {
             Spark_Process_Events();
         }
@@ -293,28 +303,27 @@ void manage_cloud_connection(bool force_events)
 
 void Spark_Idle_Events(bool force_events/*=false*/)
 {
-    DEBUG("Notify WD");
     HAL_Notify_WDT();
 
-    DEBUG("ON_EVENT_DELTA");
     ON_EVENT_DELTA();
     spark_loop_total_millis = 0;
 
-    DEBUG("Manage Serial Flasher");
-    manage_serial_flasher();
+    if (!SYSTEM_POWEROFF) {
+        manage_serial_flasher();
 
-    DEBUG("Manage Network Connections");
-    manage_network_connection();
+        manage_network_connection();
 
-    DEBUG("Manage Smart Config");
-    manage_smart_config();
+        manage_smart_config();
 
-    DEBUG("Manage IP Config");
-    manage_ip_config();
+        manage_ip_config();
 
-    DEBUG("Manage Cloud COnnections");
-    CLOUD_FN(manage_cloud_connection(force_events), (void)0);
-    DEBUG("Spark Idle Fin!");
+        CLOUD_FN(manage_cloud_connection(force_events), (void)0);
+    }
+    else
+    {
+        system_pending_shutdown();
+    }
+    system_shutdown_if_needed();
 }
 
 /*
@@ -394,8 +403,9 @@ void cloud_disconnect(bool closeSocket)
 
     if (SPARK_CLOUD_SOCKETED || SPARK_CLOUD_CONNECTED)
     {
+        INFO("Cloud: disconnecting");
         if (closeSocket)
-            Spark_Disconnect();
+        Spark_Disconnect();
 
         SPARK_FLASH_UPDATE = 0;
         SPARK_CLOUD_CONNECTED = 0;
@@ -406,6 +416,7 @@ void cloud_disconnect(bool closeSocket)
             LED_SetRGBColor(RGB_COLOR_GREEN);
             LED_On(LED_RGB);
         }
+        INFO("Cloud: disconnected");
     }
     Spark_Error_Count = 0;  // this is also used for CFOD/WiFi reset, and blocks the LED when set.
 

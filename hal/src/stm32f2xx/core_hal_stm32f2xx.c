@@ -44,6 +44,7 @@
 #include "bootloader.h"
 #include "core_hal_stm32f2xx.h"
 #include "stm32f2xx.h"
+#include "timer_hal.h"
 
 void HardFault_Handler( void ) __attribute__( ( naked ) );
 
@@ -196,6 +197,9 @@ void HAL_Core_Config(void)
 
     Set_System();
 
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_BKPSRAM, ENABLE);
+
+
     //Wiring pins default to inputs
 #if !defined(USE_SWD_JTAG) && !defined(USE_SWD)
     for (pin_t pin=0; pin<=19; pin++)
@@ -257,7 +261,11 @@ void HAL_Core_Setup(void) {
     HAL_Core_Setup_finalize();
 
     bootloader_update_if_needed();
+    HAL_Bootloader_Lock(true);
 
+#if !MODULAR_FIRMWARE
+    module_user_init_hook();
+#endif
 }
 
 #if MODULAR_FIRMWARE
@@ -460,6 +468,22 @@ uint16_t HAL_Bootloader_Get_Flag(BootloaderFlag flag)
     return 0;
 }
 
+void generate_key()
+{
+    // normallly allocating such a large buffer on the stack would be a bad idea, however, we are quite near the start of execution, with few levels of recursion.
+    char buf[EXTERNAL_FLASH_CORE_PRIVATE_KEY_LENGTH];
+    // ensure the private key is provisioned
+
+    // Reset the system after generating the key - reports of Serial not being available in listening mode
+    // after generating the key.
+    private_key_generation_t genspec;
+    genspec.size = sizeof(genspec);
+    genspec.gen = PRIVATE_KEY_GENERATE_MISSING;
+    HAL_FLASH_Read_CorePrivateKey(buf, &genspec);
+    if (genspec.generated_key)
+        HAL_Core_System_Reset();
+}
+
 /**
  * The entrypoint to our application.
  * This should be called from the RTOS main thread once initialization has been
@@ -473,19 +497,7 @@ void application_start()
 
     HAL_Core_Setup();
 
-    // normallly allocating such a large buffer on the stack would be a bad idea, however, we are quite near the start of execution, with few levels of recursion.
-    char buf[EXTERNAL_FLASH_CORE_PRIVATE_KEY_LENGTH];
-    // ensure the private key is provisioned
-
-    // Reset the system after generating the key - reports of Serial not being available in listening mode
-    // after generating the key.
-    private_key_generation_t genspec;
-    genspec.size = sizeof(genspec);
-    genspec.gen = PRIVATE_KEY_GENERATE_MISSING;
-    HAL_FLASH_Read_CorePrivateKey(buf, &genspec);
-    if (genspec.generated_key)
-        HAL_Core_System_Reset();
-
+    generate_key();
 
     app_setup_and_loop();
 }
@@ -864,9 +876,18 @@ int HAL_Feature_Set(HAL_Feature feature, bool enabled)
         {
             FunctionalState state = enabled ? ENABLE : DISABLE;
             // Switch on backup SRAM clock
-            RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_BKPSRAM, state);
-            // Switch on backup power regulator, so that it survives the sleep mode
+            // Switch on backup power regulator, so that it survives the deep sleep mode,
+            // software and hardware reset. Power must be supplied to VIN or VBAT to retain SRAM values.
             PWR_BackupRegulatorCmd(state);
+            // Wait until backup power regulator is ready, should be fairly instantaneous... but timeout in 10ms.
+            if (state == ENABLE) {
+                system_tick_t start = HAL_Timer_Get_Milli_Seconds();
+                while (PWR_GetFlagStatus(PWR_FLAG_BRR) == RESET) {
+                    if (HAL_Timer_Get_Milli_Seconds() - start > 10UL) {
+                        return -2;
+                    }
+                };
+            }
             return 0;
         }
 
@@ -878,9 +899,15 @@ bool HAL_Feature_Get(HAL_Feature feature)
 {
     switch (feature)
     {
+        // Warm Start: active when resuming from Standby mode (deep sleep)
         case FEATURE_WARM_START:
         {
             return (PWR_GetFlagStatus(PWR_FLAG_SB) != RESET);
+        }
+        // Retained Memory: active when backup regulator is enabled
+        case FEATURE_RETAINED_MEMORY:
+        {
+            return (PWR_GetFlagStatus(PWR_FLAG_BRR) != RESET);
         }
     }
     return false;

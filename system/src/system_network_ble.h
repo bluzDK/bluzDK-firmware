@@ -79,7 +79,7 @@ public:
         return true;
     }
     int set_credentials(NetworkCredentials* creds) override { return -1; }
-    void connect_cancel() override { /* n/a */ }
+    void connect_cancel(bool cancel, bool calledFromISR) override { /* n/a */ }
 
     void set_error_count(unsigned count) override
     {

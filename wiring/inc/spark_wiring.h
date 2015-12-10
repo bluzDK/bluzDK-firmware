@@ -39,7 +39,9 @@
 #include "spark_wiring_stream.h"
 #include "spark_wiring_printable.h"
 #include "spark_wiring_ipaddress.h"
+#include "spark_wiring_cellularsignal.h"
 #include "spark_wiring_wifi.h"
+#include "spark_wiring_cellular.h"
 #include "spark_wiring_character.h"
 #include "spark_wiring_random.h"
 #include "spark_wiring_system.h"
@@ -79,7 +81,7 @@ uint8_t shiftIn(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder);
 
 void serialReadLine(Stream *serialObj, char *dst, int max_len, system_tick_t timeout);
 
-
+uint32_t pulseIn(pin_t pin, uint16_t value);
 
 #ifdef __cplusplus
 }

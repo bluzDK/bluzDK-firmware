@@ -18,6 +18,8 @@
 #ifndef VERSION_H
 #define	VERSION_H
 
+#include <stdint.h>
+
 #ifdef	__cplusplus
 extern "C" {
 #endif
@@ -33,8 +35,9 @@ extern "C" {
 #define SYSTEM_VERSION_v044  0x00040400
 #define SYSTEM_VERSION_v045  0x00040500
 #define SYSTEM_VERSION_v046  0x00040600
+#define SYSTEM_VERSION_v047  0x00040700
 
-#define SYSTEM_VERSION  SYSTEM_VERSION_v046
+#define SYSTEM_VERSION  SYSTEM_VERSION_v047
 
 #define SYSTEM_VERSION_040
 #define SYSTEM_VERSION_041
@@ -43,7 +46,20 @@ extern "C" {
 #define SYSTEM_VERSION_044
 #define SYSTEM_VERSION_045
 #define SYSTEM_VERSION_046
+#define SYSTEM_VERSION_047
 
+typedef struct __attribute__((packed)) SystemVersionInfo
+{
+    uint16_t size = sizeof(SystemVersionInfo);
+    uint16_t reserved;      // use this if you need to.
+    uint32_t versionNumber;
+    char     versionString[20];
+
+
+
+} SystemVersionInfo;
+
+int system_version_info(SystemVersionInfo* target, void* reserved);
 
 #ifdef	__cplusplus
 }

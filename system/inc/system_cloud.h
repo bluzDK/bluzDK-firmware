@@ -19,11 +19,12 @@
 #pragma once
 
 #include "static_assert.h"
+#include "spark_wiring_string.h"
 #include <string.h>
 #include <time.h>
 #include <stdint.h>
 
-typedef struct SparkProtocol SparkProtocol;
+typedef class SparkProtocol SparkProtocol;
 
 
 typedef enum
@@ -34,13 +35,13 @@ typedef enum
 struct CloudVariableTypeBase {};
 struct CloudVariableTypeBool : public CloudVariableTypeBase {
     using vartype = bool;
-    using varref = bool*;
+    using varref = const bool*;
     CloudVariableTypeBool(){};
     static inline Spark_Data_TypeDef value() { return CLOUD_VAR_BOOLEAN; }
 };
 struct CloudVariableTypeInt : public CloudVariableTypeBase {
     using vartype = int;
-    using varref = int*;
+    using varref = const int*;
     CloudVariableTypeInt(){};
     static inline Spark_Data_TypeDef value() { return CLOUD_VAR_INT; }
 };
@@ -52,7 +53,7 @@ struct CloudVariableTypeString : public CloudVariableTypeBase {
 };
 struct CloudVariableTypeDouble : public CloudVariableTypeBase {
     using vartype = double;
-    using varref = double*;
+    using varref = const double*;
 
     CloudVariableTypeDouble(){};
     static inline Spark_Data_TypeDef value() { return CLOUD_VAR_DOUBLE; }
@@ -68,17 +69,19 @@ const CloudVariableTypeDouble DOUBLE;
 extern "C" {
 #endif
 
+String spark_deviceID(void);
+
 void cloud_disconnect(bool closeSocket=true);
 
 
-struct String;
+class String;
 
 
-#ifdef PLATFORM_ID
+#if defined(PLATFORM_ID)
+
+#if PLATFORM_ID!=3
 STATIC_ASSERT(spark_data_typedef_is_1_byte, sizeof(Spark_Data_TypeDef)==1);
-
-String bytes2hex(const uint8_t* buf, unsigned len);
-String spark_deviceID(void);
+#endif
 
 #endif
 
@@ -116,7 +119,13 @@ struct  cloud_function_descriptor {
 
 STATIC_ASSERT(cloud_function_descriptor_size, sizeof(cloud_function_descriptor)==16 || sizeof(void*)!=4);
 
-bool spark_variable(const char *varKey, const void *userVar, Spark_Data_TypeDef userVarType, void* reserved);
+typedef struct spark_variable_t
+{
+    uint16_t size;
+    const void* (*update)(const char* nane, Spark_Data_TypeDef type, const void* var, void* reserved);
+} spark_variable_t;
+
+bool spark_variable(const char *varKey, const void *userVar, Spark_Data_TypeDef userVarType, spark_variable_t* extra);
 
 /**
  * @param funcKey   The name of the function to register. When NULL, pFunc is taken to be a

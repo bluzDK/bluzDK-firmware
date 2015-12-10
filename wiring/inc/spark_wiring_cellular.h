@@ -21,8 +21,10 @@
 #define	SPARK_WIRING_CELLULAR_H
 
 #include "spark_wiring_platform.h"
+#include "spark_wiring_network.h"
+#include "system_network.h"
 #include "cellular_hal.h"
-//#include "system_network_cellular.h"
+#include "spark_wiring_cellularsignal.h"
 
 #if Wiring_Cellular
 
@@ -48,14 +50,46 @@ public:
     }
 
     void setCredentials(const char* apn) {
-        setCredentials(apn, "", "", NULL);
+        setCredentials(apn, "", "");
     }
     void setCredentials(const char* username, const char* password) {
-        setCredentials("", username, password, NULL);
+        setCredentials("", username, password);
     }
     void setCredentials(const char* apn, const char* username, const char* password) {
-        //network_set_credentials(*this, 0, &creds, NULL);
-        network_set_credentials(apn, username, password, NULL);
+        // todo
+    }
+
+    bool ready()
+    {
+        return network_ready(*this, 0,  NULL);
+    }
+
+    CellularSignal RSSI();
+
+    template<typename... Targs>
+    inline int command(const char* format, Targs... Fargs)
+    {
+        return cellular_command(NULL, NULL, 10000, format, Fargs...);
+    }
+
+    template<typename... Targs>
+    inline int command(system_tick_t timeout_ms, const char* format, Targs... Fargs)
+    {
+        return cellular_command(NULL, NULL, timeout_ms, format, Fargs...);
+    }
+
+    template<typename T, typename... Targs>
+    inline int command(int (*cb)(int type, const char* buf, int len, T* param),
+            T* param, const char* format, Targs... Fargs)
+    {
+        return cellular_command((_CALLBACKPTR_MDM)cb, (void*)param, 10000, format, Fargs...);
+    }
+
+    template<typename T, typename... Targs>
+    inline int command(int (*cb)(int type, const char* buf, int len, T* param),
+            T* param, system_tick_t timeout_ms, const char* format, Targs... Fargs)
+    {
+        return cellular_command((_CALLBACKPTR_MDM)cb, (void*)param, timeout_ms, format, Fargs...);
     }
 };
 

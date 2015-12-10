@@ -362,6 +362,7 @@ void Spark_Protocol_Init(void)
         descriptor.append_system_info = system_module_info;
         descriptor.call_event_handler = invokeEventHandler;
 
+        // todo - this pushes a lot of data on the stack! refactor to remove heacy stack usage
         unsigned char pubkey[EXTERNAL_FLASH_SERVER_PUBLIC_KEY_LENGTH];
         unsigned char private_key[EXTERNAL_FLASH_CORE_PRIVATE_KEY_LENGTH];
 
@@ -491,7 +492,7 @@ int Internet_Test(void)
     long testSocket;
     sockaddr_t testSocketAddr;
     int testResult = 0;
-    DEBUG("socket");
+    DEBUG("Internet test socket");
     testSocket = socket_create(AF_INET, SOCK_STREAM, IPPROTO_TCP, 53, NIF_DEFAULT);
     DEBUG("socketed testSocket=%d", testSocket);
 
@@ -515,16 +516,16 @@ int Internet_Test(void)
     testSocketAddr.sa_data[5] = 8;
 
     uint32_t ot = HAL_WLAN_SetNetWatchDog(S2M(MAX_SEC_WAIT_CONNECT));
-    DEBUG("connect");
+    DEBUG("Connect Attempt");
     testResult = socket_connect(testSocket, &testSocketAddr, sizeof (testSocketAddr));
-    DEBUG("connected testResult=%d", testResult);
+    DEBUG("socket_connect()=%s", (testResult ? "fail":"success"));
     HAL_WLAN_SetNetWatchDog(ot);
 
 #if defined(SEND_ON_CLOSE)
-    DEBUG("send");
+    DEBUG("Send Attempt");
     char c = 0;
     int rc = send(testSocket, &c, 1, 0);
-    DEBUG("send %d", rc);
+    DEBUG("send()=%d", rc);
 #endif
     DEBUG("Close");
     socket_close(testSocket);
@@ -548,7 +549,7 @@ int Spark_Connect(void)
 
     if (!socket_handle_valid(sparkSocket))
     {
-        DEBUG("socket_handle_valid()=%d", socket_handle_valid(sparkSocket));
+        DEBUG("sparkSocket not a valid socket handle!");
         return -1;
     }
     sockaddr_t tSocketAddr;
@@ -595,6 +596,12 @@ int Spark_Connect(void)
                 HAL_Delay_Milliseconds(1);
             }
             ip_resolve_failed = rv;
+            if (ip_resolve_failed) {
+                ERROR("Cloud: unable to resolve IP for %s", server_addr.domain);
+            }
+            else {
+                INFO("Resolved host %s to %s", server_addr.domain, String(ip_addr).c_str());
+            }
     }
 
 #if PLATFORM_ID<3
@@ -626,7 +633,12 @@ int Spark_Connect(void)
         uint32_t ot = HAL_WLAN_SetNetWatchDog(S2M(MAX_SEC_WAIT_CONNECT));
         DEBUG("Connect Attempt");
         rv = socket_connect(sparkSocket, &tSocketAddr, sizeof (tSocketAddr));
-        DEBUG("socket_connect()=%d", rv);
+        DEBUG("socket_connect()=%s", (rv ? "fail":"success"));
+        if (rv)
+            ERROR("connection failed to %d.%d.%d.%d", ip_addr[0], ip_addr[1], ip_addr[2], ip_addr[3]);
+        else
+            INFO("connected to cloud %d.%d.%d.%d", ip_addr[0], ip_addr[1], ip_addr[2], ip_addr[3]);
+
         HAL_WLAN_SetNetWatchDog(ot);
     }
     if (rv)     // error - prevent socket leaks
@@ -648,7 +660,7 @@ int Spark_Disconnect(void)
 #endif
         DEBUG("Close Attempt");
         retVal = socket_close(sparkSocket);
-        DEBUG("socket_close()=%d", retVal);
+        DEBUG("socket_close()=%s", (retVal ? "fail":"success"));
         sparkSocket = socket_handle_invalid();
     }
     return retVal;
@@ -663,7 +675,14 @@ int userVarType(const char *varKey)
 const void *getUserVar(const char *varKey)
 {
     User_Var_Lookup_Table_t* item = find_var_by_key(varKey);
-    return item ? item->userVar : NULL;
+    const void* result = nullptr;
+    if (item) {
+    	if (item->update)
+            result = item->update(item->userVarKey, item->userVarType, item->userVar, nullptr);
+    	else
+            result = item->userVar;
+    }
+    return result;
 }
 
 void userFuncScheduleImpl(User_Func_Lookup_Table_t* item, const char* paramString, bool freeParamString, SparkDescriptor::FunctionResultCallback callback)
@@ -673,7 +692,7 @@ void userFuncScheduleImpl(User_Func_Lookup_Table_t* item, const char* paramStrin
         delete paramString;
     // run the cloud return on the system thread again
     SYSTEM_THREAD_CONTEXT_ASYNC(callback((const void*)result, SparkReturnType::INT));
-    callback((const void*)result, SparkReturnType::INT);
+    callback((const void*)long(result), SparkReturnType::INT);
 }
 
 int userFuncSchedule(const char *funcKey, const char *paramString, SparkDescriptor::FunctionResultCallback callback, void* reserved)
@@ -783,8 +802,10 @@ void Multicast_Presence_Announcement(void)
 {
 #ifndef SPARK_NO_CLOUD
     long multicast_socket = socket_create(AF_INET, SOCK_DGRAM, IPPROTO_UDP, 0, NIF_DEFAULT);
-    if (!socket_handle_valid(multicast_socket))
+    if (!socket_handle_valid(multicast_socket)) {
+        DEBUG("socket_handle_valid() = %d", socket_handle_valid(multicast_socket));
         return;
+    }
 
     unsigned char announcement[19];
     uint8_t id_length = HAL_device_ID(NULL, 0);
@@ -805,9 +826,10 @@ void Multicast_Presence_Announcement(void)
     //why loop here? Uncommenting this leads to SOS(HardFault Exception) on local cloud
     //for (int i = 3; i > 0; i--)
     {
+        DEBUG("socket_sendto()");
         socket_sendto(multicast_socket, announcement, 19, 0, &addr, sizeof (sockaddr_t));
     }
-
+    DEBUG("socket_close(multicast_socket)");
     socket_close(multicast_socket);
 #endif
 }
@@ -822,7 +844,8 @@ bool system_cloud_active()
 
     if (SPARK_CLOUD_CONNECTED && ((millis()-lastCloudEvent))>SYSTEM_CLOUD_TIMEOUT)
     {
-        cloud_disconnect(false);
+    	WARN("Disconnecting cloud due to inactivity!");
+    	cloud_disconnect(false);
         return false;
     }
 #endif
