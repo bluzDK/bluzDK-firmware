@@ -25,4 +25,8 @@ ASFLAGS +=  -g3 -x assembler-with-cpp -Os -mcpu=cortex-m0 -mthumb -mfloat-abi=so
 
 LDFLAGS += -Xlinker --gc-sections
 
+ifeq ($(COMPILE_LTO),y)
+CFLAGS += -flto
+LDFLAGS += -flto -Os -fuse-linker-plugin
+endif
 

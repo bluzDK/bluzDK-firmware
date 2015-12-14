@@ -15,7 +15,16 @@ include $(PROJECT_ROOT)/build/verbose.mk
 include $(PROJECT_ROOT)/build/platform-id.mk
 include $(PROJECT_ROOT)/build/macros.mk
 include $(PROJECT_ROOT)/build/module-defaults.mk
+
+ifeq ("$(ARCH)","arm")
 include $(PROJECT_ROOT)/build/arm-tools.mk
+else
+ifeq ("$(ARCH)","arm-m0")
+include $(PROJECT_ROOT)/build/arm-m0-tools.mk
+else
+$(error "Unknown architecture '$(ARCH)'");
+endif
+endif
 
 $(call check_modular)
 
@@ -80,7 +89,6 @@ combined-app:
 $(makefiles):
 	$(call,echo,'Making module $@')
 	$(VERBOSE)$(MAKE) -C $(dir $@) $(SUBDIR_GOALS) $(MAKE_ARGS) $(MAKEOVERRIDES)
-
 
 make_deps: $(makefiles)
 

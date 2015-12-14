@@ -5,7 +5,6 @@ current_dir := $(patsubst %/,%,$(dir $(mkfile_path)))
 
 include $(current_dir)/top-level-module.mk
 
-
 ifeq ("$(ARCH)","arm")
 include $(current_dir)/arm-tools.mk
 else
