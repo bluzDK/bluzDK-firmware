@@ -4,8 +4,8 @@ PROJECT_ROOT = ../../..
 BUILD_PATH_EXT = $(BUILD_TARGET_PLATFORM)
 HAL_LINK :=
 PLATFORM_DFU = 0x8060000
-MAKE_DEPENDENCIES = services-dynalib hal platform system wiring communication-dynalib dynalib
-DEPENDENCIES = $(MAKE_DEPENDENCIES) dynalib services-dynalib system wiring communication-dynalib hal platform
+MAKE_DEPENDENCIES = services-dynalib hal platform system wiring communication-dynalib dynalib 
+DEPENDENCIES = $(MAKE_DEPENDENCIES) dynalib services-dynalib system wiring communication-dynalib hal platform services rt-dynalib
 include ../modular.mk
 include $(PROJECT_ROOT)/build/platform-id.mk
 
