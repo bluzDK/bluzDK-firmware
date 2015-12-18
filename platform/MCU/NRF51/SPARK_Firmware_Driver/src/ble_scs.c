@@ -48,7 +48,7 @@ static void on_disconnect(scs_t * p_scs, ble_evt_t * p_ble_evt)
 }
 
 uint16_t readBufferLength = 0;
-uint8_t readBuffer[512];
+uint8_t readBuffer[1024];
 /**@brief Function for handling the Write event.
  *
  * @param[in]   p_scs       LED Button Service structure.

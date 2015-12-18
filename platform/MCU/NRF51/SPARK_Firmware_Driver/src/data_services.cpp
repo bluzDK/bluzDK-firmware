@@ -16,6 +16,7 @@
  */
 
 #include "data_management_layer.h"
+#include "info_data_service.h"
 #include "socket_manager.h"
 
 //Data Services Functions
@@ -24,5 +25,8 @@ void data_service_init(void)
 {
     DataService* socketService = SocketManager::instance();
     DataManagementLayer::registerService(socketService);
+    
+    InfoDataService* infoService = InfoDataService::instance();
+    DataManagementLayer::registerService(infoService);
 }
 }

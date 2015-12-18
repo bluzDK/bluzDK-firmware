@@ -24,6 +24,7 @@ CSRC += $(TARGET_SPARK_SRC_PATH)/spi_master_fast.c
 
 # C++ source files included in this build.
 CPPSRC += $(TARGET_SPARK_SRC_PATH)/socket.cpp
+CPPSRC += $(TARGET_SPARK_SRC_PATH)/info_data_service.cpp
 CPPSRC += $(TARGET_SPARK_SRC_PATH)/socket_manager.cpp
 CPPSRC += $(TARGET_SPARK_SRC_PATH)/data_management_layer.cpp
 CPPSRC += $(TARGET_SPARK_SRC_PATH)/data_service.cpp
