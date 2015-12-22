@@ -19,10 +19,16 @@
 #include "bluetooth_le_hal.h"
 #include "hw_config.h"
 #include "spi_master.h"
+#include "nrf51_config.h"
 
 BLUETOOTH_LE_STATE HAL_BLE_GET_STATE(void)
 {
     return state;
+}
+
+uint32_t HAL_BLE_GET_CONNECTION_INTERVAL(void)
+{
+    return system_connection_interval;
 }
 
 void HAL_BLE_Start_Advertising(void)

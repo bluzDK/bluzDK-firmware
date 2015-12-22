@@ -14,13 +14,18 @@
  You should have received a copy of the GNU Lesser General Public
  License along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
-
+#include <stdint.h>
 #include "spark_wiring_bluetooth_le.h"
 #include "core_hal.h"
 
 BLEState BLEClass::getState()
 {
     return (BLEState)HAL_BLE_GET_STATE();
+}
+
+uint32_t BLEClass::getConnectionInterval()
+{
+    return HAL_BLE_GET_CONNECTION_INTERVAL();
 }
 
 void BLEClass::startAdvertising()

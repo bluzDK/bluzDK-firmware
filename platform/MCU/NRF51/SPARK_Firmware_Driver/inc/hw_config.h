@@ -45,6 +45,7 @@ typedef enum {
 volatile BLE_STATE state;
 
 //HW Init Functions
+void system_init(void);
 void leds_init(void);
 void timers_init(void);
 void gpiote_init(void);

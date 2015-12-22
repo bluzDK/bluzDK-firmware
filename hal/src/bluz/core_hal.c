@@ -19,12 +19,15 @@
 #include "hw_config.h"
 #include "data_services.h"
 
+#include "nrf51_config.h"
+
 /* Extern variables ----------------------------------------------------------*/
 
 /* Private function prototypes -----------------------------------------------*/
 
 void HAL_Core_Init(void)
 {
+    system_init();
     leds_init();
     timers_init();
     gpiote_init();
@@ -40,6 +43,7 @@ void HAL_Network_Init(void)
     services_init();
     advertising_init();
     data_service_init();
+    conn_params_init();
     external_flash_init();
     
     timers_start();

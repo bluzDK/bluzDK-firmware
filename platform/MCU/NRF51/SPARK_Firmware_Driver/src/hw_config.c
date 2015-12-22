@@ -26,6 +26,7 @@
 #include "device_manager.h"
 #include "pstorage.h"
 #include "ble_radio_notification.h"
+#include "ble_conn_params.h"
 
 uint32_t NbrOfPage = 0;
 uint16_t Flash_Update_Index = 0;
@@ -200,6 +201,11 @@ void FLASH_End(void)
     NVIC_SystemReset();
 }
 
+void system_init()
+{
+    system_connection_interval = 0;
+}
+
 //HW Init Functions
 void leds_init(void)
 {
@@ -337,6 +343,28 @@ void gap_params_init(void)
     gap_conn_params.conn_sup_timeout  = CONN_SUP_TIMEOUT;
     
     err_code = sd_ble_gap_ppcp_set(&gap_conn_params);
+    APP_ERROR_CHECK(err_code);
+}
+
+/**@brief Function for initializing the Connection Parameters module.
+ */
+void conn_params_init(void)
+{
+    uint32_t               err_code;
+    ble_conn_params_init_t cp_init;
+    
+    memset(&cp_init, 0, sizeof(cp_init));
+    
+    cp_init.p_conn_params                  = NULL;
+    cp_init.first_conn_params_update_delay = FIRST_CONN_PARAMS_UPDATE_DELAY;
+    cp_init.next_conn_params_update_delay  = NEXT_CONN_PARAMS_UPDATE_DELAY;
+    cp_init.max_conn_params_update_count   = MAX_CONN_PARAMS_UPDATE_COUNT;
+    cp_init.start_on_notify_cccd_handle    = BLE_GATT_HANDLE_INVALID;
+    cp_init.disconnect_on_fail             = false;
+    cp_init.evt_handler                    = NULL;
+    cp_init.error_handler                  = conn_params_error_handler;
+    
+    err_code = ble_conn_params_init(&cp_init);
     APP_ERROR_CHECK(err_code);
 }
 

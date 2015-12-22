@@ -116,6 +116,7 @@ static uint32_t data_dn_add(scs_t * p_scs, const scs_init_t * p_scs_init)
 
     char_md.char_props.read   = 1;
     char_md.char_props.write  = 1;
+    char_md.char_props.write_wo_resp = 1;
     char_md.p_char_user_desc  = NULL;
     char_md.p_char_pf         = NULL;
     char_md.p_user_desc_md    = NULL;

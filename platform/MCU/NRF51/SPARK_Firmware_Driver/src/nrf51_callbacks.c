@@ -18,6 +18,8 @@
 #include "nrf51_callbacks.h"
 #include "data_management_layer.h"
 #include "core_hal.h"
+#include "ble_conn_params.h"
+
 
 void uart_error_handle(app_uart_evt_t * p_event)
 {
@@ -29,6 +31,15 @@ void uart_error_handle(app_uart_evt_t * p_event)
     {
         APP_ERROR_HANDLER(p_event->data.error_code);
     }
+}
+
+/**@brief Function for handling a Connection Parameters error.
+ *
+ * @param[in]   nrf_error   Error code containing information about what went wrong.
+ */
+void conn_params_error_handler(uint32_t nrf_error)
+{
+    APP_ERROR_HANDLER(nrf_error);
 }
 
 void button_event_handler(uint8_t pin_no, uint8_t button_action)
@@ -86,6 +97,7 @@ void on_ble_evt(ble_evt_t * p_ble_evt)
             
             sd_ble_gap_address_get(address);
             
+            system_connection_interval = p_ble_evt->evt.gap_evt.params.conn_param_update.conn_params.max_conn_interval;
             state = BLE_CONNECTED;
             break;
             
@@ -140,6 +152,9 @@ void on_ble_evt(ble_evt_t * p_ble_evt)
             }
             break;
             
+        case BLE_GAP_EVT_CONN_PARAM_UPDATE:
+            system_connection_interval = p_ble_evt->evt.gap_evt.params.conn_param_update.conn_params.max_conn_interval;
+            break;
         default:
             // No implementation needed.
             break;
@@ -156,7 +171,7 @@ void on_ble_evt(ble_evt_t * p_ble_evt)
 void ble_evt_dispatch(ble_evt_t * p_ble_evt)
 {
     on_ble_evt(p_ble_evt);
-//    ble_conn_params_on_ble_evt(p_ble_evt);
+    ble_conn_params_on_ble_evt(p_ble_evt);
     scs_on_ble_evt(&m_scs, p_ble_evt);
 }
 

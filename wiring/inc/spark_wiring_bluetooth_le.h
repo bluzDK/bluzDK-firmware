@@ -37,6 +37,9 @@ public:
     
     static BLEState getState();
     
+    //information
+    static uint32_t getConnectionInterval();
+    
     //advertising functions
     static void startAdvertising();
     static void stopAdvertising();
