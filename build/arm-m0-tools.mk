@@ -23,7 +23,7 @@ CONLYFLAGS += -std=gnu99
 
 ASFLAGS +=  -g3 -x assembler-with-cpp -Os -mcpu=cortex-m0 -mthumb -mfloat-abi=soft -mabi=aapcs -DSOFTDEVICE_PRESENT -DBLE_STACK_SUPPORT_REQUIRED -DS110_SUPPORT_REQUIRED -DNRF51 -DNRF51822_QFAA_CA -DBLE_STACK_SUPPORT_REQD -DUSE_CUSTOM_STATIC_ASSERT -DBLUZ
 
-LDFLAGS += -Xlinker --gc-sections
+LDFLAGS += -Xlinker --gc-sections -lc -lnosys
 
 ifeq ($(COMPILE_LTO),y)
 CFLAGS += -flto

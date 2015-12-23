@@ -5,3 +5,4 @@ MEMORY
 }
 
 INCLUDE module_system_part1_export.ld
+INCLUDE part1.ld

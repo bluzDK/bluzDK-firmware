@@ -37,6 +37,7 @@
 // New HAL functions must be added to the end of this list.
 // GNINRAW
 
+#if PLATFORM_ID==6 || PLATFORM_ID==8
 DYNALIB_BEGIN(hal_i2c)
 DYNALIB_FN(hal_i2c,HAL_I2C_Set_Speed_v1)
 DYNALIB_FN(hal_i2c,HAL_I2C_Enable_DMA_Mode_v1)
@@ -54,6 +55,7 @@ DYNALIB_FN(hal_i2c,HAL_I2C_Flush_Data_v1)
 DYNALIB_FN(hal_i2c,HAL_I2C_Is_Enabled_v1)
 DYNALIB_FN(hal_i2c,HAL_I2C_Set_Callback_On_Receive_v1)
 DYNALIB_FN(hal_i2c,HAL_I2C_Set_Callback_On_Request_v1)
+#endif
 
 DYNALIB_FN(hal_i2c,HAL_I2C_Set_Speed)
 DYNALIB_FN(hal_i2c,HAL_I2C_Enable_DMA_Mode)

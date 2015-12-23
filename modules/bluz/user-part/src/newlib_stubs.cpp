@@ -28,8 +28,6 @@
 #include <stdlib.h>
 #include "debug.h"
 
-void *__dso_handle;
-
 extern "C" {
 
 /*

@@ -56,6 +56,9 @@ LDFLAGS += -T$(LINKER_FILE)
 LDFLAGS += -L$(USER_PART_MODULE_PATH)
 LDFLAGS += -Wl,-Map,$(TARGET_BASE).map
 
+ASRC += $(COMMON_BUILD)/arm/startup/startup_NRF51.S
+ASFLAGS += -I$(COMMON_BUILD)/arm/startup
+
 USER_PART_MODULE_SRC_PATH = $(USER_PART_MODULE_PATH)/src
 
 CPPSRC += $(call target_files,$(USER_PART_MODULE_SRC_PATH),*.cpp)
