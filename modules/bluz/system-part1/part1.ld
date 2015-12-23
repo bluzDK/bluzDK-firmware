@@ -48,6 +48,16 @@ ENTRY(Reset_Handler)
 SECTIONS
 {
     INCLUDE module_start.ld
+
+    /* 97*4=388 is vector table size. */
+    expected_dynalib_start = ORIGIN (APP_FLASH) + 0x184 + 24 + 0x208;
+    .dynalib :
+    {
+        link_dynalib_start = . ;
+        KEEP(*(*.system_part1_module))
+        link_dynalib_end = . ;
+    }>APP_FLASH
+
 	.text :
 	{
 		KEEP(*(.Vectors))
@@ -56,12 +66,14 @@ SECTIONS
 		KEEP(*(.init))
 		KEEP(*(.fini))
 
+        link_constructors_location = .;
 		/* .ctors */
 		*crtbegin.o(.ctors)
 		*crtbegin?.o(.ctors)
 		*(EXCLUDE_FILE(*crtend?.o *crtend.o) .ctors)
 		*(SORT(.ctors.*))
 		*(.ctors)
+        link_constructors_end = .;
 
 		/* .dtors */
  		*crtbegin.o(.dtors)
@@ -77,7 +89,7 @@ SECTIONS
 
     INCLUDE module_info.ld
 
-	.ARM.extab : 
+	.ARM.extab :
 	{
 		*(.ARM.extab* .gnu.linkonce.armextab.*)
 	} > APP_FLASH
@@ -95,7 +107,11 @@ SECTIONS
 	.data :
 	{
 		__data_start__ = .;
-		*(vtable)
+        link_global_data_initial_values = LOADADDR( .data ); /* This is the location in flash of the initial values of global variables */
+        link_global_data_start = .;
+
+        *(vtable)
+
 		*(.data*)
 
 		. = ALIGN(4);
@@ -123,17 +139,21 @@ SECTIONS
 		. = ALIGN(4);
 		/* All data end */
 		__data_end__ = .;
+        link_global_data_end = .;
 
 	} > RAM AT>APP_FLASH
 
 	.bss :
 	{
 		. = ALIGN(4);
+        link_bss_location = .;
 		__bss_start__ = .;
 		*(.bss*)
 		*(COMMON)
 		. = ALIGN(4);
 		__bss_end__ = .;
+        link_bss_end = .;
+        link_end_of_static_ram = .;
 	} > RAM
 	
 	.heap (COPY):
