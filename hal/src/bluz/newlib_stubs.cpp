@@ -35,6 +35,17 @@ int _lseek(int file, int ptr, int dir) { return 0; }
 //int _fstat(int file, void *sbuf) { return 0; }
 int _isatty(int file) { return 0; }
 
+/* Bare metal, no processes, so always process id 1 */
+int _getpid(void)
+{
+    return 1;
+}
+/* Bare metal, no processes, so error */
+int _kill(int pid, int sig)
+{
+    return -1;
+}
+
 
 } /* extern "C" */
 

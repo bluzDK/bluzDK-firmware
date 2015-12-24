@@ -51,12 +51,6 @@ SECTIONS
 
     /* 97*4=388 is vector table size. */
     expected_dynalib_start = ORIGIN (APP_FLASH) + 0x184 + 24 + 0x208;
-    .dynalib :
-    {
-        link_dynalib_start = . ;
-        KEEP(*(*.system_part1_module))
-        link_dynalib_end = . ;
-    }>APP_FLASH
 
 	.text :
 	{
