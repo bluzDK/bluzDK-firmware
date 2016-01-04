@@ -502,3 +502,14 @@ void power_manage(void)
 //    APP_ERROR_CHECK(err_code);
 }
 
+
+void FLASH_WriteProtection_Enable(uint32_t FLASH_Sectors)
+{
+
+}
+
+void FLASH_WriteProtection_Disable(uint32_t FLASH_Sectors)
+{
+    
+}
+

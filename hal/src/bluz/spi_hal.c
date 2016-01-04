@@ -142,3 +142,8 @@ void HAL_SPI_DMA_Transfer(HAL_SPI_Interface spi, void* tx_buffer, void* rx_buffe
 void HAL_SPI_Info(HAL_SPI_Interface spi, hal_spi_info_t* info, void* reserved)
 {
 }
+
+bool HAL_SPI_Is_Enabled_Old()
+{
+    return false;
+}

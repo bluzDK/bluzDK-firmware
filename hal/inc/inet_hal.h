@@ -48,14 +48,14 @@ typedef struct __attribute__((__packed__)) _HAL_IPAddress_t  {
     };
     uint8_t v;              // 4 for Ipv4, 6 for Ipv6
 } HAL_IPAddress;
-STATIC_ASSERT(HAL_IPAddress_size, sizeof(HAL_IPAddress)==17);
+//STATIC_ASSERT(HAL_IPAddress_size, sizeof(HAL_IPAddress)==17);
 #else
 typedef struct __attribute__((__packed__)) _HAL_IPAddress_t {
     union {
         uint32_t ipv4;
     };
 } HAL_IPAddress;
-STATIC_ASSERT(HAL_IPAddress_size, sizeof(HAL_IPAddress)==4);
+//STATIC_ASSERT(HAL_IPAddress_size, sizeof(HAL_IPAddress)==4);
 #endif
 
 inline bool is_ipv4(const HAL_IPAddress* address)
@@ -75,7 +75,7 @@ typedef struct __attribute__((__packed__)) _NetworkConfig_t {
     HAL_IPAddress aucDNSServer;      // byte 0 is MSB, byte 3 is LSB
     uint8_t uaMacAddr[6];
 } NetworkConfig;
-STATIC_ASSERT(NetworkConfig_size, sizeof(HAL_IPAddress)*5+6);
+//STATIC_ASSERT(NetworkConfig_size, sizeof(HAL_IPAddress)*5+6);
 
 typedef uint32_t network_interface_t;
 

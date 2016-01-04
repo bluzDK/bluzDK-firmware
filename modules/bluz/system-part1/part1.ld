@@ -57,6 +57,8 @@ SECTIONS
 		KEEP(*(.Vectors))
 		*(.text*)
 
+        KEEP(*(*.system_part1_module))
+
 		KEEP(*(.init))
 		KEEP(*(.fini))
 

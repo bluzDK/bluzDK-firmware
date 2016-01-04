@@ -38,6 +38,9 @@
 #define SPIM0_MISO_PIN  2u
 #define SPIM0_SS_PIN    4u
 
+//Bootloader section
+#define BOOTLOADER_FLASH_PAGES 0x00
+
 //FLash addresses
 #define FLASH_FW_STATUS 0x0100
 #define FLASH_FW_LENGTH1 0x0101

@@ -1,12 +1,9 @@
 /**
  ******************************************************************************
- * @file    rtc_hal.c
- * @author  Satish Nair, Brett Walach
- * @version V1.0.0
- * @date    12-Sept-2014
- * @brief
+ * @file    hal_dynalib_export.c
+ * @author  Matthew McGowan
  ******************************************************************************
-  Copyright (c) 2013-2015 Particle Industries, Inc.  All rights reserved.
+  Copyright (c) 2015 Particle Industries, Inc.  All rights reserved.
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -23,27 +20,29 @@
  ******************************************************************************
  */
 
-/* Includes ------------------------------------------------------------------*/
-#include "rtc_hal.h"
+#define DYNALIB_EXPORT
+#undef SCK
+#undef MOSI
+#undef MISO
+#undef SS
 
-void HAL_RTC_Configuration(void)
-{
-}
+#include "hal_dynalib.h"
+#include "hal_dynalib.h"
+#undef SCK
+#undef MOSI
+#undef MISO
+#undef SS
+#undef STATIC_ASSERT
+#include "hal_dynalib_core.h"
+#include "hal_dynalib_gpio.h"
+#include "hal_dynalib_i2c.h"
+#undef STATIC_ASSERT
+#include "hal_dynalib_ota.h"
+#undef STATIC_ASSERT
+#include "hal_dynalib_peripherals.h"
+#undef STATIC_ASSERT
+#include "hal_dynalib_socket.h"
+#include "hal_dynalib_spi.h"
+#include "hal_dynalib_usart.h"
+#include "hal_dynalib_concurrent.h"
 
-time_t HAL_RTC_Get_UnixTime(void)
-{
-    return 0;
-}
-
-void HAL_RTC_Set_Alarm(uint32_t value)
-{
-}
-
-void HAL_RTC_Set_UnixAlarm(time_t value)
-{
-
-}
-
-void HAL_RTC_Set_UnixTime(time_t value)
-{
-}

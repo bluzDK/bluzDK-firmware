@@ -164,3 +164,8 @@ int32_t HAL_GPIO_Read(uint16_t pin)
     
     return nrf_gpio_pin_read(PIN_MAP[pin].gpio_pin);
 }
+
+uint32_t HAL_Pulse_In(pin_t pin, uint16_t value)
+{
+    return 0;
+}

@@ -1,12 +1,10 @@
 /**
  ******************************************************************************
- * @file    rtc_hal.c
- * @author  Satish Nair, Brett Walach
- * @version V1.0.0
- * @date    12-Sept-2014
- * @brief
+ * @file    export_system.cpp
+ * @authors mat
+ * @date    31 March 2015
  ******************************************************************************
-  Copyright (c) 2013-2015 Particle Industries, Inc.  All rights reserved.
+  Copyright (c) 2015 Particle Industries, Inc.  All rights reserved.
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -23,27 +21,8 @@
  ******************************************************************************
  */
 
-/* Includes ------------------------------------------------------------------*/
-#include "rtc_hal.h"
+#define DYNALIB_EXPORT
 
-void HAL_RTC_Configuration(void)
-{
-}
-
-time_t HAL_RTC_Get_UnixTime(void)
-{
-    return 0;
-}
-
-void HAL_RTC_Set_Alarm(uint32_t value)
-{
-}
-
-void HAL_RTC_Set_UnixAlarm(time_t value)
-{
-
-}
-
-void HAL_RTC_Set_UnixTime(time_t value)
-{
-}
+#include "system_dynalib.h"
+#include "system_dynalib_net.h"
+#include "system_dynalib_cloud.h"

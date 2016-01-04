@@ -37,8 +37,9 @@
 // New HAL functions must be added to the end of this list.
 // GNINRAW
 
-#if PLATFORM_ID==6 || PLATFORM_ID==8
 DYNALIB_BEGIN(hal_i2c)
+
+#if PLATFORM_ID==6 || PLATFORM_ID==8
 DYNALIB_FN(hal_i2c,HAL_I2C_Set_Speed_v1)
 DYNALIB_FN(hal_i2c,HAL_I2C_Enable_DMA_Mode_v1)
 DYNALIB_FN(hal_i2c,HAL_I2C_Stretch_Clock_v1)

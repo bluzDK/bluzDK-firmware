@@ -33,9 +33,8 @@ PROVIDE ( dynalib_location_hal_gpio = system_part1_module_table + 32 );
 PROVIDE ( dynalib_location_hal_spi = system_part1_module_table + 36 );
 PROVIDE ( dynalib_location_hal_core = system_part1_module_table + 40 );
 PROVIDE ( dynalib_location_hal_socket = system_part1_module_table + 44 );
-PROVIDE ( dynalib_location_hal_wlan = system_part1_module_table + 48 );
-PROVIDE ( dynalib_location_hal_usart = system_part1_module_table + 52 );
-PROVIDE ( dynalib_location_system_net = system_part1_module_table + 56 );
-PROVIDE ( dynalib_location_system_cloud = system_part1_module_table + 60 );
-PROVIDE ( dynalib_location_hal_concurrent = system_part1_module_table + 64 );
+PROVIDE ( dynalib_location_hal_usart = system_part1_module_table + 48 );
+PROVIDE ( dynalib_location_system_net = system_part1_module_table + 52 );
+PROVIDE ( dynalib_location_system_cloud = system_part1_module_table + 56 );
+PROVIDE ( dynalib_location_hal_concurrent = system_part1_module_table + 60 );
 

@@ -76,6 +76,12 @@ extern "C" void HAL_SysTick_Handler(void) {
     }
 }
 
+//stubs
+uint16_t system_button_pushed_duration(uint8_t button, void*)
+{
+    return 0;
+}
+
 /*******************************************************************************
  * Function Name  : main.
  * Description    : main routine.

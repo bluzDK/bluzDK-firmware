@@ -53,6 +53,7 @@ SECTIONS
 
     .text :
     {
+        KEEP(*(*.user_part_module))
         *(.text*)
 
         KEEP(*(.init))
@@ -145,6 +146,7 @@ SECTIONS
         . = ALIGN(4);
         __bss_end__ = .;
         link_bss_end = .;
+        link_heap_start = .;
         link_end_of_static_ram = .;
     } > RAM
 

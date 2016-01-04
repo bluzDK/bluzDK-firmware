@@ -122,5 +122,8 @@ extern uint32_t RCC_CSR_SysFlag;
 
 void Save_Reset_Syndrome();
 
+void FLASH_WriteProtection_Enable(uint32_t FLASH_Sectors);
+void FLASH_WriteProtection_Disable(uint32_t FLASH_Sectors);
+
 
 #endif  /*__NRF_HW_CONFIG_H*/

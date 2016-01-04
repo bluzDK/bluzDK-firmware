@@ -203,3 +203,64 @@ int main(void) {
     app_setup_and_loop_passive();
     return 0;
 }
+
+//Particle State Functions
+uint32_t HAL_Core_Runtime_Info(runtime_info_t* info, void* reserved)
+{
+    return 0;
+}
+
+int HAL_Feature_Set(HAL_Feature feature, bool enabled)
+{
+    return -1;
+}
+
+bool HAL_Feature_Get(HAL_Feature feature)
+{
+    return false;
+}
+
+int HAL_Set_System_Config(hal_system_config_t config_item, const void* data, unsigned length)
+{
+    return -1;
+}
+
+void HAL_Bootloader_Lock(bool lock)
+{
+    if (lock)
+        FLASH_WriteProtection_Enable(BOOTLOADER_FLASH_PAGES);
+    else
+        FLASH_WriteProtection_Disable(BOOTLOADER_FLASH_PAGES);
+}
+
+uint16_t HAL_Bootloader_Get_Flag(BootloaderFlag flag)
+{
+    switch (flag) {
+        case BOOTLOADER_FLAG_VERSION:
+            break;
+        case BOOTLOADER_FLAG_STARTUP_MODE:
+            break;
+    }
+    return 0;
+}
+
+bool HAL_Core_System_Reset_FlagSet(RESET_TypeDef resetType)
+{
+    
+    switch(resetType)
+    {
+        case PIN_RESET:
+            break;
+            
+        case SOFTWARE_RESET:
+            break;
+            
+        case WATCHDOG_RESET:
+            break;
+            
+        case LOW_POWER_RESET:
+            break;
+    }
+    
+    return true;
+}
