@@ -41,9 +41,6 @@
 //Bootloader section
 #define BOOTLOADER_FLASH_PAGES 0x00
 
-//Internal Flash Address
-#define USER_FIRMWARE_IMAGE_LOCATION 0x035000
-
 //External FLash addresses
 #define FLASH_FW_STATUS 0x0100
 #define FLASH_FW_LENGTH1 0x0101

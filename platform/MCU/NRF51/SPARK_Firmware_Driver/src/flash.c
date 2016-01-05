@@ -16,6 +16,8 @@
  */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
+#include <stdint.h>
+#include <stdbool.h>
 #include "flash.h"
 
 bool FLASH_isUserModuleInfoValid(uint8_t flashDeviceID, uint32_t startAddress, uint32_t expectedAddress)

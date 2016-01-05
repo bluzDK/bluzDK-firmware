@@ -29,9 +29,10 @@ void system_part1_pre_init() {
     module_user_part_validated = HAL_Core_Validate_User_Module();
 
     if (is_user_module_valid()) {
-        void* new_heap_top = module_user_pre_init();
-        if (new_heap_top>sbrk_heap_top)
-            sbrk_heap_top = new_heap_top;
+        module_user_pre_init();
+//        void* new_heap_top = module_user_pre_init();
+//        if (new_heap_top>sbrk_heap_top)
+//            sbrk_heap_top = new_heap_top;
     }
     else {
         // indicate to the system that it shouldn't run user code

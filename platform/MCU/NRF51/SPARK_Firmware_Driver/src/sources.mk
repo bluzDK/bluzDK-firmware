@@ -10,6 +10,7 @@ INCLUDE_DIRS += SPARK_Services/inc
 
 # C source files included in this build.
 CSRC += $(TARGET_SPARK_SRC_PATH)/hw_config.c
+CSRC += $(TARGET_SPARK_SRC_PATH)/flash.c
 CSRC += $(TARGET_SPARK_SRC_PATH)/ble_scs.c
 CSRC += $(TARGET_SPARK_SRC_PATH)/sst25vf_spi.c
 CSRC += $(TARGET_SPARK_SRC_PATH)/system_nrf51.c
@@ -24,7 +25,6 @@ CSRC += $(TARGET_SPARK_SRC_PATH)/spi_master_fast.c
 
 # C++ source files included in this build.
 CPPSRC += $(TARGET_SPARK_SRC_PATH)/socket.cpp
-CPPSRC += $(TARGET_SPARK_SRC_PATH)/flash.cpp
 CPPSRC += $(TARGET_SPARK_SRC_PATH)/info_data_service.cpp
 CPPSRC += $(TARGET_SPARK_SRC_PATH)/socket_manager.cpp
 CPPSRC += $(TARGET_SPARK_SRC_PATH)/data_management_layer.cpp
