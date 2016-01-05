@@ -27,6 +27,8 @@
 #include <sys/types.h>
 
 extern "C" {
+    
+extern char link_heap_location, link_heap_location_end;
 
 int _write(int file, char *ptr, int len) { return 0; }
 //int _read(int file, char *ptr, int len) { return 0; }

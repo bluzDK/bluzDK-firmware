@@ -1,9 +1,13 @@
 #include "module_system_part1.h"
-#include "system_part1_loader.c"
+#include "dynalib.h"
+#include "system_mode.h"
+#include "module_user_init.h"
+#include "core_hal.h"
+#include <stdint.h>
+#include <stddef.h>
 
 DYNALIB_TABLE_EXTERN(communication);
 DYNALIB_TABLE_EXTERN(services);
-DYNALIB_TABLE_EXTERN(system_module_part1);
 DYNALIB_TABLE_EXTERN(hal);
 DYNALIB_TABLE_EXTERN(system);
 DYNALIB_TABLE_EXTERN(hal_peripherals);
@@ -17,10 +21,9 @@ DYNALIB_TABLE_EXTERN(system_net);
 DYNALIB_TABLE_EXTERN(system_cloud);
 DYNALIB_TABLE_EXTERN(hal_concurrent);
 
-__attribute__((externally_visible)) const void* const system_part1_module[] = {
+extern "C" __attribute__((externally_visible)) const void* const system_part1_module[] = {
     DYNALIB_TABLE_NAME(communication),
     DYNALIB_TABLE_NAME(services),
-    DYNALIB_TABLE_NAME(system_module_part1),
     DYNALIB_TABLE_NAME(hal),
     DYNALIB_TABLE_NAME(system),
     DYNALIB_TABLE_NAME(hal_peripherals),
@@ -35,3 +38,4 @@ __attribute__((externally_visible)) const void* const system_part1_module[] = {
     DYNALIB_TABLE_NAME(hal_concurrent),
 };
 
+#include "system_part1_loader.c"

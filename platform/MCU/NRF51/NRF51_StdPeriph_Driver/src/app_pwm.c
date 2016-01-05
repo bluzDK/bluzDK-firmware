@@ -450,14 +450,14 @@ uint16_t app_pwm_cycle_ticks_get(app_pwm_t const * const p_instance)
 ret_code_t app_pwm_channel_duty_set(app_pwm_t const * const p_instance,
                                   uint8_t channel, app_pwm_duty_t duty)
 {
-    uint32_t ticks = ((uint32_t)app_pwm_cycle_ticks_get(p_instance) * (uint32_t)duty) / 100UL;
+    uint32_t ticks = ((uint32_t)app_pwm_cycle_ticks_get(p_instance) * (uint32_t)duty) / 255UL;
     return app_pwm_channel_duty_ticks_set(p_instance, channel, ticks);
 }
 
 
 app_pwm_duty_t app_pwm_channel_duty_get(app_pwm_t const * const p_instance, uint8_t channel)
 {
-    uint32_t value = ((uint32_t)app_pwm_channel_duty_ticks_get(p_instance, channel) * 100UL) \
+    uint32_t value = ((uint32_t)app_pwm_channel_duty_ticks_get(p_instance, channel) * 255UL) \
                      / (uint32_t)app_pwm_cycle_ticks_get(p_instance);
 
     return (app_pwm_duty_t)value;

@@ -18,8 +18,9 @@
 #include "core_hal.h"
 #include "hw_config.h"
 #include "data_services.h"
-
 #include "nrf51_config.h"
+#undef STATIC_ASSERT
+#include "flash.h"
 
 /* Extern variables ----------------------------------------------------------*/
 
@@ -263,4 +264,28 @@ bool HAL_Core_System_Reset_FlagSet(RESET_TypeDef resetType)
     }
     
     return true;
+}
+
+bool HAL_Core_Validate_User_Module(void)
+{
+    bool valid = false;
+    
+    //CRC verification Enabled by default
+    if (FLASH_isUserModuleInfoValid(FLASH_INTERNAL, USER_FIRMWARE_IMAGE_LOCATION, USER_FIRMWARE_IMAGE_LOCATION))
+    {
+        //CRC check the user module and set to module_user_part_validated
+//        valid = FLASH_VerifyCRC32(FLASH_INTERNAL, USER_FIRMWARE_IMAGE_LOCATION,
+//                                  FLASH_ModuleLength(FLASH_INTERNAL, USER_FIRMWARE_IMAGE_LOCATION))
+//        && HAL_Verify_User_Dependencies();
+    }
+//    else if(FLASH_isUserModuleInfoValid(FLASH_INTERNAL, INTERNAL_FLASH_FAC_ADDRESS, USER_FIRMWARE_IMAGE_LOCATION))
+//    {
+//        //Reset and let bootloader perform the user module factory reset
+//        //Doing this instead of calling FLASH_RestoreFromFactoryResetModuleSlot()
+//        //saves precious system_part2 flash size i.e. fits in < 128KB
+////        HAL_Core_Factory_Reset();
+////        
+////        while(1);//Device should reset before reaching this line
+//    }
+    return valid;
 }

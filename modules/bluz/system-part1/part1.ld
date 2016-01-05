@@ -63,12 +63,18 @@ SECTIONS
 		KEEP(*(.fini))
 
         link_constructors_location = .;
+        chk_system_pre_init_start = .;
+        KEEP (*(.module_pre_init))
+        chk_system_pre_init_end = .;
 		/* .ctors */
 		*crtbegin.o(.ctors)
 		*crtbegin?.o(.ctors)
 		*(EXCLUDE_FILE(*crtend?.o *crtend.o) .ctors)
 		*(SORT(.ctors.*))
 		*(.ctors)
+        chk_system_init_start = .;
+        KEEP (*(.module_init))
+        chk_system_init_end = .;
         link_constructors_end = .;
 
 		/* .dtors */
