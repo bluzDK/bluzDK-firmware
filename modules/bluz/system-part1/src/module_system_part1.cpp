@@ -6,6 +6,8 @@
 #include <stdint.h>
 #include <stddef.h>
 
+extern "C" {
+
 DYNALIB_TABLE_EXTERN(communication);
 DYNALIB_TABLE_EXTERN(services);
 DYNALIB_TABLE_EXTERN(hal);
@@ -39,3 +41,5 @@ extern "C" __attribute__((externally_visible)) const void* const system_part1_mo
 };
 
 #include "system_part1_loader.c"
+
+}
