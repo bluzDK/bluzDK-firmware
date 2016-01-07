@@ -21,6 +21,8 @@
 #include "nrf51_config.h"
 #undef STATIC_ASSERT
 #include "flash.h"
+#include "gpio_hal.h"
+#include "rgbled.h"
 
 /* Extern variables ----------------------------------------------------------*/
 
@@ -74,6 +76,7 @@ bool HAL_Is_Advertising(void)
  *******************************************************************************/
 void HAL_Core_Config(void)
 {
+
 }
 
 bool HAL_Core_Mode_Button_Pressed(uint16_t pressedMillisDuration)
@@ -268,7 +271,7 @@ bool HAL_Core_System_Reset_FlagSet(RESET_TypeDef resetType)
 
 bool HAL_Core_Validate_User_Module(void)
 {
-    bool valid = false;
+//    bool valid = false;
     
     //CRC verification Enabled by default
     if (FLASH_isUserModuleInfoValid(FLASH_INTERNAL, USER_FIRMWARE_IMAGE_LOCATION, USER_FIRMWARE_IMAGE_LOCATION))
@@ -287,5 +290,8 @@ bool HAL_Core_Validate_User_Module(void)
 ////        
 ////        while(1);//Device should reset before reaching this line
 //    }
-    return valid;
+    
+    //TO DO: CLEARLY FIX THIS!
+    return true;
+//    return valid;
 }

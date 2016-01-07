@@ -62,7 +62,7 @@ SECTIONS
 		KEEP(*(.init))
 		KEEP(*(.fini))
 
-        link_constructors_location = .;        
+        link_constructors_location = .;
         chk_system_pre_init_start = .;
         KEEP (*(.module_pre_init))
         chk_system_pre_init_end = .;

@@ -171,6 +171,10 @@ Reset_Handler:
     
     LDR     R0, =SystemInit
     BLX     R0
+
+    /* Call C++ constructors. */
+    bl  CallConstructors
+
     LDR     R0, =_start
     BX      R0
 

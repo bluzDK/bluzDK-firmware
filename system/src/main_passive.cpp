@@ -176,7 +176,7 @@ void app_setup_and_loop_passive(void)
                 LED_SetRGBColor(RGB_COLOR_BLUE);
             } else {
                 ledOffTime = 2000;
-                LED_SetRGBColor(RGB_COLOR_GREEN);
+//                LED_SetRGBColor(RGB_COLOR_GREEN);
             }
         }
     }
