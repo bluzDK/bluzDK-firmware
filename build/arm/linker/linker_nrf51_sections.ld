@@ -56,6 +56,9 @@ SECTIONS
 		KEEP(*(.init))
 		KEEP(*(.fini))
 
+        link_constructors_location = .;
+        link_constructors_end = .;
+
 		/* .ctors */
 		*crtbegin.o(.ctors)
 		*crtbegin?.o(.ctors)
