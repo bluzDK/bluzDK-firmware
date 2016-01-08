@@ -11,6 +11,7 @@ extern "C" {
 DYNALIB_TABLE_EXTERN(communication);
 DYNALIB_TABLE_EXTERN(services);
 DYNALIB_TABLE_EXTERN(hal);
+DYNALIB_TABLE_EXTERN(rt);
 DYNALIB_TABLE_EXTERN(system);
 DYNALIB_TABLE_EXTERN(hal_peripherals);
 DYNALIB_TABLE_EXTERN(hal_i2c);
@@ -27,6 +28,7 @@ extern "C" __attribute__((externally_visible)) const void* const system_part1_mo
     DYNALIB_TABLE_NAME(communication),
     DYNALIB_TABLE_NAME(services),
     DYNALIB_TABLE_NAME(hal),
+    DYNALIB_TABLE_NAME(rt),
     DYNALIB_TABLE_NAME(system),
     DYNALIB_TABLE_NAME(hal_peripherals),
     DYNALIB_TABLE_NAME(hal_i2c),

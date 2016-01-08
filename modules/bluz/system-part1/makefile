@@ -5,7 +5,7 @@ BUILD_PATH_EXT = $(BUILD_TARGET_PLATFORM)
 HAL_LINK :=
 PLATFORM_DFU = 0x8060000
 MAKE_DEPENDENCIES = communication hal platform system wiring dynalib services
-DEPENDENCIES = modules/bluz/user-part $(MAKE_DEPENDENCIES) dynalib system wiring hal platform
+DEPENDENCIES = modules/bluz/user-part $(MAKE_DEPENDENCIES) dynalib system wiring hal platform rt-dynalib
 include ../modular.mk
 include $(PROJECT_ROOT)/build/platform-id.mk
 
