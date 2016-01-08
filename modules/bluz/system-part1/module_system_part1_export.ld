@@ -7,7 +7,7 @@
 system_part1_module_ram_end = 0x20007000;
 system_part1_start = 0x00018000;
 
-system_part1_vtor_table_size = 0x184;
+system_part1_vtor_table_size = 0xa8;
 system_part1_module_info_size = 24;
 system_part1_vtor_table_start = system_part1_start;
 

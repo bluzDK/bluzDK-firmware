@@ -82,6 +82,14 @@ uint16_t system_button_pushed_duration(uint8_t button, void*)
     return 0;
 }
 
+extern "C" void system_part1_post_init() __attribute__((weak));
+
+// this is overridden for modular firmware
+void system_part1_post_init()
+{
+}
+
+
 /*******************************************************************************
  * Function Name  : main.
  * Description    : main routine.
@@ -91,6 +99,8 @@ uint16_t system_button_pushed_duration(uint8_t button, void*)
  *******************************************************************************/
 void app_setup_and_loop_passive(void)
 {
+    system_part1_post_init();
+    
     //Set some Particle flags to bypass functionality we don't need
     SPARK_CLOUD_SOCKETED = 0;
     SPARK_CLOUD_CONNECTED = 0;

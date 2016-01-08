@@ -48,12 +48,20 @@ SECTIONS
 {
     INCLUDE module_start.ld
 
-    /* 97*4=388 is vector table size. */
-    expected_dynalib_start = ORIGIN (APP_FLASH) + 0x184 + 24 + 0x208;
+    INCLUDE module_info.ld
 
     .text :
     {
+        expected_dynalib_start = ORIGIN (APP_FLASH) + 24 ;
+
+        link_dynalib_start = .;
         KEEP(*(*.user_part_module))
+        link_dynalib_end = . ;
+
+        link_length_start = .;
+        KEEP(*(*.user_part_length))
+        link_length_end = .;
+
         *(.text*)
 
         KEEP(*(.init))
@@ -79,8 +87,6 @@ SECTIONS
 
         *(.eh_frame*)
     } > APP_FLASH
-
-    INCLUDE module_info.ld
 
     .ARM.extab :
     {

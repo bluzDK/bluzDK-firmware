@@ -25,9 +25,10 @@ extern void* sbrk_heap_top;
 void system_part1_pre_init() {
     
     module_user_part_validated = HAL_Core_Validate_User_Module();
+    module_user_part_validated = true;
 
     if (is_user_module_valid()) {
-//        module_user_pre_init();
+        module_user_pre_init();
 //        void* new_heap_top = module_user_pre_init();
 //        if (new_heap_top>sbrk_heap_top)
 //            sbrk_heap_top = new_heap_top;
@@ -51,6 +52,7 @@ void system_part1_post_init() {
 }
 
 void setup() {
+    module_user_part_validated = true;
     if (is_user_module_valid()) {
         module_user_setup();
     }
