@@ -45,6 +45,9 @@
 #define USER_FIRMWARE_IMAGE_LOCATION 0x00036000
 #endif
 
+
+#define APP_START_MASK              ((uint32_t)0x2FF10000)
+
 //External FLash addresses
 #define FLASH_FW_STATUS 0x0100
 #define FLASH_FW_LENGTH1 0x0101
@@ -53,7 +56,7 @@
 
 #define FLASH_DEVICE_INT 0x1000
 
-#define FLASH_FW_ADDRESS 0x01A000
+#define FLASH_FW_ADDRESS 0x021000
 #define FLASH_LENGTH 0x040000
 
 #endif

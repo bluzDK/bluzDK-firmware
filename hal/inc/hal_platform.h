@@ -33,6 +33,11 @@ extern "C" {
 #if PLATFORM_ID==10
 #define HAL_PLATFORM_CELLULAR 1
 #endif
+    
+#if PLATFORM_ID==103
+#define HAL_PLATFORM_BLUETOOTH_LE 1
+#endif
+
 
 
 #ifndef HAL_PLATFORM_WIFI
@@ -41,6 +46,10 @@ extern "C" {
 
 #ifndef HAL_PLATFORM_CELLULAR
 #define HAL_PLATFORM_CELLULAR 0
+#endif
+    
+#ifndef HAL_PLATFORM_BLUETOOTH_LE
+#define HAL_PLATFORM_BLUETOOTH_LE 0
 #endif
 
 

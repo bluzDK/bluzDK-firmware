@@ -41,6 +41,8 @@ $(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/src/app_error.c) \
 $(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/src/app_scheduler.c) \
 $(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/src/app_timer.c) \
 $(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/src/app_timer_appsh.c) \
+$(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/src/app_fifo.c) \
+$(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/src/app_uart.c) \
 $(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/src/bootloader.c) \
 $(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/src/bootloader_settings.c) \
 $(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/src/bootloader_util.c) \
@@ -51,9 +53,12 @@ $(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/src/dfu_transport_b
 $(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/src/hci_mem_pool.c) \
 $(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/src/nrf_assert.c) \
 $(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/src/nrf_delay.c) \
+$(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/src/nrf_drv_gpiote.c) \
+$(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/src/nrf_drv_common.c) \
 $(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/src/pstorage.c) \
 $(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/src/spi_master.c) \
 $(abspath ../../../platform/MCU/NRF51/SPARK_Firmware_Driver/src/sst25vf_spi.c) \
+$(abspath ../../../platform/MCU/NRF51/SPARK_Firmware_Driver/src/flash.c) \
 $(abspath dfu_ble_svc.c) \
 $(abspath main.c) \
 $(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/src/ble_advdata.c) \
@@ -72,12 +77,14 @@ INC_PATHS  = -I$(abspath .)
 INC_PATHS  = -I$(abspath ./config)
 INC_PATHS += -I$(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/inc/libraries/util)
 INC_PATHS += -I$(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/inc/libraries/timer)
+INC_PATHS += -I$(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/inc/libraries/fifo)
 INC_PATHS += -I$(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/inc/toolchain)
 INC_PATHS += -I$(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/inc/libraries/bootloader_dfu)
 INC_PATHS += -I$(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/inc/libraries/scheduler)
 INC_PATHS += -I$(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/inc/softdevice/s110/headers)
 INC_PATHS += -I$(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/inc/bsp)
 INC_PATHS += -I$(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/inc/drivers_nrf/pstorage)
+INC_PATHS += -I$(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/inc/drivers_nrf/common)
 INC_PATHS += -I$(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/inc/toolchain/gcc)
 INC_PATHS += -I$(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/inc/libraries/bootloader_dfu/ble_transport)
 INC_PATHS += -I$(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/inc/device)
@@ -90,9 +97,12 @@ INC_PATHS += -I$(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/inc/
 INC_PATHS += -I$(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/inc/drivers_nrf/hal)
 INC_PATHS += -I$(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/inc/drivers_nrf/uart)
 INC_PATHS += -I$(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/inc/drivers_nrf/spi_master)
+INC_PATHS += -I$(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/inc/drivers_nrf/gpiote)
 INC_PATHS += -I$(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/inc/ble/common)
 INC_PATHS += -I$(abspath ../../../platform/MCU/NRF51/SPARK_Firmware_Driver/inc)
 INC_PATHS += -I$(abspath ../../../hal/shared)
+INC_PATHS += -I$(abspath ../../../dynalib/inc)
+INC_PATHS += -I$(abspath ../../../services/inc)
 
 OBJECT_DIRECTORY = _build
 LISTING_DIRECTORY = $(OBJECT_DIRECTORY)
@@ -110,6 +120,7 @@ CFLAGS += -DS110
 CFLAGS += -D__HEAP_SIZE=0
 CFLAGS += -DBLE_STACK_SUPPORT_REQD
 CFLAGS += -DBSP_DEFINES_ONLY
+CFLAGS += -DPLATFORM_ID=103
 CFLAGS += -mcpu=cortex-m0
 CFLAGS += -mthumb -mabi=aapcs --std=gnu99
 CFLAGS += -Wall -Werror -Os

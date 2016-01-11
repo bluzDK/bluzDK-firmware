@@ -27,7 +27,6 @@
 #undef SS
 
 #include "hal_dynalib.h"
-#include "hal_dynalib.h"
 #undef SCK
 #undef MOSI
 #undef MISO
@@ -45,4 +44,5 @@
 #include "hal_dynalib_spi.h"
 #include "hal_dynalib_usart.h"
 #include "hal_dynalib_concurrent.h"
+#include "hal_dynalib_ble.h"
 

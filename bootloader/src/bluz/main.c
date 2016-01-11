@@ -53,6 +53,10 @@
 #include "hw_layout.h"
 #include "nrf_delay.h"
 #include "pstorage.h"
+#undef STATIC_ASSERT
+#include "flash.h"
+#include "module_info.h"
+#include "app_uart.h"
 
 #define IS_SRVC_CHANGED_CHARACT_PRESENT 1                                                       /**< Include the service_changed characteristic. For DFU this should normally be the case. */
 
@@ -67,6 +71,31 @@
 
 #define SCHED_QUEUE_SIZE                20                                                      /**< Maximum number of events in the scheduler queue. */
 
+
+
+void uart_put(char *str) {\
+    return;
+    uint_fast8_t i  = 0;
+    uint8_t      ch = str[i++];
+    while (ch != '\0')
+    {
+        while (app_uart_put(ch) == NRF_ERROR_NO_MEM) { }
+//        app_uart_put(ch);
+        ch = str[i++];
+    }
+}
+
+void uart_error_handle(app_uart_evt_t * p_event)
+{
+    if (p_event->evt_type == APP_UART_COMMUNICATION_ERROR)
+    {
+        APP_ERROR_HANDLER(p_event->data.error_communication);
+    }
+    else if (p_event->evt_type == APP_UART_FIFO_ERROR)
+    {
+        APP_ERROR_HANDLER(p_event->data.error_code);
+    }
+}
 
 /**@brief Callback function for asserts in the SoftDevice.
  *
@@ -237,6 +266,25 @@ int main(void)
     uint32_t err_code;
 //    bool     dfu_start = false;
     bool     app_reset = (NRF_POWER->GPREGRET == BOOTLOADER_DFU_START);
+    
+//    const app_uart_comm_params_t comm_params =
+//    {
+//        12,
+//        8,
+//        20,
+//        11,
+//        APP_UART_FLOW_CONTROL_DISABLED,
+//        false,
+//        UART_BAUDRATE_BAUDRATE_Baud38400
+//    };
+//
+//    APP_UART_INIT(&comm_params,
+//         uart_error_handle,
+//         APP_IRQ_PRIORITY_LOW,
+//         err_code);
+    
+    uart_put("STARTING!\n");
+    
 
     if (app_reset)
     {
@@ -281,7 +329,14 @@ int main(void)
         err_code = pstorage_raw_register(&storage_module_param, &m_storage_handle_app);
         APP_ERROR_CHECK(err_code);
         
-        m_storage_handle_app.block_id  = DFU_BANK_0_REGION_START;
+        const module_info_t* modinfo = FLASH_ModuleInfo(0, FLASH_FW_ADDRESS);
+        m_storage_handle_app.block_id  = (uint32_t)modinfo->module_start_address;
+        
+        if (!FLASH_isUserModuleInfoValid(0, FLASH_FW_ADDRESS, 0x00)) {
+            uart_put("BAD MODULE. NOT GOING TO FLASH\n");
+            bootloader_app_start(DFU_BANK_0_REGION_START);
+        }
+        uart_put("GOOD MODULE. FLASHING\n");
         
         uint32_t    ops_count = 7;
         //now clear the nrf51 flash
@@ -319,9 +374,11 @@ int main(void)
         sFLASH_EraseSector(FLASH_FW_STATUS);
         sFLASH_WriteSingleByte(FLASH_FW_STATUS, 0x00);
         nrf_gpio_pin_set(RGB_LED_PIN_BLUE);
+            
     }
     //TO DO: Temporary for now, just boot directly into the app.
     //Really, we should go on and see if they want to enter boot mode, then take FW and keys through DFU
+    uart_put("LAUNCHING\n");
     bootloader_app_start(DFU_BANK_0_REGION_START);
 
 //    (void)bootloader_init();

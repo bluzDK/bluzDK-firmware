@@ -15,16 +15,29 @@
  License along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
 
-/* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __FLASH_H
-#define __FLASH_H
+#ifndef HAL_DYNALIB_BLE_H
+#define	HAL_DYNALIB_BLE_H
 
-#include "hw_layout.h"
-#include "flash_device_hal.h"
-#include "module_info.h"
-#include "module_info_hal.h"
+#include "dynalib.h"
 
-bool FLASH_isUserModuleInfoValid(uint8_t flashDeviceID, uint32_t startAddress, uint32_t expectedAddress);
-const module_info_t* FLASH_ModuleInfo(uint8_t flashDeviceID, uint32_t startAddress);
+#ifdef DYNALIB_EXPORT
+#include "bluetooth_le_hal.h"
+#endif
 
-#endif  /*__FLASH_H*/
+// WARNING
+// The order of functions must not be changed or older applications will break
+// when used with newer system firmware.
+// Function signatures shouldn't be changed other than changing pointer types.
+// New HAL functions must be added to the end of this list.
+// GNINRAW
+
+DYNALIB_BEGIN(hal_ble)
+DYNALIB_FN(hal_ble,HAL_BLE_GET_STATE)
+DYNALIB_FN(hal_ble,HAL_BLE_GET_CONNECTION_INTERVAL)
+DYNALIB_FN(hal_ble,HAL_BLE_Start_Advertising)
+DYNALIB_FN(hal_ble,HAL_BLE_Stop_Advertising)
+
+DYNALIB_END(hal_ble)
+
+#endif	/* HAL_DYNALIB_BLE_H */
+
