@@ -9,12 +9,11 @@ void setup() {
 
 /* executes continuously after setup() runs */
 void loop() {
-    if (millis() % 1000 == 0 && ledOn) {
+    delay(1000);
+    if (ledOn) {
         digitalWrite(D7, LOW);
-        ledOn = !ledOn;
-    } else if (millis() % 1000 == 0) {
+    } else {
         digitalWrite(D7, HIGH);
-        ledOn = !ledOn;
     }
-    System.sleep(SLEEP_MODE_DEEP);
+    ledOn = !ledOn;
 }
