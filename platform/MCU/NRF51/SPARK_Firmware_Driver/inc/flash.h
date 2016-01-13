@@ -19,6 +19,7 @@
 #ifndef __FLASH_H
 #define __FLASH_H
 
+#include <stdbool.h>
 #include "hw_layout.h"
 #include "flash_device_hal.h"
 #include "module_info.h"
@@ -26,5 +27,6 @@
 
 bool FLASH_isUserModuleInfoValid(uint8_t flashDeviceID, uint32_t startAddress, uint32_t expectedAddress);
 const module_info_t* FLASH_ModuleInfo(uint8_t flashDeviceID, uint32_t startAddress);
+bool FLASH_VerifyCRC32(uint8_t flashDeviceID, uint32_t startAddress, uint32_t length);
 
 #endif  /*__FLASH_H*/

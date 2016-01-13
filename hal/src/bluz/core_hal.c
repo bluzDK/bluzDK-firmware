@@ -271,11 +271,12 @@ bool HAL_Core_System_Reset_FlagSet(RESET_TypeDef resetType)
 
 bool HAL_Core_Validate_User_Module(void)
 {
-//    bool valid = false;
+    bool valid = false;
     
     //CRC verification Enabled by default
     if (FLASH_isUserModuleInfoValid(FLASH_INTERNAL, USER_FIRMWARE_IMAGE_LOCATION, USER_FIRMWARE_IMAGE_LOCATION))
     {
+        valid = true;;
         //CRC check the user module and set to module_user_part_validated
 //        valid = FLASH_VerifyCRC32(FLASH_INTERNAL, USER_FIRMWARE_IMAGE_LOCATION,
 //                                  FLASH_ModuleLength(FLASH_INTERNAL, USER_FIRMWARE_IMAGE_LOCATION))
@@ -291,7 +292,5 @@ bool HAL_Core_Validate_User_Module(void)
 ////        while(1);//Device should reset before reaching this line
 //    }
     
-    //TO DO: CLEARLY FIX THIS!
-    return true;
-//    return valid;
+    return valid;
 }

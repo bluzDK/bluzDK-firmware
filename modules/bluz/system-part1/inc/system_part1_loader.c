@@ -25,8 +25,8 @@ extern void* sbrk_heap_top;
 void system_part1_pre_init() {
     HAL_Core_Config();
     
-//    module_user_part_validated = HAL_Core_Validate_User_Module();
-    module_user_part_validated = true;
+    module_user_part_validated = HAL_Core_Validate_User_Module();
+//    module_user_part_validated = true;
 
     if (is_user_module_valid()) {
         module_user_pre_init();

@@ -35,21 +35,43 @@ bool FLASH_isUserModuleInfoValid(uint8_t flashDeviceID, uint32_t startAddress, u
 
 const module_info_t* FLASH_ModuleInfo(uint8_t flashDeviceID, uint32_t startAddress)
 {
-    //largest possible location for module_info is 0xc0 + 0x18, so 256 bytes is plenty
-    uint8_t buf[256];
-    uint32_t moduleInfoAddress = 0;
-    
-    //read the buffer from external flash, then check the first byte to see if it is the vector table
-    sFLASH_ReadBuffer(buf, startAddress, 256);
-    uint32_t firstInt = (buf[3] << 24) | (buf[2] << 16) | (buf[1] << 8)  |  buf[0];
-    
-    //if it is the vector table, then look past it for module_info
-    if ((firstInt & APP_START_MASK) == 0x20000000)
-    {
-        moduleInfoAddress += 0xc0;
+    if (flashDeviceID == FLASH_INTERNAL) {
+        //read the buffer from internal flash
+        if (startAddress >= 0x40000) {
+            return NULL;
+        }
+//        memcpy(buf, (const void *)startAddress, 256);
+        if (((*(volatile uint32_t*)startAddress) & APP_START_MASK) == 0x20000000)
+        {
+            startAddress += 0xc0;
+        }
+        
+        const module_info_t* module_info = (const module_info_t*)startAddress;
+        return module_info;
+    } else {
+        //largest possible location for module_info is 0xc0 + 0x18, so 256 bytes is plenty
+        uint8_t buf[256];
+        uint32_t moduleInfoAddress = 0;
+        
+        //read the buffer from external flash
+        sFLASH_ReadBuffer(buf, startAddress, 256);
+        
+        uint32_t firstInt = (buf[3] << 24) | (buf[2] << 16) | (buf[1] << 8)  |  buf[0];
+        
+        //if it is the vector table, then look past it for module_info
+        if ((firstInt & APP_START_MASK) == 0x20000000)
+        {
+            moduleInfoAddress += 0xc0;
+        }
+        
+        const module_info_t *module_info = (const module_info_t*)(buf+moduleInfoAddress);
+        return module_info;
+        
     }
-    
-    const module_info_t *module_info = (const module_info_t*)(buf+moduleInfoAddress);
-    return module_info;
+}
+
+bool FLASH_VerifyCRC32(uint8_t flashDeviceID, uint32_t startAddress, uint32_t length)
+{
+    return true;
 }
 
