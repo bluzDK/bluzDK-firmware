@@ -73,7 +73,7 @@
 
 
 
-void uart_put(char *str) {\
+void uart_put(char *str) {
     return;
     uint_fast8_t i  = 0;
     uint8_t      ch = str[i++];
@@ -329,10 +329,10 @@ int main(void)
         err_code = pstorage_raw_register(&storage_module_param, &m_storage_handle_app);
         APP_ERROR_CHECK(err_code);
         
-        const module_info_t* modinfo = FLASH_ModuleInfo(0, FLASH_FW_ADDRESS);
+        const module_info_t* modinfo = FLASH_ModuleInfo(FLASH_SERIAL, FLASH_FW_ADDRESS);
         m_storage_handle_app.block_id  = (uint32_t)modinfo->module_start_address;
         
-        if (!FLASH_isUserModuleInfoValid(0, FLASH_FW_ADDRESS, 0x00)) {
+        if (!FLASH_isUserModuleInfoValid(FLASH_SERIAL, FLASH_FW_ADDRESS, 0x00)) {
             uart_put("BAD MODULE. NOT GOING TO FLASH\n");
             bootloader_app_start(DFU_BANK_0_REGION_START);
         }
