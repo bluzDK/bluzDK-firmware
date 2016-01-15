@@ -57,6 +57,7 @@
 #include "flash.h"
 #include "module_info.h"
 #include "app_uart.h"
+#include "rgbled.h"
 
 #define IS_SRVC_CHANGED_CHARACT_PRESENT 1                                                       /**< Include the service_changed characteristic. For DFU this should normally be the case. */
 
@@ -74,7 +75,6 @@
 
 
 void uart_put(char *str) {
-    return;
     uint_fast8_t i  = 0;
     uint8_t      ch = str[i++];
     while (ch != '\0')
@@ -259,29 +259,101 @@ void blink(int times)
 }
 
 
+void copyFW(uint32_t flashFWLocation, uint32_t fw_len, bool wipeUserApp)
+{
+    uint32_t         err_code;
+    
+    LED_SetRGBColor(RGB_COLOR_BLUE);
+    LED_On(LED_RGB);
+    
+    //let's init the pstorage
+    pstorage_handle_t m_storage_handle_app;
+    pstorage_module_param_t storage_module_param = {.cb = pstorage_callback_handler};
+    
+    if (wipeUserApp) {
+        //hack for now...
+        fw_len += 0x4000;
+    }
+    
+    storage_module_param.block_size = 0x100;
+    storage_module_param.block_count = fw_len / 256;
+    
+    pstorage_init();
+    err_code = pstorage_raw_register(&storage_module_param, &m_storage_handle_app);
+    APP_ERROR_CHECK(err_code);
+    
+    const module_info_t* modinfo = FLASH_ModuleInfo(FLASH_SERIAL, flashFWLocation);
+    m_storage_handle_app.block_id  = (uint32_t)modinfo->module_start_address;
+    
+    if (!FLASH_isUserModuleInfoValid(FLASH_SERIAL, flashFWLocation, 0x00)) {
+        uart_put("BAD MODULE. NOT GOING TO FLASH\n");
+        bootloader_app_start(DFU_BANK_0_REGION_START);
+    }
+    uart_put("GOOD MODULE. FLASHING\n");
+    
+    uint32_t    ops_count = 7;
+    //now clear the nrf51 flash
+    stillWorking = true;
+    err_code = pstorage_raw_clear(&m_storage_handle_app, fw_len);
+    do {
+        app_sched_execute();
+        pstorage_access_status_get(&ops_count);
+    }
+    while(ops_count != 0);
+    
+    app_sched_execute();
+    
+    APP_ERROR_CHECK(err_code);
+    //now read from SPI Flash one page at a time and copy over to internal flash
+    uint8_t buf[PSTORAGE_FLASH_PAGE_SIZE];
+    uint32_t addr = flashFWLocation;
+    for (int i = 0; i < fw_len; i+=PSTORAGE_FLASH_PAGE_SIZE) {
+        sFLASH_ReadBuffer(buf, addr, PSTORAGE_FLASH_PAGE_SIZE);
+        err_code = pstorage_raw_store(&m_storage_handle_app,
+                                      (uint8_t *)buf,
+                                      PSTORAGE_FLASH_PAGE_SIZE,
+                                      i);
+        APP_ERROR_CHECK(err_code);
+        
+        do {
+            app_sched_execute();
+            pstorage_access_status_get(&ops_count);
+        }
+        while(ops_count != 0);
+        
+        
+        addr+=PSTORAGE_FLASH_PAGE_SIZE;
+    }
+    sFLASH_EraseSector(FLASH_FW_STATUS);
+    sFLASH_WriteSingleByte(FLASH_FW_STATUS, 0x00);
+    LED_Off(LED_RGB);
+}
+
+
 /**@brief Function for bootloader main entry.
  */
 int main(void)
 {
-    uint32_t err_code;
 //    bool     dfu_start = false;
     bool     app_reset = (NRF_POWER->GPREGRET == BOOTLOADER_DFU_START);
     
-//    const app_uart_comm_params_t comm_params =
-//    {
-//        12,
-//        8,
-//        20,
-//        11,
-//        APP_UART_FLOW_CONTROL_DISABLED,
-//        false,
-//        UART_BAUDRATE_BAUDRATE_Baud38400
-//    };
-//
-//    APP_UART_INIT(&comm_params,
-//         uart_error_handle,
-//         APP_IRQ_PRIORITY_LOW,
-//         err_code);
+    uint32_t         err_code;
+    const app_uart_comm_params_t comm_params =
+    {
+        12,
+        8,
+        20,
+        11,
+        APP_UART_FLOW_CONTROL_DISABLED,
+        false,
+        UART_BAUDRATE_BAUDRATE_Baud38400
+    };
+
+    APP_UART_INIT(&comm_params,
+         uart_error_handle,
+         APP_IRQ_PRIORITY_LOW,
+         err_code);
+    APP_ERROR_CHECK(err_code);
     
     uart_put("STARTING!\n");
     
@@ -308,73 +380,51 @@ int main(void)
     
     //init external flash then check if update is ready
     sFLASH_Init();
-    uint8_t byte0 = sFLASH_ReadSingleByte(FLASH_FW_STATUS);
-    if (byte0 == 0x01) {
-        nrf_gpio_pin_clear(RGB_LED_PIN_BLUE);
-        //we have an app waiting for us. let's first find out the length
-        uint32_t fw_len = 0;
-        uint8_t byte1 = sFLASH_ReadSingleByte(FLASH_FW_LENGTH1);
-        uint8_t byte2 = sFLASH_ReadSingleByte(FLASH_FW_LENGTH2);
-        uint8_t byte3 = sFLASH_ReadSingleByte(FLASH_FW_LENGTH3);
-        fw_len = (byte1 << 16) | (byte2 << 8)  |  byte3;
-        
-        //let's init the pstorage
-        pstorage_handle_t m_storage_handle_app;
-        pstorage_module_param_t storage_module_param = {.cb = pstorage_callback_handler};
-        
-        storage_module_param.block_size = 0x100;
-        storage_module_param.block_count = fw_len / 256;
-        
-        pstorage_init();
-        err_code = pstorage_raw_register(&storage_module_param, &m_storage_handle_app);
-        APP_ERROR_CHECK(err_code);
-        
-        const module_info_t* modinfo = FLASH_ModuleInfo(FLASH_SERIAL, FLASH_FW_ADDRESS);
-        m_storage_handle_app.block_id  = (uint32_t)modinfo->module_start_address;
-        
-        if (!FLASH_isUserModuleInfoValid(FLASH_SERIAL, FLASH_FW_ADDRESS, 0x00)) {
-            uart_put("BAD MODULE. NOT GOING TO FLASH\n");
-            bootloader_app_start(DFU_BANK_0_REGION_START);
-        }
-        uart_put("GOOD MODULE. FLASHING\n");
-        
-        uint32_t    ops_count = 7;
-        //now clear the nrf51 flash
-        stillWorking = true;
-        err_code = pstorage_raw_clear(&m_storage_handle_app, fw_len);
-        do {
-            app_sched_execute();
-            pstorage_access_status_get(&ops_count);
-        }
-        while(ops_count != 0);
-        
-        app_sched_execute();
-        
-        APP_ERROR_CHECK(err_code);
-        //now read from SPI Flash one page at a time and copy over to internal flash
-        uint8_t buf[PSTORAGE_FLASH_PAGE_SIZE];
-        uint32_t addr = FLASH_FW_ADDRESS;
-        for (int i = 0; i < fw_len; i+=PSTORAGE_FLASH_PAGE_SIZE) {
-            sFLASH_ReadBuffer(buf, addr, PSTORAGE_FLASH_PAGE_SIZE);
-            err_code = pstorage_raw_store(&m_storage_handle_app,
-                                          (uint8_t *)buf,
-                                          PSTORAGE_FLASH_PAGE_SIZE,
-                                          i);
-            APP_ERROR_CHECK(err_code);
-            
-            do {
-                app_sched_execute();
-                pstorage_access_status_get(&ops_count);
+    
+    bool setup_mode = ((nrf_gpio_pin_read(BOOTLOADER_BUTTON) == 0) ? true: false);
+    if (setup_mode) {
+        int counter = 1;
+        bool ledOn = true;
+        LED_SetRGBColor(RGB_COLOR_MAGENTA);
+        while (nrf_gpio_pin_read(BOOTLOADER_BUTTON) == 0)
+        {
+            if (counter >=100) {
+                LED_SetRGBColor(RGB_COLOR_WHITE);
+            } else if (counter >=30) {
+                LED_SetRGBColor(RGB_COLOR_YELLOW);
             }
-            while(ops_count != 0);
             
-            
-            addr+=PSTORAGE_FLASH_PAGE_SIZE;
+            if (ledOn) {
+                LED_Off(LED_RGB);
+            } else {
+                LED_On(LED_RGB);
+            }
+            ledOn = !ledOn;
+            counter++;
+            nrf_delay_ms(100);
         }
-        sFLASH_EraseSector(FLASH_FW_STATUS);
-        sFLASH_WriteSingleByte(FLASH_FW_STATUS, 0x00);
-        nrf_gpio_pin_set(RGB_LED_PIN_BLUE);
+        if (counter >=100) {
+            //copy factory reset firmware to application space
+            copyFW(FACTORY_RESET_FW_ADDRESS, FACTORY_RESET_FW_SIZE, true);
+        } else if (counter > 30) {
+            //enter serial setup mode so we can get data from the user
+        }
+        
+        
+    }
+    else {
+        uint8_t byte0 = sFLASH_ReadSingleByte(FLASH_FW_STATUS);
+        if (byte0 == 0x01) {
+            //we have an app waiting for us. let's first find out the length
+            uint32_t fw_len = 0;
+            uint8_t byte1 = sFLASH_ReadSingleByte(FLASH_FW_LENGTH1);
+            uint8_t byte2 = sFLASH_ReadSingleByte(FLASH_FW_LENGTH2);
+            uint8_t byte3 = sFLASH_ReadSingleByte(FLASH_FW_LENGTH3);
+            fw_len = (byte1 << 16) | (byte2 << 8)  |  byte3;
             
+            copyFW(FLASH_FW_ADDRESS, fw_len, false);
+                
+        }
     }
     //TO DO: Temporary for now, just boot directly into the app.
     //Really, we should go on and see if they want to enter boot mode, then take FW and keys through DFU

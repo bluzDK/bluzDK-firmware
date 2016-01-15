@@ -2,7 +2,7 @@
 
 extern void** dynalib_location_user;
 
-static bool module_user_part_validated = false;
+static bool module_user_part_validated = true;
 
 /**
  * Determines if the user module is present and valid.
@@ -23,7 +23,6 @@ extern void* sbrk_heap_top;
  * but before C++ constructors are executed and before any dynamic memory has been allocated.
  */
 void system_part1_pre_init() {
-    HAL_Core_Config();
     
     module_user_part_validated = HAL_Core_Validate_User_Module();
 //    module_user_part_validated = true;
@@ -44,6 +43,7 @@ void system_part1_pre_init() {
  * Invoked after all module-scope instances have been constructed.
  */
 void system_part1_init() {
+
 }
 
 void system_part1_post_init() {
@@ -53,7 +53,6 @@ void system_part1_post_init() {
 }
 
 void setup() {
-    module_user_part_validated = true;
     if (is_user_module_valid()) {
         module_user_setup();
     }

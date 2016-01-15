@@ -115,11 +115,13 @@ void app_setup_and_loop_passive(void)
     //setup BLE stack
     HAL_Network_Init();
     
-    LED_SetRGBColor(RGB_COLOR_GREEN);
+    LED_SetRGBColor(system_mode()==SAFE_MODE ? RGB_COLOR_MAGENTA : RGB_COLOR_GREEN);
     LED_On(LED_RGB);
     
     //call user setup function, device may or may not be connected
-    setup();
+    if (system_mode()!=SAFE_MODE) {
+        setup();
+    }
     
     while (1)
     {
@@ -161,7 +163,7 @@ void app_setup_and_loop_passive(void)
                     LED_SetRGBColor(RGB_COLOR_MAGENTA);
                     ERROR("Error when calling Spark Handshake");
                 } else {
-                    LED_SetRGBColor(RGB_COLOR_CYAN);
+                    LED_SetRGBColor(system_mode()==SAFE_MODE ? RGB_COLOR_MAGENTA : RGB_COLOR_CYAN);
                     DEBUG("Handshake Complete");
                     
                     CLOUD_CONNECTED = true;
@@ -179,7 +181,7 @@ void app_setup_and_loop_passive(void)
                 SPARK_CLOUD_CONNECTED = 0;
                 
                 ledOffTime = 2000;
-                LED_SetRGBColor(RGB_COLOR_GREEN);
+                LED_SetRGBColor(system_mode()==SAFE_MODE ? RGB_COLOR_MAGENTA : RGB_COLOR_GREEN);
             }
             if (!HAL_Is_Advertising()) {
                 ledOffTime = 2000;

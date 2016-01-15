@@ -76,7 +76,8 @@ bool HAL_Is_Advertising(void)
  *******************************************************************************/
 void HAL_Core_Config(void)
 {
-
+    HAL_Pin_Mode(D7, OUTPUT);
+    HAL_GPIO_Write(D7, 1);
 }
 
 bool HAL_Core_Mode_Button_Pressed(uint16_t pressedMillisDuration)
@@ -202,8 +203,10 @@ void HAL_Notify_WDT()
 {    
 }
 
+void CallConstructors(void);
 //main function
 int main(void) {
+    CallConstructors();
     app_setup_and_loop_passive();
     return 0;
 }

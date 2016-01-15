@@ -24,6 +24,7 @@ endif
 
 # Toolchain commands
 CC       		:= "$(GNU_INSTALL_ROOT)/bin/$(GNU_PREFIX)-gcc"
+CPP       		:= "$(GNU_INSTALL_ROOT)/bin/$(GNU_PREFIX)-g++"
 AS       		:= "$(GNU_INSTALL_ROOT)/bin/$(GNU_PREFIX)-as"
 AR       		:= "$(GNU_INSTALL_ROOT)/bin/$(GNU_PREFIX)-ar" -r
 LD       		:= "$(GNU_INSTALL_ROOT)/bin/$(GNU_PREFIX)-ld"
@@ -68,6 +69,11 @@ $(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/src/ble_srv_common.
 $(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/src/system_nrf51.c) \
 $(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/src/softdevice_handler.c) \
 $(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/src/softdevice_handler_appsh.c) \
+$(abspath ../../../services/src/rgbled.c) \
+$(abspath ../../../hal/src/bluz/pinmap_hal.c)
+
+CPP_SOURCE_FILES += \
+$(abspath ../../../hal/src/bluz/rgbled_hal.cpp) \
 
 #assembly files common to all targets
 ASM_SOURCE_FILES  = $(abspath ./gcc_startup_nrf51.s)
@@ -101,6 +107,7 @@ INC_PATHS += -I$(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/inc/
 INC_PATHS += -I$(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/inc/ble/common)
 INC_PATHS += -I$(abspath ../../../platform/MCU/NRF51/SPARK_Firmware_Driver/inc)
 INC_PATHS += -I$(abspath ../../../hal/shared)
+INC_PATHS += -I$(abspath ../../../hal/inc)
 INC_PATHS += -I$(abspath ../../../dynalib/inc)
 INC_PATHS += -I$(abspath ../../../services/inc)
 
@@ -112,22 +119,25 @@ OUTPUT_BINARY_DIRECTORY = $(OBJECT_DIRECTORY)
 BUILD_DIRECTORIES := $(sort $(OBJECT_DIRECTORY) $(OUTPUT_BINARY_DIRECTORY) $(LISTING_DIRECTORY) )
 
 #flags common to all targets
-CFLAGS  = -DSWI_DISABLE0
-CFLAGS += -DBOARD_PCA10028
-CFLAGS += -DSOFTDEVICE_PRESENT
-CFLAGS += -DNRF51
-CFLAGS += -DS110
-CFLAGS += -D__HEAP_SIZE=0
-CFLAGS += -DBLE_STACK_SUPPORT_REQD
-CFLAGS += -DBSP_DEFINES_ONLY
-CFLAGS += -DPLATFORM_ID=103
-CFLAGS += -mcpu=cortex-m0
-CFLAGS += -mthumb -mabi=aapcs --std=gnu99
-CFLAGS += -Wall -Werror -Os
-CFLAGS += -mfloat-abi=soft
+CPPFLAGS  = -DSWI_DISABLE0
+CPPFLAGS += -DBOARD_PCA10028
+CPPFLAGS += -DSOFTDEVICE_PRESENT
+CPPFLAGS += -DNRF51
+CPPFLAGS += -DS110
+CPPFLAGS += -D__HEAP_SIZE=0
+CPPFLAGS += -DBLE_STACK_SUPPORT_REQD
+CPPFLAGS += -DBSP_DEFINES_ONLY
+CPPFLAGS += -DPLATFORM_ID=103
+CPPFLAGS += -mcpu=cortex-m0
+CPPFLAGS += -mthumb -mabi=aapcs
+CPPFLAGS += -Wall -Werror -Os
+CPPFLAGS += -mfloat-abi=soft
 # keep every function in separate section. This will allow linker to dump unused functions
-CFLAGS += -ffunction-sections -fdata-sections -fno-strict-aliasing
-CFLAGS += -fno-builtin --short-enums
+CPPFLAGS += -ffunction-sections -fdata-sections -fno-strict-aliasing
+CPPFLAGS += -fno-builtin --short-enums
+
+CFLAGS = $(CPPFLAGS)
+CFLAGS += --std=gnu99
 
 # keep every function in separate section. This will allow linker to dump unused functions
 LDFLAGS += -Xlinker -Map=$(LISTING_DIRECTORY)/$(OUTPUT_FILENAME).map
@@ -166,20 +176,25 @@ C_SOURCE_FILE_NAMES = $(notdir $(C_SOURCE_FILES))
 C_PATHS = $(call remduplicates, $(dir $(C_SOURCE_FILES) ) )
 C_OBJECTS = $(addprefix $(OBJECT_DIRECTORY)/, $(C_SOURCE_FILE_NAMES:.c=.o) )
 
+CPP_SOURCE_FILE_NAMES = $(notdir $(CPP_SOURCE_FILES))
+CPP_PATHS = $(call remduplicates, $(dir $(CPP_SOURCE_FILES) ) )
+CPP_OBJECTS = $(addprefix $(OBJECT_DIRECTORY)/, $(CPP_SOURCE_FILE_NAMES:.cpp=.o) )
+
 ASM_SOURCE_FILE_NAMES = $(notdir $(ASM_SOURCE_FILES))
 ASM_PATHS = $(call remduplicates, $(dir $(ASM_SOURCE_FILES) ))
 ASM_OBJECTS = $(addprefix $(OBJECT_DIRECTORY)/, $(ASM_SOURCE_FILE_NAMES:.s=.o) )
 
 vpath %.c $(C_PATHS)
+vpath %.cpp $(CPP_PATHS)
 vpath %.s $(ASM_PATHS)
 
-OBJECTS = $(C_OBJECTS) $(ASM_OBJECTS)
+OBJECTS = $(C_OBJECTS) $(CPP_OBJECTS) $(ASM_OBJECTS)
 
 bluz_bootloader: OUTPUT_FILENAME := bluz_bootloader
 bluz_bootloader: LINKER_SCRIPT=./dfu_gcc_nrf51.ld
 bluz_bootloader: $(BUILD_DIRECTORIES) $(OBJECTS)
 	@echo Linking target: $(OUTPUT_FILENAME).out
-	$(NO_ECHO)$(CC) $(LDFLAGS) $(OBJECTS) $(LIBS) -o $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).out
+	$(NO_ECHO)$(CPP) $(LDFLAGS) $(OBJECTS) $(LIBS) -o $(OUTPUT_BINARY_DIRECTORY)/$(OUTPUT_FILENAME).out
 	$(NO_ECHO)$(MAKE) -f $(MAKEFILE_NAME) -C $(MAKEFILE_DIR) -e finalize
 
 ## Create build directories
@@ -189,8 +204,13 @@ $(BUILD_DIRECTORIES):
 
 # Create objects from C SRC files
 $(OBJECT_DIRECTORY)/%.o: %.c
-	@echo Compiling file: $(notdir $<)
+	@echo Compiling C file: $(notdir $<)
 	$(NO_ECHO)$(CC) $(CFLAGS) $(INC_PATHS) -c -o $@ $<
+
+# Create objects from CPP SRC files
+$(OBJECT_DIRECTORY)/%.o: %.cpp
+	@echo Compiling CPP file: $(notdir $<)
+	$(NO_ECHO)$(CPP) $(CPPFLAGS) $(INC_PATHS) -c -o $@ $<
 
 # Assemble files
 $(OBJECT_DIRECTORY)/%.o: %.s
