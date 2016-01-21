@@ -37,7 +37,7 @@ const module_bounds_t* module_bounds[] = { &module_bootloader, &module_user, &mo
 const module_bounds_t module_ota = { 0x1D000, 0x1004000, 0x1021000, MODULE_FUNCTION_NONE, 0, MODULE_STORE_SCRATCHPAD};
 #endif
 
-const unsigned module_bounds_length = 4;
+const unsigned module_bounds_length = sizeof(module_ota) / sizeof(module_bounds_t);
 void HAL_OTA_Add_System_Info(hal_system_info_t* info, bool create, void* reserved);
 
 /**
@@ -145,7 +145,7 @@ void HAL_System_Info(hal_system_info_t* info, bool construct, void* reserved)
         info->modules = malloc(module_bounds_length * sizeof(hal_module_t));
         if (info->modules) {
             info->module_count = count;
-            for (unsigned i=0; i<count; i++) {
+            for (unsigned i=0; i<module_bounds_length; i++) {
                 fetch_module(info->modules+i, module_bounds[i], false, MODULE_VALIDATION_INTEGRITY);
             }
         }

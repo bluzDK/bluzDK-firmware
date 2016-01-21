@@ -1,14 +1,33 @@
 CFLAGS += -DUSE_STDPERIPH_DRIVER
 CPPFLAGS += -std=gnu++11
 
+ifeq ("$(PLATFORM_ID)","103")
+ASRC += $(COMMON_BUILD)/arm/startup/startup_$(STM32_DEVICE).S
+else
 ASRC += $(COMMON_BUILD)/arm/startup/startup_$(STM32_DEVICE_LC).S
+endif
+
 ASFLAGS += -I$(COMMON_BUILD)/arm/startup
 
 # Linker flags
+
+ifeq ("$(PLATFORM_ID)","103")
+LDFLAGS += -T$(COMMON_BUILD)/arm/linker/bootloader_nrf51.ld
+LDFLAGS += -T$(COMMON_BUILD)/arm/linker/bootloader_nrf51_common.ld
+else
 LDFLAGS += -T$(COMMON_BUILD)/arm/linker/linker_$(STM32_DEVICE_LC).ld
+endif
+
 LDFLAGS += -Wl,-Map,$(TARGET_BASE).map
 
+
+ifeq ("$(PLATFORM_ID)","103")
+LINKER_DEPS += $(COMMON_BUILD)/arm/linker/bootloader_nrf51.ld
+LINKER_DEPS += $(COMMON_BUILD)/arm/linker/bootloader_nrf51_common.ld
+else
 LINKER_DEPS += $(COMMON_BUILD)/arm/linker/linker_$(STM32_DEVICE_LC).ld
+endif
+
 LINKER_DEPS += $(COMMON_BUILD)/arm/linker/module_start.ld
 LINKER_DEPS += $(COMMON_BUILD)/arm/linker/module_end.ld
 LINKER_DEPS += $(COMMON_BUILD)/arm/linker/module_info.ld

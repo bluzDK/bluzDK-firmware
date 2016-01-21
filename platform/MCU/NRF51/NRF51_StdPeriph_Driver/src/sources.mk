@@ -10,6 +10,12 @@ TARGET_STDPERIPH_SRC_PATH = $(TARGET_STDPERIPH_PATH)/src
 # CSRC += $(TARGET_STDPERIPH_SRC_PATH)/app_button.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/app_error.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/app_scheduler.c
+CSRC += $(TARGET_STDPERIPH_SRC_PATH)/app_timer.c
+CSRC += $(TARGET_STDPERIPH_SRC_PATH)/app_timer_appsh.c
+CSRC += $(TARGET_STDPERIPH_SRC_PATH)/bootloader.c
+CSRC += $(TARGET_STDPERIPH_SRC_PATH)/bootloader_settings.c
+CSRC += $(TARGET_STDPERIPH_SRC_PATH)/bootloader_util.c
+CSRC += $(TARGET_STDPERIPH_SRC_PATH)/crc16.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/device_manager_peripheral.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/app_timer.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/app_trace.c
@@ -30,6 +36,7 @@ CSRC += $(TARGET_STDPERIPH_SRC_PATH)/nrf_drv_timer.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/nrf_drv_interrupts.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/pstorage.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/softdevice_handler.c
+CSRC += $(TARGET_STDPERIPH_SRC_PATH)/softdevice_handler_appsh.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/spi_master.c
 
 # C++ source files included in this build.

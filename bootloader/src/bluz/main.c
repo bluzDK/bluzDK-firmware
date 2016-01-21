@@ -59,6 +59,9 @@
 #include "app_uart.h"
 #include "rgbled.h"
 
+#include "spi_master.h"
+
+
 #define IS_SRVC_CHANGED_CHARACT_PRESENT 1                                                       /**< Include the service_changed characteristic. For DFU this should normally be the case. */
 
 #define BOOTLOADER_BUTTON               BOARD_BUTTON                                            /**< Button used to enter SW update mode. */
@@ -75,6 +78,7 @@
 
 
 void uart_put(char *str) {
+    return;
     uint_fast8_t i  = 0;
     uint8_t      ch = str[i++];
     while (ch != '\0')
@@ -85,17 +89,7 @@ void uart_put(char *str) {
     }
 }
 
-void uart_error_handle(app_uart_evt_t * p_event)
-{
-    if (p_event->evt_type == APP_UART_COMMUNICATION_ERROR)
-    {
-        APP_ERROR_HANDLER(p_event->data.error_communication);
-    }
-    else if (p_event->evt_type == APP_UART_FIFO_ERROR)
-    {
-        APP_ERROR_HANDLER(p_event->data.error_code);
-    }
-}
+void uart_error_handle(app_uart_evt_t * p_event);
 
 /**@brief Callback function for asserts in the SoftDevice.
  *
@@ -251,20 +245,18 @@ void blink(int times)
 {
     for (int i = 0; i < times; i++) {
         nrf_gpio_pin_clear(RGB_LED_PIN_BLUE);
-        nrf_delay_ms(100);
+        nrf_delay_ms(200);
         nrf_gpio_pin_set(RGB_LED_PIN_BLUE);
-        nrf_delay_ms(100);
+        nrf_delay_ms(200);
     }
     nrf_delay_ms(450);
 }
-
 
 void copyFW(uint32_t flashFWLocation, uint32_t fw_len, bool wipeUserApp)
 {
     uint32_t         err_code;
     
-    LED_SetRGBColor(RGB_COLOR_BLUE);
-    LED_On(LED_RGB);
+    nrf_gpio_pin_clear(RGB_LED_PIN_BLUE);
     
     //let's init the pstorage
     pstorage_handle_t m_storage_handle_app;
@@ -278,12 +270,13 @@ void copyFW(uint32_t flashFWLocation, uint32_t fw_len, bool wipeUserApp)
     storage_module_param.block_size = 0x100;
     storage_module_param.block_count = fw_len / 256;
     
-    pstorage_init();
-    err_code = pstorage_raw_register(&storage_module_param, &m_storage_handle_app);
-    APP_ERROR_CHECK(err_code);
     
     const module_info_t* modinfo = FLASH_ModuleInfo(FLASH_SERIAL, flashFWLocation);
     m_storage_handle_app.block_id  = (uint32_t)modinfo->module_start_address;
+    
+    pstorage_init();
+    err_code = pstorage_raw_register(&storage_module_param, &m_storage_handle_app);
+    APP_ERROR_CHECK(err_code);
     
     if (!FLASH_isUserModuleInfoValid(FLASH_SERIAL, flashFWLocation, 0x00)) {
         uart_put("BAD MODULE. NOT GOING TO FLASH\n");
@@ -329,40 +322,39 @@ void copyFW(uint32_t flashFWLocation, uint32_t fw_len, bool wipeUserApp)
     LED_Off(LED_RGB);
 }
 
-
 /**@brief Function for bootloader main entry.
  */
 int main(void)
 {
+    
 //    bool     dfu_start = false;
     bool     app_reset = (NRF_POWER->GPREGRET == BOOTLOADER_DFU_START);
     
-    uint32_t         err_code;
-    const app_uart_comm_params_t comm_params =
-    {
-        12,
-        8,
-        20,
-        11,
-        APP_UART_FLOW_CONTROL_DISABLED,
-        false,
-        UART_BAUDRATE_BAUDRATE_Baud38400
-    };
-
-    APP_UART_INIT(&comm_params,
-         uart_error_handle,
-         APP_IRQ_PRIORITY_LOW,
-         err_code);
-    APP_ERROR_CHECK(err_code);
-    
-    uart_put("STARTING!\n");
+//    uint32_t         err_code;
+//    const app_uart_comm_params_t comm_params =
+//    {
+//        12,
+//        8,
+//        20,
+//        11,
+//        APP_UART_FLOW_CONTROL_DISABLED,
+//        false,
+//        UART_BAUDRATE_BAUDRATE_Baud38400
+//    };
+//
+//    APP_UART_INIT(&comm_params,
+//         uart_error_handle,
+//         APP_IRQ_PRIORITY_LOW,
+//         err_code);
+//    APP_ERROR_CHECK(err_code);
+//    
+//    uart_put("STARTING!\n");
     
 
     if (app_reset)
     {
         NRF_POWER->GPREGRET = 0;
     }
-    
     leds_init();
 
     // This check ensures that the defined fields in the bootloader corresponds with actual
@@ -377,7 +369,7 @@ int main(void)
     //For now, until you implement the full bootloader
     ble_stack_init(true);
     scheduler_init();
-    
+
     //init external flash then check if update is ready
     sFLASH_Init();
     

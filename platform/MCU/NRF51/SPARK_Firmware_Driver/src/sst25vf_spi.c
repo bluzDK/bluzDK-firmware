@@ -48,7 +48,7 @@ static uint8_t rx_data[TX_RX_MSG_LENGTH]; /**< SPI RX buffer. */
   * @param void
   * @return void
   */
-bool spi_transmission_completed = false;
+volatile bool spi_transmission_completed = false;
 void spi_master_event_handler(spi_master_evt_t spi_master_evt)
 {
     switch (spi_master_evt.evt_type)

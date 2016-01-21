@@ -32,7 +32,7 @@ SPI_config_t spi_config =  {
     .pin_MISO                = SPIM0_MISO_PIN,
     .pin_CSN                 = SPIM0_MOSI_PIN,
     .frequency               = SPI_FREQ_1MBPS,
-    .config.fields.mode      = SPI_MODE0,
+    .config.fields.mode      = SPI_MODE3,
     .config.fields.bit_order = SPI_BITORDER_MSB_LSB
 };
 

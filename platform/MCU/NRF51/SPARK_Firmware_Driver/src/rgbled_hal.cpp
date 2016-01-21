@@ -17,32 +17,32 @@
 
 #include "rgbled_hal.h"
 #include "gpio_hal.h"
-#include "pinmap_impl.h"
 #undef SCK
 #undef MOSI
 #undef MISO
 #undef SS
+#include "hw_layout.h"
 #include "nrf_gpio.h"
 
 uint16_t rgbValues[3];
 void Set_RGB_LED_Values(uint16_t r, uint16_t g, uint16_t b)
 {
     if (r > 0x00) {
-        nrf_gpio_pin_clear(PIN_MAP[RGBR].gpio_pin);
+        nrf_gpio_pin_clear(RGB_LED_PIN_RED);
     } else {
-        nrf_gpio_pin_set(PIN_MAP[RGBR].gpio_pin);
+        nrf_gpio_pin_set(RGB_LED_PIN_RED);
     }
     
     if (g > 0x00) {
-        nrf_gpio_pin_clear(PIN_MAP[RGBG].gpio_pin);
+        nrf_gpio_pin_clear(RGB_LED_PIN_GREEN);
     } else {
-        nrf_gpio_pin_set(PIN_MAP[RGBG].gpio_pin);
+        nrf_gpio_pin_set(RGB_LED_PIN_GREEN);
     }
     
     if (b > 0x00) {
-        nrf_gpio_pin_clear(PIN_MAP[RGBB].gpio_pin);
+        nrf_gpio_pin_clear(RGB_LED_PIN_BLUE);
     } else {
-        nrf_gpio_pin_set(PIN_MAP[RGBB].gpio_pin);
+        nrf_gpio_pin_set(RGB_LED_PIN_BLUE);
     }
     
     rgbValues[0] = r;

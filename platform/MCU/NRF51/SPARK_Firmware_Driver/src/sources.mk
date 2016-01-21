@@ -30,6 +30,7 @@ CPPSRC += $(TARGET_SPARK_SRC_PATH)/socket_manager.cpp
 CPPSRC += $(TARGET_SPARK_SRC_PATH)/data_management_layer.cpp
 CPPSRC += $(TARGET_SPARK_SRC_PATH)/data_service.cpp
 CPPSRC += $(TARGET_SPARK_SRC_PATH)/data_services.cpp
+CPPSRC += $(TARGET_SPARK_SRC_PATH)/rgbled_hal.cpp
 # ASM source files included in this build.
 ASRC +=
 
