@@ -389,105 +389,60 @@ int main(void)
 
     //init external flash then check if update is ready
     sFLASH_Init();
-    uint16_t colors[3] = {0x00, 0x00, 0x00};
-    bool setup_mode = ((nrf_gpio_pin_read(BOOTLOADER_BUTTON) == 0) ? true: false);
-    if (setup_mode) {
-        int counter = 1;
-        bool ledOn = true;
-        //set to magenta
-        colors[0] = 0x255; colors[1] =  0x00; colors[2]= 0x255;
-        Set_RGB_LED_Values(colors[0],colors[1],colors[2]);
-        while (nrf_gpio_pin_read(BOOTLOADER_BUTTON) == 0)
-        {
-            if (counter >=100) {
-                //set to white
-                colors[0] = 0x255; colors[1] =  0x255; colors[2]= 0x255;
-            } else if (counter >=30) {
-                //set to yellow
-                colors[0] = 0x255; colors[1] =  0x255; colors[2]= 0x00;
-            }
-            
-            if (ledOn) {
-                Set_RGB_LED_Values(0,0,0);
-            } else {
-                Set_RGB_LED_Values(colors[0],colors[1],colors[2]);
-            }
-            ledOn = !ledOn;
-            counter++;
-            nrf_delay_ms(100);
-        }
-        if (counter >=100) {
-            //copy factory reset firmware to application space
-            copyFW(FACTORY_RESET_FW_ADDRESS, FACTORY_RESET_FW_SIZE, true);
-        } else if (counter > 30) {
-            //enter serial setup mode so we can get data from the user
-        }
-        
-        
-    }
-    else {
-        uint8_t byte0 = sFLASH_ReadSingleByte(FLASH_FW_STATUS);
-        if (byte0 == 0x01) {
-            //we have an app waiting for us. let's first find out the length
-            uint32_t fw_len = 0;
-            uint8_t byte1 = sFLASH_ReadSingleByte(FLASH_FW_LENGTH1);
-            uint8_t byte2 = sFLASH_ReadSingleByte(FLASH_FW_LENGTH2);
-            uint8_t byte3 = sFLASH_ReadSingleByte(FLASH_FW_LENGTH3);
-            fw_len = (byte1 << 16) | (byte2 << 8)  |  byte3;
-            
-            copyFW(FLASH_FW_ADDRESS, fw_len, false);
-                
-        }
-    }
-    //TO DO: Temporary for now, just boot directly into the app.
-    //Really, we should go on and see if they want to enter boot mode, then take FW and keys through DFU
-    uart_put("LAUNCHING\n");
-    bootloader_app_start(DFU_BANK_0_REGION_START);
-
-//    (void)bootloader_init();
-//
-//    if (bootloader_dfu_sd_in_progress())
-//    {
-//        nrf_gpio_pin_clear(UPDATE_IN_PROGRESS_LED);
-//
-//        err_code = bootloader_dfu_sd_update_continue();
-//        APP_ERROR_CHECK(err_code);
-//
-//        ble_stack_init(!app_reset);
-//        scheduler_init();
-//
-//        err_code = bootloader_dfu_sd_update_finalize();
-//        APP_ERROR_CHECK(err_code);
-//
-//        nrf_gpio_pin_set(UPDATE_IN_PROGRESS_LED);
-//    }
-//    else
-//    {
-//        // If stack is present then continue initialization of bootloader.
-//        ble_stack_init(!app_reset);
-//        scheduler_init();
-//    }
-//
-//    dfu_start  = app_reset;
-//    dfu_start |= ((nrf_gpio_pin_read(BOOTLOADER_BUTTON) == 0) ? true: false);
-//    
-//    if (dfu_start || (!bootloader_app_is_valid(DFU_BANK_0_REGION_START)))
-//    {
-//        nrf_gpio_pin_clear(UPDATE_IN_PROGRESS_LED);
-//
-//        // Initiate an update of the firmware.
-//        err_code = bootloader_dfu_start();
-//        APP_ERROR_CHECK(err_code);
-//
-//        nrf_gpio_pin_set(UPDATE_IN_PROGRESS_LED);
-//    }
-
-    if (bootloader_app_is_valid(DFU_BANK_0_REGION_START) && !bootloader_dfu_sd_in_progress())
-    {
-        // Select a bank region to use as application region.
-        // @note: Only applications running from DFU_BANK_0_REGION_START is supported.
-        bootloader_app_start(DFU_BANK_0_REGION_START);
-    }
     
-    NVIC_SystemReset();
+    
+    //copy device int to external flash
+    uint8_t buf[2];
+    memcpy(buf, (const void *)0x3F000, 2);
+    sFLASH_EraseSector(FLASH_DEVICE_INT);
+    sFLASH_WriteBuffer(buf, FLASH_DEVICE_INT, 2);
+    blink(1);
+    
+    int len = 0;
+    //copy private key to external flash
+    len = 612;
+    uint8_t privateKeyBuf[len];
+    memcpy(privateKeyBuf, (const void *)0x3F400, len);
+    sFLASH_EraseSector(FLASH_PRIVATE_KEY);
+    sFLASH_WriteBuffer(privateKeyBuf, FLASH_PRIVATE_KEY, len);
+    blink(1);
+    
+    //copy public key to external flash
+    len = 296;
+    uint8_t pubKeyBuf[len];
+    memcpy(pubKeyBuf, (const void *)0x3F800, len);
+    sFLASH_EraseSector(FLASH_PUBLIC_KEY);
+    sFLASH_WriteBuffer(pubKeyBuf, FLASH_PUBLIC_KEY, len);
+    blink(1);
+    
+    //copy system part to external flash
+    //...but first, prepare SPI flash by erasing everything
+    for (unsigned int i = FACTORY_RESET_FW_ADDRESS; i < FLASH_FW_ADDRESS; i+=0x1000) {
+        sFLASH_EraseSector(FACTORY_RESET_FW_ADDRESS+i);
+    }
+    len = 1024;
+    uint8_t fwBuf[len];
+    for (unsigned int i = 0x00; i < FACTORY_RESET_FW_SIZE; i+=len) {
+        memcpy(fwBuf, (const void *)(0x00018000+i), len);
+        sFLASH_WriteBuffer(fwBuf, FACTORY_RESET_FW_ADDRESS+i, len);
+    }
+    blink(1);
+    uart_put("Done\n");
+    
+    //forever rainbows!
+    Set_RGB_LED_Values(255,0,0);
+    while (1) {
+        Set_RGB_LED_Values(255,0,0);
+        nrf_delay_ms(250);
+        Set_RGB_LED_Values(0,255,0);
+        nrf_delay_ms(250);
+        Set_RGB_LED_Values(0,0,255);
+        nrf_delay_ms(250);
+        Set_RGB_LED_Values(255,255,0);
+        nrf_delay_ms(250);
+        Set_RGB_LED_Values(255,0,255);
+        nrf_delay_ms(250);
+        Set_RGB_LED_Values(255,255,255);
+        nrf_delay_ms(250);
+    }       
 }
