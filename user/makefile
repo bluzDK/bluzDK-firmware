@@ -3,6 +3,7 @@ USER_MODULE_PATH=.
 
 BUILD_PATH_EXT = $(USER_BUILD_PATH_EXT)
 
+MAKE_DEPENDENCIES = dynalib
 DEPENDENCIES = wiring system services communication hal
 
 include ../build/platform-id.mk
