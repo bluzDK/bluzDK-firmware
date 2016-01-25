@@ -93,6 +93,9 @@ void system_sleep(Spark_Sleep_TypeDef sleepMode, long seconds, uint32_t param, v
             HAL_Core_Enter_Standby_Mode();
             break;
 #endif
+        case SLEEP_MODE_CPU:
+            HAL_Core_CPU_Sleep();
+            break;
     }
 }
 

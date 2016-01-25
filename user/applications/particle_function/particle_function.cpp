@@ -29,5 +29,5 @@ void loop() {
 //        }
 //        nextRun = millis() + 30000;
 //    }
-    System.sleep(SLEEP_MODE_DEEP);
+    System.sleep(SLEEP_MODE_CPU);
 }

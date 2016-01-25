@@ -57,10 +57,7 @@
 #include "flash.h"
 #include "module_info.h"
 #include "app_uart.h"
-#include "rgbled.h"
-
-#include "spi_master.h"
-
+#include "rgbled_hal.h"
 
 #define IS_SRVC_CHANGED_CHARACT_PRESENT 1                                                       /**< Include the service_changed characteristic. For DFU this should normally be the case. */
 
@@ -78,7 +75,6 @@
 
 
 void uart_put(char *str) {
-    return;
     uint_fast8_t i  = 0;
     uint8_t      ch = str[i++];
     while (ch != '\0')
@@ -244,9 +240,9 @@ static void scheduler_init(void)
 void blink(int times)
 {
     for (int i = 0; i < times; i++) {
-        nrf_gpio_pin_clear(RGB_LED_PIN_BLUE);
+        Set_RGB_LED_Values(0,0,255);
         nrf_delay_ms(200);
-        nrf_gpio_pin_set(RGB_LED_PIN_BLUE);
+        Set_RGB_LED_Values(0,0,0);
         nrf_delay_ms(200);
     }
     nrf_delay_ms(450);
@@ -256,7 +252,7 @@ void copyFW(uint32_t flashFWLocation, uint32_t fw_len, bool wipeUserApp)
 {
     uint32_t         err_code;
     
-    nrf_gpio_pin_clear(RGB_LED_PIN_BLUE);
+    Set_RGB_LED_Values(0,0,255);
     
     //let's init the pstorage
     pstorage_handle_t m_storage_handle_app;
@@ -270,19 +266,40 @@ void copyFW(uint32_t flashFWLocation, uint32_t fw_len, bool wipeUserApp)
     storage_module_param.block_size = 0x100;
     storage_module_param.block_count = fw_len / 256;
     
-    
-    const module_info_t* modinfo = FLASH_ModuleInfo(FLASH_SERIAL, flashFWLocation);
-    m_storage_handle_app.block_id  = (uint32_t)modinfo->module_start_address;
-    
     pstorage_init();
     err_code = pstorage_raw_register(&storage_module_param, &m_storage_handle_app);
     APP_ERROR_CHECK(err_code);
+    
+    const module_info_t* modinfo = FLASH_ModuleInfo(FLASH_SERIAL, flashFWLocation);
+    m_storage_handle_app.block_id  = (uint32_t)modinfo->module_start_address;
     
     if (!FLASH_isUserModuleInfoValid(FLASH_SERIAL, flashFWLocation, 0x00)) {
         uart_put("BAD MODULE. NOT GOING TO FLASH\n");
         bootloader_app_start(DFU_BANK_0_REGION_START);
     }
     uart_put("GOOD MODULE. FLASHING\n");
+    
+    
+    
+    uart_put("GOOD MODULE. FLASHING\n");
+    
+    uart_put("Flashing over ");
+    char str0[80];
+    sprintf(str0, "%d", (int)fw_len);
+    uart_put(str0);
+    uart_put(" bytes\n");
+    
+    uart_put("To address ");
+    char str1[80];
+    sprintf(str1, "%d", (int)m_storage_handle_app.block_id);
+    uart_put(str1);
+    uart_put("\n");
+    
+    uart_put("For platform ");
+    char str2[80];
+    sprintf(str2, "%d", (int)modinfo->platform_id);
+    uart_put(str2);
+    uart_put("\n");
     
     uint32_t    ops_count = 7;
     //now clear the nrf51 flash
@@ -319,7 +336,7 @@ void copyFW(uint32_t flashFWLocation, uint32_t fw_len, bool wipeUserApp)
     }
     sFLASH_EraseSector(FLASH_FW_STATUS);
     sFLASH_WriteSingleByte(FLASH_FW_STATUS, 0x00);
-    LED_Off(LED_RGB);
+    Set_RGB_LED_Values(0,0,0);
 }
 
 /**@brief Function for bootloader main entry.
@@ -330,25 +347,25 @@ int main(void)
 //    bool     dfu_start = false;
     bool     app_reset = (NRF_POWER->GPREGRET == BOOTLOADER_DFU_START);
     
-//    uint32_t         err_code;
-//    const app_uart_comm_params_t comm_params =
-//    {
-//        12,
-//        8,
-//        20,
-//        11,
-//        APP_UART_FLOW_CONTROL_DISABLED,
-//        false,
-//        UART_BAUDRATE_BAUDRATE_Baud38400
-//    };
-//
-//    APP_UART_INIT(&comm_params,
-//         uart_error_handle,
-//         APP_IRQ_PRIORITY_LOW,
-//         err_code);
-//    APP_ERROR_CHECK(err_code);
-//    
-//    uart_put("STARTING!\n");
+    uint32_t         err_code;
+    const app_uart_comm_params_t comm_params =
+    {
+        12,
+        8,
+        20,
+        11,
+        APP_UART_FLOW_CONTROL_DISABLED,
+        false,
+        UART_BAUDRATE_BAUDRATE_Baud38400
+    };
+
+    APP_UART_INIT(&comm_params,
+         uart_error_handle,
+         APP_IRQ_PRIORITY_LOW,
+         err_code);
+    APP_ERROR_CHECK(err_code);
+    
+    uart_put("STARTING!\n");
     
 
     if (app_reset)
@@ -372,24 +389,28 @@ int main(void)
 
     //init external flash then check if update is ready
     sFLASH_Init();
-    
+    uint16_t colors[3] = {0x00, 0x00, 0x00};
     bool setup_mode = ((nrf_gpio_pin_read(BOOTLOADER_BUTTON) == 0) ? true: false);
     if (setup_mode) {
         int counter = 1;
         bool ledOn = true;
-        LED_SetRGBColor(RGB_COLOR_MAGENTA);
+        //set to magenta
+        colors[0] = 0x255; colors[1] =  0x00; colors[2]= 0x255;
+        Set_RGB_LED_Values(colors[0],colors[1],colors[2]);
         while (nrf_gpio_pin_read(BOOTLOADER_BUTTON) == 0)
         {
             if (counter >=100) {
-                LED_SetRGBColor(RGB_COLOR_WHITE);
+                //set to white
+                colors[0] = 0x255; colors[1] =  0x255; colors[2]= 0x255;
             } else if (counter >=30) {
-                LED_SetRGBColor(RGB_COLOR_YELLOW);
+                //set to yellow
+                colors[0] = 0x255; colors[1] =  0x255; colors[2]= 0x00;
             }
             
             if (ledOn) {
-                LED_Off(LED_RGB);
+                Set_RGB_LED_Values(0,0,0);
             } else {
-                LED_On(LED_RGB);
+                Set_RGB_LED_Values(colors[0],colors[1],colors[2]);
             }
             ledOn = !ledOn;
             counter++;

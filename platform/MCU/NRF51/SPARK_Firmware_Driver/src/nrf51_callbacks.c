@@ -76,6 +76,10 @@ void micros_timer_timeout(nrf_timer_event_t event_type, void* p_context)
                 nrf_gpio_pin_set(30);
             }
             break;
+        case NRF_TIMER_EVENT_COMPARE3:
+        case NRF_TIMER_EVENT_COMPARE2:
+        case NRF_TIMER_EVENT_COMPARE0:
+            break;
     }
 }
 

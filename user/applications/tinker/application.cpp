@@ -51,6 +51,7 @@ void setup()
 /* This function loops forever --------------------------------------------*/
 void loop()
 {
+    System.sleep(SLEEP_MODE_CPU);
 	//This will run in a loop
 }
 
