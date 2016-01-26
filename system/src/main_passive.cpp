@@ -57,6 +57,7 @@ static volatile uint32_t TimingLED;
 static volatile uint32_t TimingIWDGReload;
 static bool CLOUD_CONNECTED = false;
 uint32_t on_mseconds = ledOnTime, off_mseconds = ledOnTime+ledOffTime;
+uint16_t cloudErrors = 0;
 
 /* Extern variables ----------------------------------------------------------*/
 
@@ -123,6 +124,7 @@ void app_setup_and_loop_passive(void)
         setup();
     }
     
+//    Spark_Protocol_Init();
     while (1)
     {
         DECLARE_SYS_HEALTH(ENTERED_WLAN_Loop);
@@ -142,8 +144,16 @@ void app_setup_and_loop_passive(void)
 //                DEBUG("Calling Spark Comm Loop");
 //                Spark_Process_Events();
                 if (!Spark_Communication_Loop()) {
+                    cloudErrors++;
                     ERROR("Error when calling Spark Comm Loop");
-//                    CLOUD_CONNECTED = false;
+                    if (cloudErrors > 2) {
+                      Spark_Disconnect();
+                      CLOUD_CONNECTED = false;
+                      SPARK_CLOUD_SOCKETED = 0;
+                      SPARK_CLOUD_CONNECTED = 0;
+                      cloudErrors = 0;
+                      LED_SetRGBColor(RGB_COLOR_MAGENTA);
+                    }
                 }
             } else {
                 ledOffTime = 250;
@@ -162,6 +172,7 @@ void app_setup_and_loop_passive(void)
                 if (err_code) {
                     LED_SetRGBColor(RGB_COLOR_MAGENTA);
                     ERROR("Error when calling Spark Handshake");
+                    SPARK_CLOUD_SOCKETED = 0;
                 } else {
                     LED_SetRGBColor(system_mode()==SAFE_MODE ? RGB_COLOR_MAGENTA : RGB_COLOR_CYAN);
                     DEBUG("Handshake Complete");

@@ -28,5 +28,6 @@
 bool FLASH_isUserModuleInfoValid(uint8_t flashDeviceID, uint32_t startAddress, uint32_t expectedAddress);
 const module_info_t* FLASH_ModuleInfo(uint8_t flashDeviceID, uint32_t startAddress);
 bool FLASH_VerifyCRC32(uint8_t flashDeviceID, uint32_t startAddress, uint32_t length);
+uint32_t FLASH_ModuleLength(uint8_t flashDeviceID, uint32_t startAddress);
 
 #endif  /*__FLASH_H*/

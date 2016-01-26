@@ -99,6 +99,7 @@ void SysTick_Configuration(void);
 void SysTick_Disable(void);
 void System1MsTick(void);
 system_tick_t GetSystem1MsTick(void);
+uint32_t Compute_CRC32(uint32_t crc, const uint8_t* buf, size_t size);
 
 void IWDG_Reset_Enable(uint32_t msTimeout);
 

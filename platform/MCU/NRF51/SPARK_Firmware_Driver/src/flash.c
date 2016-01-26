@@ -22,6 +22,8 @@
 #include "flash.h"
 #include "module_info.h"
 #include "sst25vf_spi.h"
+#undef STATIC_ASSERT
+#include "hw_config.h"
 
 bool FLASH_isUserModuleInfoValid(uint8_t flashDeviceID, uint32_t startAddress, uint32_t expectedAddress)
 {
@@ -70,8 +72,35 @@ const module_info_t* FLASH_ModuleInfo(uint8_t flashDeviceID, uint32_t startAddre
     }
 }
 
-bool FLASH_VerifyCRC32(uint8_t flashDeviceID, uint32_t startAddress, uint32_t length)
-{
-    return true;
+inline uint32_t decode_uint32(unsigned char* buf) {
+    return buf[0] << 24 | buf[1] << 16 | buf[2] << 8 | buf[3];
 }
 
+bool FLASH_VerifyCRC32(uint8_t flashDeviceID, uint32_t startAddress, uint32_t length)
+{
+    if(flashDeviceID == FLASH_INTERNAL && length > 0)
+    {
+//        uint32_t expectedCRC = __REV((*(__IO uint32_t*) (startAddress + length)));
+        uint32_t expectedCRC = decode_uint32((uint8_t*)(startAddress+length));
+        uint32_t computedCRC = Compute_CRC32(0, (uint8_t*)startAddress, length);
+        
+        if (expectedCRC == computedCRC)
+        {
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+uint32_t FLASH_ModuleLength(uint8_t flashDeviceID, uint32_t startAddress)
+{
+    const module_info_t* module_info = FLASH_ModuleInfo(flashDeviceID, startAddress);
+    
+    if (module_info != NULL)
+    {
+        return ((uint32_t)module_info->module_end_address - (uint32_t)module_info->module_start_address);
+    }
+    
+    return 0;
+}
