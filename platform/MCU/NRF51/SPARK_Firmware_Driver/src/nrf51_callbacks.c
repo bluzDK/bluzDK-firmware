@@ -19,7 +19,7 @@
 #include "data_management_layer.h"
 #include "core_hal.h"
 #include "ble_conn_params.h"
-
+#include "pstorage.h"
 
 void uart_error_handle(app_uart_evt_t * p_event)
 {
@@ -189,7 +189,7 @@ void ble_evt_dispatch(ble_evt_t * p_ble_evt)
 void sys_evt_dispatch(uint32_t sys_evt)
 {
     //TO DO: When pstorage is turned back on, this is necessary
-    //pstorage_sys_event_handler(sys_evt);
+    pstorage_sys_event_handler(sys_evt);
 }
 
 void data_write_handler(scs_t * p_lbs, uint8_t *data, uint16_t length)

@@ -151,44 +151,6 @@ static void sys_evt_dispatch(uint32_t event)
     pstorage_sys_event_handler(event);
 }
 
-/**@brief Function for handling callbacks from pstorage module.
- *
- * @details Handles pstorage results for clear and storage operation. For detailed description of
- *          the parameters provided with the callback, please refer to \ref pstorage_ntf_cb_t.
- */
-bool stillWorking = false;
-static void pstorage_callback_handler(pstorage_handle_t * p_handle,
-                                      uint8_t             op_code,
-                                      uint32_t            result,
-                                      uint8_t           * p_data,
-                                      uint32_t            data_len)
-{
-    switch (op_code)
-    {
-        case PSTORAGE_STORE_OP_CODE:
-            
-            break;
-            
-        case PSTORAGE_CLEAR_OP_CODE:
-            
-            if (result == NRF_SUCCESS)
-            {
-                stillWorking = false;
-                return;
-            }
-            else
-            {
-                stillWorking = false;
-                return;
-            }
-            break;
-            
-        default:
-            break;
-    }
-    APP_ERROR_CHECK(result);
-}
-
 
 /**@brief Function for initializing the BLE stack.
  *
@@ -249,97 +211,6 @@ void blink(int times)
     nrf_delay_ms(450);
 }
 
-void copyFW(uint32_t flashFWLocation, uint32_t fw_len, bool wipeUserApp)
-{
-    uint32_t         err_code;
-    
-    Set_RGB_LED_Values(0,0,255);
-    
-    //let's init the pstorage
-    pstorage_handle_t m_storage_handle_app;
-    pstorage_module_param_t storage_module_param = {.cb = pstorage_callback_handler};
-    
-    if (wipeUserApp) {
-        //hack for now...
-        fw_len += 0x4000;
-    }
-    
-    storage_module_param.block_size = 0x100;
-    storage_module_param.block_count = fw_len / 256;
-    
-    pstorage_init();
-    err_code = pstorage_raw_register(&storage_module_param, &m_storage_handle_app);
-    APP_ERROR_CHECK(err_code);
-    
-    const module_info_t* modinfo = FLASH_ModuleInfo(FLASH_SERIAL, flashFWLocation);
-    m_storage_handle_app.block_id  = (uint32_t)modinfo->module_start_address;
-    
-    if (!FLASH_isUserModuleInfoValid(FLASH_SERIAL, flashFWLocation, 0x00)) {
-        uart_put("BAD MODULE. NOT GOING TO FLASH\n");
-        bootloader_app_start(DFU_BANK_0_REGION_START);
-    }
-    uart_put("GOOD MODULE. FLASHING\n");
-    
-    
-    
-    uart_put("GOOD MODULE. FLASHING\n");
-    
-    uart_put("Flashing over ");
-    char str0[80];
-    sprintf(str0, "%d", (int)fw_len);
-    uart_put(str0);
-    uart_put(" bytes\n");
-    
-    uart_put("To address ");
-    char str1[80];
-    sprintf(str1, "%d", (int)m_storage_handle_app.block_id);
-    uart_put(str1);
-    uart_put("\n");
-    
-    uart_put("For platform ");
-    char str2[80];
-    sprintf(str2, "%d", (int)modinfo->platform_id);
-    uart_put(str2);
-    uart_put("\n");
-    
-    uint32_t    ops_count = 7;
-    //now clear the nrf51 flash
-    stillWorking = true;
-    err_code = pstorage_raw_clear(&m_storage_handle_app, fw_len);
-    do {
-        app_sched_execute();
-        pstorage_access_status_get(&ops_count);
-    }
-    while(ops_count != 0);
-    
-    app_sched_execute();
-    
-    APP_ERROR_CHECK(err_code);
-    //now read from SPI Flash one page at a time and copy over to internal flash
-    uint8_t buf[PSTORAGE_FLASH_PAGE_SIZE];
-    uint32_t addr = flashFWLocation;
-    for (int i = 0; i < fw_len; i+=PSTORAGE_FLASH_PAGE_SIZE) {
-        sFLASH_ReadBuffer(buf, addr, PSTORAGE_FLASH_PAGE_SIZE);
-        err_code = pstorage_raw_store(&m_storage_handle_app,
-                                      (uint8_t *)buf,
-                                      PSTORAGE_FLASH_PAGE_SIZE,
-                                      i);
-        APP_ERROR_CHECK(err_code);
-        
-        do {
-            app_sched_execute();
-            pstorage_access_status_get(&ops_count);
-        }
-        while(ops_count != 0);
-        
-        
-        addr+=PSTORAGE_FLASH_PAGE_SIZE;
-    }
-    sFLASH_EraseSector(FLASH_FW_STATUS);
-    sFLASH_WriteSingleByte(FLASH_FW_STATUS, 0x00);
-    Set_RGB_LED_Values(0,0,0);
-}
-
 /**@brief Function for bootloader main entry.
  */
 int main(void)
@@ -387,6 +258,7 @@ int main(void)
     //For now, until you implement the full bootloader
     ble_stack_init(true);
     scheduler_init();
+    pstorage_init();
 
     //init external flash then check if update is ready
     sFLASH_Init();
@@ -419,7 +291,7 @@ int main(void)
         }
         if (counter >=100) {
             //copy factory reset firmware to application space
-            copyFW(FACTORY_RESET_FW_ADDRESS, FACTORY_RESET_FW_SIZE, true);
+            FLASH_CopyFW(FACTORY_RESET_FW_ADDRESS, FACTORY_RESET_FW_SIZE, true, false);
         } else if (counter > 30) {
             //enter serial setup mode so we can get data from the user
         }
@@ -436,7 +308,7 @@ int main(void)
             uint8_t byte3 = sFLASH_ReadSingleByte(FLASH_FW_LENGTH3);
             fw_len = (byte1 << 16) | (byte2 << 8)  |  byte3;
             
-            copyFW(FLASH_FW_ADDRESS, fw_len, false);
+            FLASH_CopyFW(FLASH_FW_ADDRESS, fw_len, false, false);
                 
         }
     }

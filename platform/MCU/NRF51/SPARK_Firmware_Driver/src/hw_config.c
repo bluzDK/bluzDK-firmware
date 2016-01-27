@@ -16,7 +16,9 @@
  */
 
 #include <string.h>
-
+#include "module_info.h"
+#include "flash.h"
+#undef STATIC_ASSERT
 #include "hw_config.h"
 #include "sst25vf_spi.h"
 #include "data_management_layer.h"
@@ -181,24 +183,30 @@ uint16_t FLASH_Update(const uint8_t *pBuffer, uint32_t address, uint32_t bufferS
 
 void FLASH_End(void)
 {
-	uint32_t fw_len = (uint32_t)(External_Flash_Address - External_Flash_Start_Address);
-
-	//erase the sector for now, so we can store the FW size and set the flag
-	sFLASH_EraseSector(FLASH_FW_STATUS);
-
-	uint8_t length1 = (uint8_t)((fw_len & 0xFF0000) >> 16);
-	uint8_t length2 = (uint8_t)((fw_len & 0xFF00) >> 8);
-	uint8_t length3 = (uint8_t)(fw_len & 0xFF);
-
-
-	//TO DO: Set a flag in external flash to notify bootloader there is a FW update
-	sFLASH_WriteSingleByte(FLASH_FW_STATUS, 0x01);
-	sFLASH_WriteSingleByte(FLASH_FW_LENGTH1, length1);
-	sFLASH_WriteSingleByte(FLASH_FW_LENGTH2, length2);
-	sFLASH_WriteSingleByte(FLASH_FW_LENGTH3, length3);
+    const module_info_t* module_info = FLASH_ModuleInfo(FLASH_SERIAL, FLASH_FW_ADDRESS);
     
-    //reboot
-    NVIC_SystemReset();
+    if (module_info != NULL) {
+        uint32_t fw_len = (uint32_t)(External_Flash_Address - External_Flash_Start_Address);
+        if (module_info->module_function==MODULE_FUNCTION_BOOTLOADER) {
+            FLASH_CopyFW(FLASH_FW_ADDRESS, fw_len, false, true);
+        } else {
+            //erase the sector for now, so we can store the FW size and set the flag
+            sFLASH_EraseSector(FLASH_FW_STATUS);
+
+            uint8_t length1 = (uint8_t)((fw_len & 0xFF0000) >> 16);
+            uint8_t length2 = (uint8_t)((fw_len & 0xFF00) >> 8);
+            uint8_t length3 = (uint8_t)(fw_len & 0xFF);
+
+
+            //TO DO: Set a flag in external flash to notify bootloader there is a FW update
+            sFLASH_WriteSingleByte(FLASH_FW_STATUS, 0x01);
+            sFLASH_WriteSingleByte(FLASH_FW_LENGTH1, length1);
+            sFLASH_WriteSingleByte(FLASH_FW_LENGTH2, length2);
+            sFLASH_WriteSingleByte(FLASH_FW_LENGTH3, length3);
+        }
+        //reboot
+        NVIC_SystemReset();
+    }
 }
 
 void system_init()
