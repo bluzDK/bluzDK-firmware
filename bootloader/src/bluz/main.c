@@ -75,6 +75,7 @@
 
 
 void uart_put(char *str) {
+    return;
     uint_fast8_t i  = 0;
     uint8_t      ch = str[i++];
     while (ch != '\0')
@@ -347,25 +348,25 @@ int main(void)
 //    bool     dfu_start = false;
     bool     app_reset = (NRF_POWER->GPREGRET == BOOTLOADER_DFU_START);
     
-    uint32_t         err_code;
-    const app_uart_comm_params_t comm_params =
-    {
-        12,
-        8,
-        20,
-        11,
-        APP_UART_FLOW_CONTROL_DISABLED,
-        false,
-        UART_BAUDRATE_BAUDRATE_Baud38400
-    };
-
-    APP_UART_INIT(&comm_params,
-         uart_error_handle,
-         APP_IRQ_PRIORITY_LOW,
-         err_code);
-    APP_ERROR_CHECK(err_code);
-    
-    uart_put("STARTING!\n");
+//    uint32_t         err_code;
+//    const app_uart_comm_params_t comm_params =
+//    {
+//        12,
+//        8,
+//        20,
+//        11,
+//        APP_UART_FLOW_CONTROL_DISABLED,
+//        false,
+//        UART_BAUDRATE_BAUDRATE_Baud38400
+//    };
+//
+//    APP_UART_INIT(&comm_params,
+//         uart_error_handle,
+//         APP_IRQ_PRIORITY_LOW,
+//         err_code);
+//    APP_ERROR_CHECK(err_code);
+//    
+//    uart_put("STARTING!\n");
     
 
     if (app_reset)
