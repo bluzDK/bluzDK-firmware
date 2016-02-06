@@ -51,7 +51,7 @@ PinFunction HAL_Validate_Pin_Function(pin_t pin, PinFunction pinFunction)
 {
     if (!is_valid_pin(pin))
         return PF_NONE;
-    if (pinFunction==PF_ADC && PIN_MAP[pin].adc!=true)
+    if (pinFunction==PF_ADC && PIN_MAP[pin].adc==true)
         return PF_ADC;
     if (pinFunction==PF_TIMER)
         return PF_TIMER;
