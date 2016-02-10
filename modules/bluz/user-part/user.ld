@@ -68,6 +68,19 @@ SECTIONS
         KEEP(*(.fini))
 
         link_constructors_location = .;
+
+        . = ALIGN(4);
+        /* preinit data */
+        PROVIDE_HIDDEN (__preinit_array_start = .);
+        KEEP(*(.preinit_array))
+        PROVIDE_HIDDEN (__preinit_array_end = .);
+
+        . = ALIGN(4);
+        /* init data */
+        PROVIDE_HIDDEN (__init_array_start = .);
+        KEEP(*(.init_array))
+        PROVIDE_HIDDEN (__init_array_end = .);
+
         /* .ctors */
         *crtbegin.o(.ctors)
         *crtbegin?.o(.ctors)
@@ -112,19 +125,6 @@ SECTIONS
         *(vtable)
 
         *(.data*)
-
-        . = ALIGN(4);
-        /* preinit data */
-        PROVIDE_HIDDEN (__preinit_array_start = .);
-        KEEP(*(.preinit_array))
-        PROVIDE_HIDDEN (__preinit_array_end = .);
-
-        . = ALIGN(4);
-        /* init data */
-        PROVIDE_HIDDEN (__init_array_start = .);
-        KEEP(*(SORT(.init_array.*)))
-        KEEP(*(.init_array))
-        PROVIDE_HIDDEN (__init_array_end = .);
 
 
         . = ALIGN(4);
