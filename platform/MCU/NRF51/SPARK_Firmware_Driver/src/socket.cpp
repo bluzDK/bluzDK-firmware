@@ -41,29 +41,27 @@ int32_t Socket::connect(uint32_t sockid, const sockaddr_b *addr, long addrlen)
 {
     id = sockid;
     //format to tell the gateway to open a socket is: <sockid><family><type><protocol><port><address>
-    uint8_t data[11+addrlen];
+    uint8_t data[9+addrlen];
     //first, the service ID
-    data[0] = (SOCKET_DATA_SERVICE & 0xFF00) >> 8;
-    data[1] = SOCKET_DATA_SERVICE & 0xFF;
+    data[0] = SOCKET_DATA_SERVICE & 0xFF;
     
     //next, the socket ID
-    data[2] = (sockid & 0xFF00) >> 8;
-    data[3] = sockid & 0xFF;
+    data[1] = (SOCKET_CONNECT & 0xF0) | (id & 0x0F);
     
     //then the connection code
-    data[4] = (SOCKET_CONNECT & 0xFF00) >> 8;
-    data[5] = SOCKET_CONNECT & 0xFF;
+    data[2] = (SOCKET_CONNECT & 0xFF00) >> 8;
+    data[3] = SOCKET_CONNECT & 0xFF;
     
-    data[6] = family;
-    data[7] = type;
-    data[8] = protocol;
+    data[4] = family;
+    data[5] = type;
+    data[6] = protocol;
+
+    data[7] = (port & 0xFF00) >> 8;
+    data[8] = port & 0xFF;
     
-    data[9] = (port & 0xFF00) >> 8;
-    data[10] = port & 0xFF;
+    memcpy(data+9, addr, addrlen);
     
-    memcpy(data+11, addr, addrlen);
-    
-    DataManagementLayer::sendData(11+addrlen, data);
+    DataManagementLayer::sendData(9+addrlen, data);
     return 0;
 }
 int32_t Socket::send(const void* data, uint32_t len)
@@ -71,7 +69,7 @@ int32_t Socket::send(const void* data, uint32_t len)
     DEBUG("Sending on socket %d data of size %d!", id, len);
     uint8_t dataPlusID[len+2];
     dataPlusID[0] = SOCKET_DATA_SERVICE & 0xFF;
-    dataPlusID[1] = id & 0xFF;
+    dataPlusID[1] = ((SOCKET_DATA << 4) & 0xF0) | (id & 0x0F);
     
     memcpy(dataPlusID+2, data, len);
     
@@ -111,6 +109,11 @@ int32_t Socket::receive(void* data, uint32_t len, unsigned long _timeout)
 int32_t Socket::close()
 {
     inUse = false;
+//    uint8_t data[2];
+//    data[0] = SOCKET_DATA_SERVICE & 0xFF;
+//    data[1] = (SOCKET_DISCONNECT & 0xF0) | (id & 0x0F);
+//    
+//    DataManagementLayer::sendData(2, data);
     return 1;
 }
 

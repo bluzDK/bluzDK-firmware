@@ -24,6 +24,7 @@
 #include "data_service.h"
 
 enum SOCKET_COMMANDS {
+    SOCKET_DATA,
     SOCKET_CONNECT,
     SOCKET_DISCONNECT
 };

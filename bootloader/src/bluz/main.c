@@ -329,7 +329,7 @@ int main(void)
             //enter serial setup mode so we can get data from the user
             bool exit = false;
             uint8_t code = ' ';
-//            uart_init();
+            uart_init();
             Set_RGB_LED_Values(255,255,0);
             while (!exit) {
                 if (uart_get(&code) == NRF_SUCCESS) {
@@ -368,6 +368,9 @@ int main(void)
                             }
                             
                             
+                            sprintf(str0, "%d", (int)fw_length);
+                            uart_put(str0);
+                            uart_put("\n");
                             
                             for (int i = 0; i < fw_length; i+=512) {
                                 int chunklength = (fw_length - i > 512 ? 512 : fw_length - i);
@@ -383,8 +386,7 @@ int main(void)
                                 
                                 
                                 sFLASH_WriteBuffer(buf, FLASH_FW_ADDRESS+i, chunklength);
-                                
-                                
+                                uart_put("\r\n");
                             }
                             Set_RGB_LED_Values(255,255,255);
 //                            FLASH_End();
