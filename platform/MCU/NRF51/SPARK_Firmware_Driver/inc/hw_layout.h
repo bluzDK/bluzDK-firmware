@@ -45,6 +45,8 @@
 #define USER_FIRMWARE_IMAGE_LOCATION 0x00037000
 #endif
 
+#define BOOTLOADER_IMAGE_LOCATION 0x0003C000
+
 #define APP_START_MASK              ((uint32_t)0x2FF10000)
 
 //External FLash addresses

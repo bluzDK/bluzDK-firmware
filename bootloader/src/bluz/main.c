@@ -72,10 +72,9 @@
 
 #define SCHED_QUEUE_SIZE                20                                                      /**< Maximum number of events in the scheduler queue. */
 
-
+void uart_error_handle(app_uart_evt_t * p_event);
 
 void uart_put(char *str) {
-    return;
     uint_fast8_t i  = 0;
     uint8_t      ch = str[i++];
     while (ch != '\0')
@@ -86,7 +85,33 @@ void uart_put(char *str) {
     }
 }
 
-void uart_error_handle(app_uart_evt_t * p_event);
+uint32_t uart_get(uint8_t *p_byte) {
+    return app_uart_get(p_byte);
+}
+
+void uart_init(void) {
+    uint32_t         err_code;
+    const app_uart_comm_params_t comm_params =
+    {
+        12,
+        8,
+        20,
+        11,
+        APP_UART_FLOW_CONTROL_DISABLED,
+        false,
+        UART_BAUDRATE_BAUDRATE_Baud38400
+    };
+
+    APP_UART_INIT(&comm_params,
+         uart_error_handle,
+         APP_IRQ_PRIORITY_LOW,
+         err_code);
+    APP_ERROR_CHECK(err_code);
+}
+
+void uart_deinit(void) {
+    app_uart_close(1);
+}
 
 /**@brief Callback function for asserts in the SoftDevice.
  *
@@ -211,6 +236,13 @@ void blink(int times)
     nrf_delay_ms(450);
 }
 
+void FLASH_Begin(uint32_t sFLASH_Address, uint32_t fileSize);
+uint16_t FLASH_Update(const uint8_t *pBuffer, uint32_t address, uint32_t bufferSize);
+void FLASH_End(void);
+
+
+uint32_t FLASH_PagesMask(uint32_t fileSize);
+
 /**@brief Function for bootloader main entry.
  */
 int main(void)
@@ -236,7 +268,7 @@ int main(void)
 //         APP_IRQ_PRIORITY_LOW,
 //         err_code);
 //    APP_ERROR_CHECK(err_code);
-//    
+//
 //    uart_put("STARTING!\n");
     
 
@@ -293,7 +325,120 @@ int main(void)
             //copy factory reset firmware to application space
             FLASH_CopyFW(FACTORY_RESET_FW_ADDRESS, FACTORY_RESET_FW_SIZE, true, false);
         } else if (counter > 30) {
+            
             //enter serial setup mode so we can get data from the user
+            bool exit = false;
+            uint8_t code = ' ';
+//            uart_init();
+            Set_RGB_LED_Values(255,255,0);
+            while (!exit) {
+                if (uart_get(&code) == NRF_SUCCESS) {
+                    uint8_t buf[512];
+                    const module_info_t* modinfo = FLASH_ModuleInfo(FLASH_INTERNAL, BOOTLOADER_IMAGE_LOCATION);
+                    char str0[8];
+                    uint8_t byte1, byte2, byte3, byte4;
+//                    uint8_t bytes_num[4];
+                    
+                    
+                    uint32_t NbrOfPage;
+                    
+                    switch (code) {
+                        case 'f':
+                            Set_RGB_LED_Values(0,0,255);
+                            while (uart_get(&byte1) != NRF_SUCCESS) { }
+                            while (uart_get(&byte2) != NRF_SUCCESS) { }
+                            while (uart_get(&byte3) != NRF_SUCCESS) { }
+                            while (uart_get(&byte4) != NRF_SUCCESS) { }
+                            uint32_t fw_length = (byte1 << 24) | (byte2 << 16) | (byte3 << 8)  |  byte4;
+                            
+//                            while (uart_get(bytes_num+0) != NRF_SUCCESS) { }
+//                            while (uart_get(bytes_num+1) != NRF_SUCCESS) { }
+//                            while (uart_get(bytes_num+2) != NRF_SUCCESS) { }
+//                            while (uart_get(bytes_num+3) != NRF_SUCCESS) { }
+//                            uint32_t fw_length = (bytes_num[0] << 24) | (bytes_num[1] << 16) | (bytes_num[2] << 8)  |  bytes_num[3];
+//                            
+                            NbrOfPage = FLASH_PagesMask(fw_length);
+
+//                            FLASH_Begin(FLASH_FW_ADDRESS, fw_length);
+                            
+                            /* Erase the SPI Flash pages */
+                            for (uint32_t EraseCounter = 0; (EraseCounter < NbrOfPage); EraseCounter++)
+                            {
+                                sFLASH_EraseSector(FLASH_FW_ADDRESS + (sFLASH_PAGESIZE * EraseCounter));
+                            }
+                            
+                            
+                            
+                            for (int i = 0; i < fw_length; i+=512) {
+                                int chunklength = (fw_length - i > 512 ? 512 : fw_length - i);
+                                int j = 0;
+                                Set_RGB_LED_Values(255,0,0);
+                                while (j < chunklength) {
+                                    if (uart_get(buf+j) == NRF_SUCCESS) {
+                                        j++;
+                                    }
+                                }
+                                Set_RGB_LED_Values(0,255,0);
+//                                FLASH_Update(buf, i, chunklength);
+                                
+                                
+                                sFLASH_WriteBuffer(buf, FLASH_FW_ADDRESS+i, chunklength);
+                                
+                                
+                            }
+                            Set_RGB_LED_Values(255,255,255);
+//                            FLASH_End();
+                            
+                            
+                            sFLASH_EraseSector(FLASH_FW_STATUS);
+                            
+                            uint8_t length1 = (uint8_t)((fw_length & 0xFF0000) >> 16);
+                            uint8_t length2 = (uint8_t)((fw_length & 0xFF00) >> 8);
+                            uint8_t length3 = (uint8_t)(fw_length & 0xFF);
+                            
+                            
+                            //TO DO: Set a flag in external flash to notify bootloader there is a FW update
+                            sFLASH_WriteSingleByte(FLASH_FW_STATUS, 0x01);
+                            sFLASH_WriteSingleByte(FLASH_FW_LENGTH1, length1);
+                            sFLASH_WriteSingleByte(FLASH_FW_LENGTH2, length2);
+                            sFLASH_WriteSingleByte(FLASH_FW_LENGTH3, length3);
+                            NVIC_SystemReset();
+                            
+                            
+                            break;
+                        case 'u':
+                            break;
+                        case 'v':
+                            sprintf(str0, "%d", modinfo->module_version);
+                            uart_put(str0);
+                            uart_put("\n");
+                            break;
+                        case 'r':
+                            break;
+                        case 'e':
+                            exit = true;
+                            break;
+                        case 'h':
+                        default:
+                            uart_put("Use the following commands: \
+                                     \n  f - update firmware \
+                                     \n  u - update public key \
+                                     \n  r - update private key \
+                                     \n  e - exit and boot \
+                                     \n  v - version \
+                                     \n  h - help \n");
+                            break;
+                    }
+                }
+//                if (ledOn) {
+//                    Set_RGB_LED_Values(0,0,0);
+//                } else {
+//                    Set_RGB_LED_Values(255,255,0);
+//                }
+//                ledOn = !ledOn;
+//                nrf_delay_ms(100);
+            }
+            uart_deinit();
         }
         
         
@@ -301,6 +446,7 @@ int main(void)
     else {
         uint8_t byte0 = sFLASH_ReadSingleByte(FLASH_FW_STATUS);
         if (byte0 == 0x01) {
+//            uart_put("FW Waiting!\n");
             //we have an app waiting for us. let's first find out the length
             uint32_t fw_len = 0;
             uint8_t byte1 = sFLASH_ReadSingleByte(FLASH_FW_LENGTH1);
@@ -308,13 +454,15 @@ int main(void)
             uint8_t byte3 = sFLASH_ReadSingleByte(FLASH_FW_LENGTH3);
             fw_len = (byte1 << 16) | (byte2 << 8)  |  byte3;
             
-            FLASH_CopyFW(FLASH_FW_ADDRESS, fw_len, false, false);
+            if (!FLASH_CopyFW(FLASH_FW_ADDRESS, fw_len, false, false)) {
+//                uart_put("Didn't Copy Module!\n");
+            }
                 
         }
     }
     //TO DO: Temporary for now, just boot directly into the app.
     //Really, we should go on and see if they want to enter boot mode, then take FW and keys through DFU
-    uart_put("LAUNCHING\n");
+//    uart_put("Launching!\n");
     bootloader_app_start(DFU_BANK_0_REGION_START);
 
 //    (void)bootloader_init();
