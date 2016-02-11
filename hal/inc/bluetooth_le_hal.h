@@ -38,6 +38,7 @@ extern "C" {
     uint32_t HAL_BLE_GET_CONNECTION_INTERVAL(void);
     void HAL_BLE_Start_Advertising(void);
     void HAL_BLE_Stop_Advertising(void);
+    void HAL_BLE_Disconnect(void);
     
     int HAL_BLE_Register_Radio_Notification(void (*radio_callback)(bool radio_active));
 

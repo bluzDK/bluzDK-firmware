@@ -173,6 +173,7 @@ void app_setup_and_loop_passive(void)
                     LED_SetRGBColor(RGB_COLOR_MAGENTA);
                     ERROR("Error when calling Spark Handshake");
                     SPARK_CLOUD_SOCKETED = 0;
+                    HAL_Handle_Cloud_Disconnect();
                 } else {
                     LED_SetRGBColor(system_mode()==SAFE_MODE ? RGB_COLOR_MAGENTA : RGB_COLOR_CYAN);
                     DEBUG("Handshake Complete");
@@ -193,6 +194,8 @@ void app_setup_and_loop_passive(void)
                 
                 ledOffTime = 2000;
                 LED_SetRGBColor(system_mode()==SAFE_MODE ? RGB_COLOR_MAGENTA : RGB_COLOR_GREEN);
+                
+                HAL_Handle_Cloud_Disconnect();
             }
             if (!HAL_Is_Advertising()) {
                 ledOffTime = 2000;

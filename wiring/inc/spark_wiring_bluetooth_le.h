@@ -44,6 +44,9 @@ public:
     static void startAdvertising();
     static void stopAdvertising();
     
+    //actions
+    static void disconnect();
+    
     //notification handler
     static int registerNotifications(void (*radio_callback)(bool radio_active));
     

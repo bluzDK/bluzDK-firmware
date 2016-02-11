@@ -36,6 +36,7 @@ DYNALIB_FN(hal_ble,HAL_BLE_GET_STATE)
 DYNALIB_FN(hal_ble,HAL_BLE_GET_CONNECTION_INTERVAL)
 DYNALIB_FN(hal_ble,HAL_BLE_Start_Advertising)
 DYNALIB_FN(hal_ble,HAL_BLE_Stop_Advertising)
+DYNALIB_FN(hal_ble,HAL_BLE_Disconnect)
 DYNALIB_FN(hal_ble,HAL_BLE_Register_Radio_Notification)
 DYNALIB_END(hal_ble)
 

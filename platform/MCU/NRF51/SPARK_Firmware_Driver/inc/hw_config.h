@@ -65,6 +65,7 @@ void conn_params_init(void);
 void sec_params_init(void);
 void advertising_start(void);
 void advertising_stop(void);
+void ble_disconnect(void);
 uint32_t timers_start(void);
 uint32_t timers_stop(void);
 

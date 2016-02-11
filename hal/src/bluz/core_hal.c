@@ -54,6 +54,11 @@ void HAL_Network_Init(void)
     advertising_start();
 }
 
+void HAL_Handle_Cloud_Disconnect(void)
+{
+    ble_disconnect();
+}
+
 void HAL_Events_Manage(void)
 {
 }

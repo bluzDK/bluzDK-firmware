@@ -40,6 +40,11 @@ void HAL_BLE_Stop_Advertising(void)
     advertising_stop();
 }
 
+void HAL_BLE_Disconnect(void)
+{
+    ble_disconnect();
+}
+
 int HAL_BLE_Register_Radio_Notification(void (*radio_callback)(bool radio_active))
 {
     return register_radio_callback(radio_callback);

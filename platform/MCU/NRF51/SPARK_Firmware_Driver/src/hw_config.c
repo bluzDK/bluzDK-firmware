@@ -29,6 +29,7 @@
 #include "pstorage.h"
 #include "ble_radio_notification.h"
 #include "ble_conn_params.h"
+#include "ble_hci.h"
 
 uint32_t NbrOfPage = 0;
 uint16_t Flash_Update_Index = 0;
@@ -491,6 +492,17 @@ void advertising_stop(void)
         err_code = sd_ble_gap_adv_stop();
         APP_ERROR_CHECK(err_code);
         state = BLE_OFF;
+    }
+}
+
+/**@brief Function for disconnectiong from ble.
+ */
+void ble_disconnect(void)
+{
+    uint32_t             err_code;
+    if (state == BLE_CONNECTED) {
+        err_code = sd_ble_gap_disconnect(m_conn_handle, BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
+        APP_ERROR_CHECK(err_code);
     }
 }
 
