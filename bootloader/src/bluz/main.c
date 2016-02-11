@@ -243,6 +243,41 @@ void FLASH_End(void);
 
 uint32_t FLASH_PagesMask(uint32_t fileSize);
 
+void copyFromSerialTo(uint32_t address)
+{
+    char str0[8];
+    uint8_t byte1, byte2, byte3, byte4;
+    uint8_t buf[512];
+    
+    Set_RGB_LED_Values(0,0,255);
+    while (uart_get(&byte1) != NRF_SUCCESS) { }
+    while (uart_get(&byte2) != NRF_SUCCESS) { }
+    while (uart_get(&byte3) != NRF_SUCCESS) { }
+    while (uart_get(&byte4) != NRF_SUCCESS) { }
+    uint32_t fw_length = (byte1 << 24) | (byte2 << 16) | (byte3 << 8)  |  byte4;
+    
+    FLASH_Begin(address, fw_length);
+    
+    sprintf(str0, "%d", (int)fw_length);
+    uart_put(str0);
+    uart_put("\n");
+    
+    for (int i = 0; i < fw_length; i+=512) {
+        int chunklength = (fw_length - i > 512 ? 512 : fw_length - i);
+        int j = 0;
+        Set_RGB_LED_Values(255,0,0);
+        while (j < chunklength) {
+            if (uart_get(buf+j) == NRF_SUCCESS) {
+                j++;
+            }
+        }
+        Set_RGB_LED_Values(0,255,0);
+        FLASH_Update(buf, address+i, chunklength);
+        uart_put("\r\n");
+    }
+    Set_RGB_LED_Values(255,255,255);
+}
+
 /**@brief Function for bootloader main entry.
  */
 int main(void)
@@ -333,82 +368,16 @@ int main(void)
             Set_RGB_LED_Values(255,255,0);
             while (!exit) {
                 if (uart_get(&code) == NRF_SUCCESS) {
-                    uint8_t buf[512];
-                    const module_info_t* modinfo = FLASH_ModuleInfo(FLASH_INTERNAL, BOOTLOADER_IMAGE_LOCATION);
                     char str0[8];
-                    uint8_t byte1, byte2, byte3, byte4;
-//                    uint8_t bytes_num[4];
-                    
-                    
-                    uint32_t NbrOfPage;
+                    const module_info_t* modinfo = FLASH_ModuleInfo(FLASH_INTERNAL, BOOTLOADER_IMAGE_LOCATION);
                     
                     switch (code) {
                         case 'f':
-                            Set_RGB_LED_Values(0,0,255);
-                            while (uart_get(&byte1) != NRF_SUCCESS) { }
-                            while (uart_get(&byte2) != NRF_SUCCESS) { }
-                            while (uart_get(&byte3) != NRF_SUCCESS) { }
-                            while (uart_get(&byte4) != NRF_SUCCESS) { }
-                            uint32_t fw_length = (byte1 << 24) | (byte2 << 16) | (byte3 << 8)  |  byte4;
-                            
-//                            while (uart_get(bytes_num+0) != NRF_SUCCESS) { }
-//                            while (uart_get(bytes_num+1) != NRF_SUCCESS) { }
-//                            while (uart_get(bytes_num+2) != NRF_SUCCESS) { }
-//                            while (uart_get(bytes_num+3) != NRF_SUCCESS) { }
-//                            uint32_t fw_length = (bytes_num[0] << 24) | (bytes_num[1] << 16) | (bytes_num[2] << 8)  |  bytes_num[3];
-//                            
-                            NbrOfPage = FLASH_PagesMask(fw_length);
-
-//                            FLASH_Begin(FLASH_FW_ADDRESS, fw_length);
-                            
-                            /* Erase the SPI Flash pages */
-                            for (uint32_t EraseCounter = 0; (EraseCounter < NbrOfPage); EraseCounter++)
-                            {
-                                sFLASH_EraseSector(FLASH_FW_ADDRESS + (sFLASH_PAGESIZE * EraseCounter));
-                            }
-                            
-                            
-                            sprintf(str0, "%d", (int)fw_length);
-                            uart_put(str0);
-                            uart_put("\n");
-                            
-                            for (int i = 0; i < fw_length; i+=512) {
-                                int chunklength = (fw_length - i > 512 ? 512 : fw_length - i);
-                                int j = 0;
-                                Set_RGB_LED_Values(255,0,0);
-                                while (j < chunklength) {
-                                    if (uart_get(buf+j) == NRF_SUCCESS) {
-                                        j++;
-                                    }
-                                }
-                                Set_RGB_LED_Values(0,255,0);
-//                                FLASH_Update(buf, i, chunklength);
-                                
-                                
-                                sFLASH_WriteBuffer(buf, FLASH_FW_ADDRESS+i, chunklength);
-                                uart_put("\r\n");
-                            }
-                            Set_RGB_LED_Values(255,255,255);
-//                            FLASH_End();
-                            
-                            
-                            sFLASH_EraseSector(FLASH_FW_STATUS);
-                            
-                            uint8_t length1 = (uint8_t)((fw_length & 0xFF0000) >> 16);
-                            uint8_t length2 = (uint8_t)((fw_length & 0xFF00) >> 8);
-                            uint8_t length3 = (uint8_t)(fw_length & 0xFF);
-                            
-                            
-                            //TO DO: Set a flag in external flash to notify bootloader there is a FW update
-                            sFLASH_WriteSingleByte(FLASH_FW_STATUS, 0x01);
-                            sFLASH_WriteSingleByte(FLASH_FW_LENGTH1, length1);
-                            sFLASH_WriteSingleByte(FLASH_FW_LENGTH2, length2);
-                            sFLASH_WriteSingleByte(FLASH_FW_LENGTH3, length3);
-                            NVIC_SystemReset();
-                            
-                            
+                            copyFromSerialTo(FLASH_FW_ADDRESS);
+                            FLASH_End();
                             break;
                         case 'u':
+                            copyFromSerialTo(FLASH_PUBLIC_KEY);
                             break;
                         case 'v':
                             sprintf(str0, "%d", modinfo->module_version);
@@ -416,6 +385,7 @@ int main(void)
                             uart_put("\n");
                             break;
                         case 'r':
+                            copyFromSerialTo(FLASH_PRIVATE_KEY);
                             break;
                         case 'e':
                             exit = true;
