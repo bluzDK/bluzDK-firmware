@@ -245,9 +245,10 @@ uint32_t FLASH_PagesMask(uint32_t fileSize);
 
 void copyFromSerialTo(uint32_t address)
 {
+    uint32_t maxChunkkLength = 1024;
     char str0[8];
     uint8_t byte1, byte2, byte3, byte4;
-    uint8_t buf[512];
+    uint8_t buf[maxChunkkLength];
     
     Set_RGB_LED_Values(0,0,255);
     while (uart_get(&byte1) != NRF_SUCCESS) { }
@@ -262,20 +263,23 @@ void copyFromSerialTo(uint32_t address)
     uart_put(str0);
     uart_put("\n");
     
-    for (int i = 0; i < fw_length; i+=512) {
-        int chunklength = (fw_length - i > 512 ? 512 : fw_length - i);
+    for (int i = 0; i < fw_length; i+=maxChunkkLength) {
+        int chunklength = (fw_length - i > maxChunkkLength ? maxChunkkLength : fw_length - i);
         int j = 0;
-        Set_RGB_LED_Values(255,0,0);
+        Set_RGB_LED_Values(255,0,255);
         while (j < chunklength) {
             if (uart_get(buf+j) == NRF_SUCCESS) {
                 j++;
             }
         }
-        Set_RGB_LED_Values(0,255,0);
+        Set_RGB_LED_Values(0,0,255);
         FLASH_Update(buf, address+i, chunklength);
+        
+        sprintf(str0, "%d", (int)chunklength);
+        uart_put(str0);
         uart_put("\r\n");
     }
-    Set_RGB_LED_Values(255,255,255);
+    Set_RGB_LED_Values(255,255,0);
 }
 
 /**@brief Function for bootloader main entry.
