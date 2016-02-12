@@ -152,7 +152,8 @@ void app_setup_and_loop_passive(void)
                       SPARK_CLOUD_SOCKETED = 0;
                       SPARK_CLOUD_CONNECTED = 0;
                       cloudErrors = 0;
-                      LED_SetRGBColor(RGB_COLOR_MAGENTA);
+                      LED_SetRGBColor(RGB_COLOR_GREEN);
+                      HAL_Handle_Cloud_Disconnect();
                     }
                 }
             } else {
@@ -195,7 +196,6 @@ void app_setup_and_loop_passive(void)
                 ledOffTime = 2000;
                 LED_SetRGBColor(system_mode()==SAFE_MODE ? RGB_COLOR_MAGENTA : RGB_COLOR_GREEN);
                 
-                HAL_Handle_Cloud_Disconnect();
             }
             if (!HAL_Is_Advertising()) {
                 ledOffTime = 2000;
