@@ -394,6 +394,50 @@ void system_set_time(time_t time, unsigned, void*)
 
 const int CLAIM_CODE_SIZE = 63;
 
+const char* module_function_string(module_function_t func);
+void system_info_to_json(BufferAppender &appender, hal_system_info_t& system)
+{
+    appender.append("{");
+    appender.append("\"m\":[");;
+    
+    //look through one less module then the count, the last one is the OTA update area and isn't important
+    for (unsigned i=0; i<(system.module_count-(unsigned)1); i++) {
+        appender.append("{");;
+        
+        const hal_module_t& module = system.modules[i];
+        const module_info_t* info = module.info;
+        
+        appender.append("\"f\":\"");
+        appender.append(module_function_string(module_function(info)));
+        appender.append("\",");
+        
+        appender.append("\"n\":\"");
+        appender.append(String(info->module_index));
+        appender.append("\",");
+        
+        appender.append("\"v\":\"");
+        appender.append(String(info->module_version));
+        
+        appender.append("}");;
+    }
+    appender.append("]}");
+}
+
+
+void publish_system_module_info()
+{
+    uint8_t buf[108];
+    BufferAppender appender(buf, sizeof(buf));
+    
+    hal_system_info_t info;
+    memset(&info, 0, sizeof(info));
+    info.size = sizeof(info);
+    HAL_System_Info(&info, true, NULL);
+    system_info_to_json(appender, info);
+    HAL_System_Info(&info, false, NULL);
+    Particle.publish("module-info", (const char*)buf, 60, PRIVATE);
+}
+
 int Spark_Handshake(void)
 {
     int err = spark_protocol_handshake(sp);
@@ -419,6 +463,8 @@ int Spark_Handshake(void)
 #ifdef BLUZ
         ultoa(HAL_OTA_SessionTimeout(), buf, 10);
         Particle.publish("spark/device/session/timeout", buf, 60, PRIVATE);
+        
+        publish_system_module_info();
 #endif
 
         if (system_mode()==SAFE_MODE)
