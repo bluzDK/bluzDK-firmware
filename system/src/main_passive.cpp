@@ -147,12 +147,7 @@ void app_setup_and_loop_passive(void)
                     cloudErrors++;
                     ERROR("Error when calling Spark Comm Loop");
                     if (cloudErrors > 2) {
-                      Spark_Disconnect();
-                      CLOUD_CONNECTED = false;
-                      SPARK_CLOUD_SOCKETED = 0;
-                      SPARK_CLOUD_CONNECTED = 0;
                       cloudErrors = 0;
-                      LED_SetRGBColor(RGB_COLOR_GREEN);
                       HAL_Handle_Cloud_Disconnect();
                     }
                 }

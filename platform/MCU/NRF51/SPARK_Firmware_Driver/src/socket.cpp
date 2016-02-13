@@ -108,6 +108,8 @@ int32_t Socket::receive(void* data, uint32_t len, unsigned long _timeout)
 }
 int32_t Socket::close()
 {
+    bufferLength=0;
+    bufferStart=0;
     inUse = false;
 //    uint8_t data[2];
 //    data[0] = SOCKET_DATA_SERVICE & 0xFF;
