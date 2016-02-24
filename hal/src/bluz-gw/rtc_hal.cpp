@@ -1,6 +1,12 @@
 /**
  ******************************************************************************
-  Copyright (c) 2015 Particle Industries, Inc.  All rights reserved.
+ * @file    rtc_hal.c
+ * @author  Satish Nair, Brett Walach
+ * @version V1.0.0
+ * @date    12-Sept-2014
+ * @brief
+ ******************************************************************************
+  Copyright (c) 2013-2015 Particle Industries, Inc.  All rights reserved.
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -17,46 +23,27 @@
  ******************************************************************************
  */
 
-#ifndef HAL_PLATFORM_H
-#define	HAL_PLATFORM_H
+/* Includes ------------------------------------------------------------------*/
+#include "rtc_hal.h"
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
-
-
-
-#if PLATFORM_ID<9
-    #define HAL_PLATFORM_WIFI 1
-#endif
-
-#if PLATFORM_ID==10
-#define HAL_PLATFORM_CELLULAR 1
-#endif
-    
-#if PLATFORM_ID==103 || PLATFORM_ID==269
-#define HAL_PLATFORM_BLUETOOTH_LE 1
-#endif
-
-
-
-#ifndef HAL_PLATFORM_WIFI
-#define HAL_PLATFORM_WIFI 0
-#endif
-
-#ifndef HAL_PLATFORM_CELLULAR
-#define HAL_PLATFORM_CELLULAR 0
-#endif
-    
-#ifndef HAL_PLATFORM_BLUETOOTH_LE
-#define HAL_PLATFORM_BLUETOOTH_LE 0
-#endif
-
-
-
-#ifdef	__cplusplus
+void HAL_RTC_Configuration(void)
+{
 }
-#endif
 
-#endif	/* HAL_PLATFORM_H */
+time_t HAL_RTC_Get_UnixTime(void)
+{
+    return 0;
+}
 
+void HAL_RTC_Set_Alarm(uint32_t value)
+{
+}
+
+void HAL_RTC_Set_UnixAlarm(time_t value)
+{
+
+}
+
+void HAL_RTC_Set_UnixTime(time_t value)
+{
+}

@@ -38,6 +38,7 @@ CSRC += $(TARGET_STDPERIPH_SRC_PATH)/pstorage.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/softdevice_handler.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/softdevice_handler_appsh.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/spi_master.c
+CSRC += $(TARGET_STDPERIPH_SRC_PATH)/spi_slave.c
 
 # C++ source files included in this build.
 CPPSRC +=

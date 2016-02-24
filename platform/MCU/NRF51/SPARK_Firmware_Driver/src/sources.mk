@@ -10,6 +10,11 @@ INCLUDE_DIRS += SPARK_Services/inc
 
 # C source files included in this build.
 CSRC += $(TARGET_SPARK_SRC_PATH)/hw_config.c
+
+#if PLATFORM_ID==269
+CSRC += $(TARGET_SPARK_SRC_PATH)/hw_gateway_config.c
+#endif
+
 CSRC += $(TARGET_SPARK_SRC_PATH)/flash.c
 CSRC += $(TARGET_SPARK_SRC_PATH)/ble_scs.c
 CSRC += $(TARGET_SPARK_SRC_PATH)/sst25vf_spi.c

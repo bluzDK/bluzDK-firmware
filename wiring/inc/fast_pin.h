@@ -129,7 +129,7 @@ extern "C" {
     {
         return ((PIN_MAP[_pin].gpio_peripheral->IDR & PIN_MAP[_pin].gpio_pin) == 0 ? LOW : HIGH);
     }
-#elif PLATFORM_ID==3 || PLATFORM_ID==103
+#elif PLATFORM_ID==3 || PLATFORM_ID==103 || PLATFORM_ID==269
     
     // make them unresolved symbols so attempted use will result in a linker error
     void pinResetFast(pin_t _pin);

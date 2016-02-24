@@ -1,5 +1,8 @@
 /**
  ******************************************************************************
+ * @file    hal_dynalib_export.c
+ * @author  Matthew McGowan
+ ******************************************************************************
   Copyright (c) 2015 Particle Industries, Inc.  All rights reserved.
 
   This library is free software; you can redistribute it and/or
@@ -17,46 +20,29 @@
  ******************************************************************************
  */
 
-#ifndef HAL_PLATFORM_H
-#define	HAL_PLATFORM_H
+#define DYNALIB_EXPORT
+#undef SCK
+#undef MOSI
+#undef MISO
+#undef SS
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
-
-
-
-#if PLATFORM_ID<9
-    #define HAL_PLATFORM_WIFI 1
-#endif
-
-#if PLATFORM_ID==10
-#define HAL_PLATFORM_CELLULAR 1
-#endif
-    
-#if PLATFORM_ID==103 || PLATFORM_ID==269
-#define HAL_PLATFORM_BLUETOOTH_LE 1
-#endif
-
-
-
-#ifndef HAL_PLATFORM_WIFI
-#define HAL_PLATFORM_WIFI 0
-#endif
-
-#ifndef HAL_PLATFORM_CELLULAR
-#define HAL_PLATFORM_CELLULAR 0
-#endif
-    
-#ifndef HAL_PLATFORM_BLUETOOTH_LE
-#define HAL_PLATFORM_BLUETOOTH_LE 0
-#endif
-
-
-
-#ifdef	__cplusplus
-}
-#endif
-
-#endif	/* HAL_PLATFORM_H */
+#include "hal_dynalib.h"
+#undef SCK
+#undef MOSI
+#undef MISO
+#undef SS
+#undef STATIC_ASSERT
+#include "hal_dynalib_core.h"
+#include "hal_dynalib_gpio.h"
+#include "hal_dynalib_i2c.h"
+#undef STATIC_ASSERT
+#include "hal_dynalib_ota.h"
+#undef STATIC_ASSERT
+#include "hal_dynalib_peripherals.h"
+#undef STATIC_ASSERT
+#include "hal_dynalib_socket.h"
+#include "hal_dynalib_spi.h"
+#include "hal_dynalib_usart.h"
+#include "hal_dynalib_concurrent.h"
+#include "hal_dynalib_ble.h"
 

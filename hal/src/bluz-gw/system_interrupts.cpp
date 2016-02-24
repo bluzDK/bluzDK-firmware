@@ -1,0 +1,28 @@
+
+#include "interrupts_hal.h"
+
+/* For now, we remember only one handler, but in future this may be extended to a
+ * dynamically linked list to allow for multiple handlers.
+ */
+
+
+inline bool is_valid_irq(hal_irq_t irq)
+{
+    return true;
+}
+
+uint8_t HAL_Set_System_Interrupt_Handler(hal_irq_t irq, const HAL_InterruptCallback* callback, HAL_InterruptCallback* previous, void* reserved)
+{
+
+    return true;
+}
+
+uint8_t HAL_Get_System_Interrupt_Handler(hal_irq_t irq, HAL_InterruptCallback* callback, void* reserved)
+{
+    return true;
+}
+
+void HAL_System_Interrupt_Trigger(hal_irq_t irq, void* reserved)
+{
+}
+
