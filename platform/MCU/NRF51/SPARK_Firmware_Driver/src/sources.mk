@@ -15,8 +15,6 @@ CSRC += $(TARGET_SPARK_SRC_PATH)/sst25vf_spi.c
 CSRC += $(TARGET_SPARK_SRC_PATH)/system_nrf51.c
 CSRC += $(TARGET_SPARK_SRC_PATH)/nrf51_callbacks.c
 CSRC += $(TARGET_SPARK_SRC_PATH)/spi_master_fast.c
-CSRC += $(TARGET_SPARK_SRC_PATH)/spi_slave_stream.c
-CSRC += $(TARGET_SPARK_SRC_PATH)/client_handling.c
 
 ifeq ("$(PLATFORM_ID)","103")
 CSRC += $(TARGET_SPARK_SRC_PATH)/ble_scs.c
@@ -25,11 +23,9 @@ endif
 
 ifeq ("$(PLATFORM_ID)","269")
 CSRC += $(TARGET_SPARK_SRC_PATH)/hw_gateway_config.c
+CSRC += $(TARGET_SPARK_SRC_PATH)/spi_slave_stream.c
+CSRC += $(TARGET_SPARK_SRC_PATH)/client_handling.c
 endif
-
-#ifdef BLUZ
-
-#endif
 
 
 # C++ source files included in this build.
