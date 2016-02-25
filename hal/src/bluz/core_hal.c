@@ -59,6 +59,11 @@ void HAL_Handle_Cloud_Disconnect(void)
     ble_disconnect();
 }
 
+void HAL_Loop_Iteration(void)
+{
+    
+}
+
 void HAL_Events_Manage(void)
 {
 }

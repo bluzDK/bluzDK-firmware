@@ -20,6 +20,7 @@
 #include "core_hal.h"
 #include "ble_conn_params.h"
 #include "pstorage.h"
+#include "hw_gateway_config.h"
 
 void uart_error_handle(app_uart_evt_t * p_event)
 {
@@ -89,7 +90,7 @@ void micros_timer_timeout(nrf_timer_event_t event_type, void* p_context)
  */
 void on_ble_evt(ble_evt_t * p_ble_evt)
 {
-//    uint32_t                         err_code;
+    uint32_t                         err_code;
 //    static ble_gap_evt_auth_status_t m_auth_status;
 //    ble_gap_enc_info_t *             p_enc_info;
     ble_gap_addr_t* address = 0;
@@ -110,6 +111,54 @@ void on_ble_evt(ble_evt_t * p_ble_evt)
             advertising_start();
             state = BLE_ADVERTISING;
             break;
+            
+            
+        case BLE_GAP_EVT_ADV_REPORT:
+        {
+            data_t adv_data;
+            data_t type_data;
+            
+//            uint8_t service_uuid[] = {0xB2, 0x2D, 0x14, 0xAA, 0xB3, 0x9F, 0x41, 0xED, 0xB1, 0x77, 0xFF, 0x38, 0x23, 0x02, 0x1E, 0x87};
+            
+            // Initialize advertisement report for parsing.
+            adv_data.p_data = p_ble_evt->evt.gap_evt.params.adv_report.data;
+            adv_data.data_len = p_ble_evt->evt.gap_evt.params.adv_report.dlen;
+            
+            err_code = adv_report_parse(BLE_GAP_AD_TYPE_COMPLETE_LOCAL_NAME,
+                                        &adv_data,
+                                        &type_data);
+            if (err_code != NRF_SUCCESS)
+            {
+                // Compare short local name in case complete name does not match.
+                err_code = adv_report_parse(BLE_GAP_AD_TYPE_SHORT_LOCAL_NAME,
+                                            &adv_data,
+                                            &type_data);
+            }
+            
+            //            err_code = adv_report_parse(BLE_GAP_AD_TYPE_128BIT_SERVICE_UUID_COMPLETE,
+            //                                                  &adv_data,
+            //                                                  &type_data);
+            
+            // Verify if short or complete name matches target.
+            if ((err_code == NRF_SUCCESS) &&
+                (0 == memcmp(TARGET_DEV_NAME,type_data.p_data,type_data.data_len)))
+            {
+                err_code = sd_ble_gap_scan_stop();
+                if (err_code != NRF_SUCCESS)
+                {
+                }
+                
+                err_code = sd_ble_gap_connect(&p_ble_evt->evt.gap_evt.params.adv_report.\
+                                              peer_addr,
+                                              &m_scan_param,
+                                              &m_connection_param);
+                
+                if (err_code != NRF_SUCCESS)
+                {
+                }
+            }
+            break;
+        }
             
 //        case BLE_GAP_EVT_SEC_PARAMS_REQUEST:
 //            err_code = sd_ble_gap_sec_params_reply(m_conn_handle,
@@ -143,6 +192,7 @@ void on_ble_evt(ble_evt_t * p_ble_evt)
 //            break;
             
         case BLE_GAP_EVT_TIMEOUT:
+            //bluz
             if (p_ble_evt->evt.gap_evt.params.timeout.src == BLE_GAP_TIMEOUT_SRC_ADVERTISING)
             {
                 
@@ -154,6 +204,19 @@ void on_ble_evt(ble_evt_t * p_ble_evt)
                 // Go to system-off mode (this function will not return; wakeup will cause a reset)
                 advertising_stop();
             }
+            //bluz gateway
+            if(p_ble_evt->evt.gap_evt.params.timeout.src == BLE_GAP_TIMEOUT_SRC_SCAN)
+            {
+            }
+            else if (p_ble_evt->evt.gap_evt.params.timeout.src == BLE_GAP_TIMEOUT_SRC_CONN)
+            {
+            }
+            break;
+        case BLE_GAP_EVT_CONN_PARAM_UPDATE_REQUEST:
+            // Accepting parameters requested by peer.
+            err_code = sd_ble_gap_conn_param_update(p_ble_evt->evt.gap_evt.conn_handle,
+                                                    &p_ble_evt->evt.gap_evt.params.conn_param_update_request.conn_params);
+            APP_ERROR_CHECK(err_code);
             break;
             
         case BLE_GAP_EVT_CONN_PARAM_UPDATE:

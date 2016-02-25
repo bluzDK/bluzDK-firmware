@@ -20,13 +20,61 @@
 #define __NRF_HW_GATEWAY_CONFIG_H
 
 /* Includes ------------------------------------------------------------------*/
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
+#include "ble_gap.h"
+#include "app_util.h"
 
 //Gateway Constants
 #define SPI_SLAVE_TX_BUF_SIZE   255u                        /**< SPI TX buffer size. */
 #define SPI_SLAVE_RX_BUF_SIZE   SPI_SLAVE_TX_BUF_SIZE       /**< SPI RX buffer size. */
 
+#define MIN_CONNECTION_INTERVAL          MSEC_TO_UNITS(7.5, UNIT_1_25_MS)                /**< Determines minimum connection interval in millisecond. */
+#define MAX_CONNECTION_INTERVAL          MSEC_TO_UNITS(300, UNIT_1_25_MS)                /**< Determines maximum connection interval in millisecond. */
+#define SLAVE_LATENCY                    0                                              /**< Determines slave latency in counts of connection events. */
+#define SUPERVISION_TIMEOUT              MSEC_TO_UNITS(4000, UNIT_10_MS)                /**< Determines supervision time-out in units of 10 millisecond. */
+
+#define TARGET_DEV_NAME                  "Bluz DK"                                      /**< Target device name that application is looking for. */
+
+#define SCAN_INTERVAL                    0x00A0                                         /**< Determines scan interval in units of 0.625 millisecond. */
+#define SCAN_WINDOW                      0x0050                                         /**< Determines scan window in units of 0.625 millisecond. */
+
+/**@brief Variable length data encapsulation in terms of length and pointer to data */
+typedef struct
+{
+    uint8_t     * p_data;                                                      /**< Pointer to data. */
+    uint16_t      data_len;                                                    /**< Length of data. */
+}data_t;
+
+/**
+ * @brief Scan parameters requested for scanning and connection.
+ */
+static const ble_gap_scan_params_t m_scan_param =
+{
+    0,                       // Active scanning not set.
+    0,                       // Selective scanning not set.
+    NULL,                    // White-list not set.
+    (uint16_t)SCAN_INTERVAL, // Scan interval.
+    (uint16_t)SCAN_WINDOW,   // Scan window.
+    0                        // Never stop scanning unless explicitly asked to.
+};
+
+/**
+ * @brief Connection parameters requested for connection.
+ */
+static const ble_gap_conn_params_t m_connection_param =
+{
+    (uint16_t)MIN_CONNECTION_INTERVAL,   // Minimum connection
+    (uint16_t)MAX_CONNECTION_INTERVAL,   // Maximum connection
+    0,                                   // Slave latency
+    (uint16_t)SUPERVISION_TIMEOUT        // Supervision time-out
+};
+
 //Gateway Init Functions
 void gateway_init(void);
+void gateway_scan_start(void);
+void gateway_loop(void);
 
 //Gateway Callback Functions
 #if PLATFORM_ID==269
@@ -41,5 +89,6 @@ volatile uint16_t spi_slave_rx_buffer_start;
 void spi_slave_rx_data(uint8_t *rx_buffer, uint16_t size);
 #endif
 
+uint32_t adv_report_parse(uint8_t type, data_t * p_advdata, data_t * p_typedata);
 
 #endif  /*__NRF_HW_GATEWAY_CONFIG_H*/

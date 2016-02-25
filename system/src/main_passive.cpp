@@ -138,6 +138,8 @@ void app_setup_and_loop_passive(void)
 //            DEBUG("Exited User Loop");
         }
         
+        HAL_Loop_Iteration();
+        
         //we may not be connected. if not, don't try to manage anything cloud related
         if (HAL_Network_Connection()){
             if (CLOUD_CONNECTED) {

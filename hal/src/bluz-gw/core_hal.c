@@ -49,11 +49,17 @@ void HAL_Network_Init(void)
     external_flash_init();
     
     timers_start();
+    gateway_scan_start();
 }
 
 void HAL_Handle_Cloud_Disconnect(void)
 {
     ble_disconnect();
+}
+
+void HAL_Loop_Iteration(void)
+{
+    gateway_loop();
 }
 
 void HAL_Events_Manage(void)
