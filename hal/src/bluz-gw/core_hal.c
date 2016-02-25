@@ -45,15 +45,10 @@ void HAL_Network_Init(void)
     scheduler_init();
     device_manager_init();
     gateway_init();
-    gap_params_init();
-    services_init();
-    advertising_init();
     data_service_init();
-    conn_params_init();
     external_flash_init();
     
     timers_start();
-    advertising_start();
 }
 
 void HAL_Handle_Cloud_Disconnect(void)

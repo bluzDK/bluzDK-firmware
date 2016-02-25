@@ -22,7 +22,7 @@
 /* Includes ------------------------------------------------------------------*/
 
 //Gateway Constants
-#define SPI_SLAVE_TX_BUF_SIZE   1024u                       /**< SPI TX buffer size. */
+#define SPI_SLAVE_TX_BUF_SIZE   255u                        /**< SPI TX buffer size. */
 #define SPI_SLAVE_RX_BUF_SIZE   SPI_SLAVE_TX_BUF_SIZE       /**< SPI RX buffer size. */
 
 //Gateway Init Functions

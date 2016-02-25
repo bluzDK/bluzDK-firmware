@@ -747,17 +747,17 @@ __STATIC_INLINE void nrf_drv_twi_int_handler(NRF_TWI_Type * p_reg, uint32_t inst
 }
 
 //Had to modify this driver from basic Nordic one as there are conflicts with SPI0 and TWI0
-#if (TWI0_ENABLED == 1)
-void nrf_drv_twi0_int_handler(void)
+#if (TWI1_ENABLED == 1)
+void nrf_drv_twi1_int_handler(void)
 {
-    nrf_drv_twi_int_handler(NRF_TWI0, TWI0_INSTANCE_INDEX);
+    nrf_drv_twi_int_handler(NRF_TWI1, TWI1_INSTANCE_INDEX);
 }
 #endif // (TWI0_ENABLED == 1)
 
 
-#if (TWI1_ENABLED == 1)
-void SPI0_TWI1_IRQHandler(void)
+#if (TWI0_ENABLED == 1)
+void SPI0_TWI0_IRQHandler(void)
 {
-    nrf_drv_twi_int_handler(NRF_TWI1, TWI1_INSTANCE_INDEX);
+    nrf_drv_twi_int_handler(NRF_TWI0, TWI0_INSTANCE_INDEX);
 }
 #endif // (TWI0_ENABLED == 1)

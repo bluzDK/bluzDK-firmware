@@ -75,15 +75,15 @@ void sFLASH_Init(void)
 	uint32_t Device_ID = 0;
 //	spi_base_address = spi_master_init(SFLASH_SPI, SPI_MODE0, (bool)0);
 	spi_master_config_t spi_config = SPI_MASTER_INIT_DEFAULT;
-	spi_config.SPI_Pin_SCK = SPIM1_SCK_PIN;
-	spi_config.SPI_Pin_MISO = SPIM1_MISO_PIN;
-	spi_config.SPI_Pin_MOSI = SPIM1_MOSI_PIN;
-	spi_config.SPI_Pin_SS = SPIM1_SS_PIN;
+	spi_config.SPI_Pin_SCK = SPIM0_SCK_PIN;
+	spi_config.SPI_Pin_MISO = SPIM0_MISO_PIN;
+	spi_config.SPI_Pin_MOSI = SPIM0_MOSI_PIN;
+	spi_config.SPI_Pin_SS = SPIM0_SS_PIN;
 	spi_config.SPI_CONFIG_ORDER = SPI_CONFIG_ORDER_MsbFirst;
 	spi_config.SPI_PriorityIRQ = APP_IRQ_PRIORITY_HIGH;
 
-	spi_master_open(SPI_MASTER_1, &spi_config);
-	spi_master_evt_handler_reg(SPI_MASTER_1, spi_master_event_handler);
+	spi_master_open(SPI_MASTER_0, &spi_config);
+	spi_master_evt_handler_reg(SPI_MASTER_0, spi_master_event_handler);
 
 	/* Disable the write access to the FLASH */
 	sFLASH_WriteDisable();
@@ -399,7 +399,7 @@ static uint8_t sFLASH_SendByte(uint8_t byte)
 	rx_data[0] = 0x0;
 
 	spi_transmission_completed = false;
-	uint32_t err_code = spi_master_send_recv(SPI_MASTER_1,(uint8_t *)tx_data, 1, rx_data, 1);
+	uint32_t err_code = spi_master_send_recv(SPI_MASTER_0,(uint8_t *)tx_data, 1, rx_data, 1);
 	if (err_code == NRF_SUCCESS)
 	{
 		while(spi_transmission_completed == false) { }
@@ -415,7 +415,7 @@ static uint8_t sFLASH_SendByte(uint8_t byte)
   */
 static void sFLASH_CS_LOW(void)
 {
-	nrf_gpio_pin_clear(SPIM1_SS_PIN);
+	nrf_gpio_pin_clear(SPIM0_SS_PIN);
 }
 
 /**
@@ -425,7 +425,7 @@ static void sFLASH_CS_LOW(void)
   */
 static void sFLASH_CS_HIGH(void)
 {
-	nrf_gpio_pin_set(SPIM1_SS_PIN);
+	nrf_gpio_pin_set(SPIM0_SS_PIN);
 }
 
 /**

@@ -1,8 +1,9 @@
-
+#include <stdint.h>
+#include <stdbool.h>
+#include <string.h>
 #include "spi_slave_stream.h"
 #include "spi_slave.h"
 #include "nrf_delay.h"
-#include "nr51_config.h"
 
 static void blink_led(int count)
 {
@@ -56,7 +57,6 @@ static void spi_slave_event_handle(spi_slave_evt_t event)
 {
     uint32_t err_code;
 
-    uint16_t size;
     if (event.evt_type == SPI_SLAVE_XFER_DONE)
     {
     	if (transmitting) {
@@ -67,9 +67,7 @@ static void spi_slave_event_handle(spi_slave_evt_t event)
 			if (event.rx_amount == 255) {
 				memcpy(buf+currentRxBufferSize, m_rx_buf, 254);
 				currentRxBufferSize+=254;
-				uart_put("SPIS: received 255 bytes, waiting.");
 			} else {
-				uart_put("SPIS: calling callback.");
 				memcpy(buf+currentRxBufferSize, m_rx_buf, event.rx_amount);
 				currentRxBufferSize += event.rx_amount;
 				rx_callback(buf, currentRxBufferSize);
@@ -78,7 +76,7 @@ static void spi_slave_event_handle(spi_slave_evt_t event)
 			}
     	}
     	//Set buffers.
-		err_code = spi_slave_buffers_set(m_tx_buf, m_rx_buf, TX_BUF_SIZE, RX_BUF_SIZE);
+		err_code = spi_slave_buffers_set(m_tx_buf, m_rx_buf, SPI_SLAVE_TX_BUF_SIZE, SPI_SLAVE_RX_BUF_SIZE);
 		APP_ERROR_CHECK(err_code);
     } else if (event.evt_type == SPI_SLAVE_BUFFERS_SET_DONE) {
 

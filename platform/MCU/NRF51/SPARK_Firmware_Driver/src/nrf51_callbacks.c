@@ -176,7 +176,10 @@ void ble_evt_dispatch(ble_evt_t * p_ble_evt)
 {
     on_ble_evt(p_ble_evt);
     ble_conn_params_on_ble_evt(p_ble_evt);
+    
+#if PLATFORM_ID==103
     scs_on_ble_evt(&m_scs, p_ble_evt);
+#endif
 }
 
 /**@brief Function for dispatching a system event to interested modules.

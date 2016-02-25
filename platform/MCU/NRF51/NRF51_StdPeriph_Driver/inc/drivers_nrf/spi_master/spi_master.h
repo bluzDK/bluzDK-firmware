@@ -49,7 +49,10 @@
 #include <stdlib.h>
 
 #define SPI_MASTER_0_ENABLE 1
+//Only enable SPI1 on bluz, not the gateway, which requires this peripheral for SPI Slave
+#if PLATFORM_ID==103
 #define SPI_MASTER_1_ENABLE 1
+#endif
 
 #define SPI_PIN_DISCONNECTED 0xFFFFFFFF /**< A value used to the PIN deinitialization. */
 #define SPI_DEFAULT_TX_BYTE  0x00       /**< Default byte (used to clock transmission

@@ -27,16 +27,16 @@
 #define BOARD_BUTTON          			7                                        /**< Main LED on the board. */
 
 //Flash SPI address
-#define SPIM1_SCK_PIN       10u     /**< SPI clock GPIO pin number. */
-#define SPIM1_MOSI_PIN      9u     /**< SPI Master Out Slave In GPIO pin number. */
-#define SPIM1_MISO_PIN      14u     /**< SPI Master In Slave Out GPIO pin number. */
-#define SPIM1_SS_PIN        15u     /**< SPI Slave Select GPIO pin number. */
+#define SPIM0_SCK_PIN       10u     /**< SPI clock GPIO pin number. */
+#define SPIM0_MOSI_PIN      9u     /**< SPI Master Out Slave In GPIO pin number. */
+#define SPIM0_MISO_PIN      14u     /**< SPI Master In Slave Out GPIO pin number. */
+#define SPIM0_SS_PIN        15u     /**< SPI Slave Select GPIO pin number. */
 
 //SPI Pins
-#define SPIM0_SCK_PIN   3u
-#define SPIM0_MOSI_PIN  1u
-#define SPIM0_MISO_PIN  2u
-#define SPIM0_SS_PIN    4u
+#define SPIM1_SCK_PIN   3u
+#define SPIM1_MOSI_PIN  1u
+#define SPIM1_MISO_PIN  2u
+#define SPIM1_SS_PIN    4u
 
 //Bootloader section
 #define BOOTLOADER_FLASH_PAGES 0x00

@@ -28,8 +28,8 @@
 #include "nrf_drv_twi.h"
 #include "nrf51_driver_config.h"
 
-const nrf_drv_twi_t     p_twi_instance = NRF_DRV_TWI_INSTANCE(0);
-nrf_drv_twi_config_t    p_twi_config = NRF_DRV_TWI_DEFAULT_CONFIG(0);
+const nrf_drv_twi_t     p_twi_instance = NRF_DRV_TWI_INSTANCE(1);
+nrf_drv_twi_config_t    p_twi_config = NRF_DRV_TWI_DEFAULT_CONFIG(1);
 uint8_t dataOutBuffer[32];
 uint8_t dataOutBufferSize = 0;
 
@@ -46,11 +46,11 @@ void HAL_I2C_Init(HAL_I2C_Interface i2c, void* reserved)
 
 void HAL_I2C_Begin(HAL_I2C_Interface i2c, I2C_Mode mode, uint8_t address, void* reserved)
 {
-    p_twi_config.scl = TWI0_CONFIG_SCL;
-    p_twi_config.sda = TWI0_CONFIG_SDA;
+    p_twi_config.scl = TWI1_CONFIG_SCL;
+    p_twi_config.sda = TWI1_CONFIG_SDA;
     int ret_code = nrf_drv_twi_init(&p_twi_instance, &p_twi_config, NULL); // Initiate twi driver with instance and configuration values
     APP_ERROR_CHECK(ret_code); // Check for errors in return value
-    HW_ZERO_CONFIG = HW0_TWI;
+    HW_ONE_CONFIG = HW1_TWI;
     nrf_drv_twi_enable(&p_twi_instance); // Enable the TWI instance
 }
 
@@ -127,7 +127,7 @@ void HAL_I2C_Flush_Data(HAL_I2C_Interface i2c,void* reserved)
 
 bool HAL_I2C_Is_Enabled(HAL_I2C_Interface i2c,void* reserved)
 {
-    return NRF_TWI0->ENABLE;
+    return NRF_TWI1->ENABLE;
 }
 
 void HAL_I2C_Set_Callback_On_Receive(HAL_I2C_Interface i2c, void (*function)(int),void* reserved)

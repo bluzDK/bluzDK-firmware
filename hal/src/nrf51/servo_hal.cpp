@@ -1,9 +1,12 @@
 /**
  ******************************************************************************
- * @file    hal_dynalib_export.c
+ * @file    servo_hal.c
  * @author  Matthew McGowan
+ * @version V1.0.0
+ * @date    27-Sept-2014
+ * @brief
  ******************************************************************************
-  Copyright (c) 2015 Particle Industries, Inc.  All rights reserved.
+  Copyright (c) 2013-2015 Particle Industries, Inc.  All rights reserved.
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -20,29 +23,35 @@
  ******************************************************************************
  */
 
-#define DYNALIB_EXPORT
-#undef SCK
-#undef MOSI
-#undef MISO
-#undef SS
+/* Includes ------------------------------------------------------------------*/
+#include "servo_hal.h"
 
-#include "hal_dynalib.h"
-#undef SCK
-#undef MOSI
-#undef MISO
-#undef SS
-#undef STATIC_ASSERT
-#include "hal_dynalib_core.h"
-#include "hal_dynalib_gpio.h"
-#include "hal_dynalib_i2c.h"
-#undef STATIC_ASSERT
-#include "hal_dynalib_ota.h"
-#undef STATIC_ASSERT
-#include "hal_dynalib_peripherals.h"
-#undef STATIC_ASSERT
-#include "hal_dynalib_socket.h"
-#include "hal_dynalib_spi.h"
-#include "hal_dynalib_usart.h"
-#include "hal_dynalib_concurrent.h"
-#include "hal_dynalib_ble.h"
+/* Private macro -------------------------------------------------------------*/
 
+/* Private variables ---------------------------------------------------------*/
+
+/* Extern variables ----------------------------------------------------------*/
+
+/* Private function prototypes -----------------------------------------------*/
+
+void HAL_Servo_Attach(uint16_t pin)
+{
+}
+
+void HAL_Servo_Detach(uint16_t pin)
+{
+}
+
+void HAL_Servo_Write_Pulse_Width(uint16_t pin, uint16_t pulseWidth)
+{
+}
+
+uint16_t HAL_Servo_Read_Pulse_Width(uint16_t pin)
+{
+    return 0;
+}
+
+uint16_t HAL_Servo_Read_Frequency(uint16_t pin)
+{
+    return 0;
+}

@@ -1,10 +1,8 @@
 
 HAL_SRC_TEMPLATE_PATH = $(TARGET_HAL_PATH)/src/template
-HAL_SRC_SHARED_PATH = $(TARGET_HAL_PATH)/src/nrf51
 
 templatedir=$(HAL_SRC_TEMPLATE_PATH)
 overridedir=$(HAL_SRC_BLUZ_GW_PATH)
-shareddir=$(HAL_SRC_SHARED_PATH)
 
 # C source files included in this build.
 # Use files from the template unless they are overridden by files in the 
@@ -16,8 +14,6 @@ CPPSRC += $(call target_files,$(templatedir)/,*.cpp)
 # find the overridden list of files (without extension)
 overrides_abs = $(call rwildcard,$(overridedir)/,*.cpp)
 overrides_abs += $(call rwildcard,$(overridedir)/,*.c)
-overrides_abs += $(call rwildcard,$(shareddir)/,*.c)
-overrides_abs += $(call rwildcard,$(shareddir)/,*.cpp)
 overrides = $(basename $(patsubst $(overridedir)/%,%,$(overrides_abs)))
 
 remove_c = $(addsuffix .c,$(addprefix $(templatedir)/,$(overrides)))

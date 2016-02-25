@@ -1,12 +1,12 @@
 /**
  ******************************************************************************
- * @file    rtc_hal.c
- * @author  Satish Nair, Brett Walach
+ * @file    rng_hal.c
+ * @author  Satish Nair
  * @version V1.0.0
- * @date    12-Sept-2014
+ * @date    13-Jan-2015
  * @brief
  ******************************************************************************
-  Copyright (c) 2013-2015 Particle Industries, Inc.  All rights reserved.
+  Copyright (c) 2015 Particle Industries, Inc.  All rights reserved.
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -24,26 +24,35 @@
  */
 
 /* Includes ------------------------------------------------------------------*/
-#include "rtc_hal.h"
+#include "rng_hal.h"
 
-void HAL_RTC_Configuration(void)
+/* Private typedef -----------------------------------------------------------*/
+
+/* Private define ------------------------------------------------------------*/
+
+/* Private macro -------------------------------------------------------------*/
+
+/* Private variables ---------------------------------------------------------*/
+
+/* Extern variables ----------------------------------------------------------*/
+
+/* Private function prototypes -----------------------------------------------*/
+
+/**
+ * @brief  RNG configuration
+ * @param  None
+ * @retval None
+ */
+void HAL_RNG_Configuration(void)
 {
 }
 
-time_t HAL_RTC_Get_UnixTime(void)
+/**
+ * @brief  Get a 32bit random number
+ * @param  None
+ * @retval random number
+ */
+uint32_t HAL_RNG_GetRandomNumber(void)
 {
     return 0;
-}
-
-void HAL_RTC_Set_Alarm(uint32_t value)
-{
-}
-
-void HAL_RTC_Set_UnixAlarm(time_t value)
-{
-
-}
-
-void HAL_RTC_Set_UnixTime(time_t value)
-{
 }

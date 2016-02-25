@@ -19,11 +19,10 @@
 #include "nrf_delay.h"
 #include "spi_slave_stream.h"
 #include "app_uart.h"
-#include "millis.h"
 
 #define LED_PIN                0                                                 /**< LED pin number offset. */
 
-#define MULTILINK_PERIPHERAL_BASE_UUID {0xB2, 0x2D, 0x14, 0xAA, 0xB3, 0x9F, 0x41, 0xED, 0xB1, 0x77, 0xFF, 0x38, 0xD8, 0x17, 0x1E, 0x87};
+#define MULTILINK_PERIPHERAL_BASE_UUID {{0xB2, 0x2D, 0x14, 0xAA, 0xB3, 0x9F, 0x41, 0xED, 0xB1, 0x77, 0xFF, 0x38, 0xD8, 0x17, 0x1E, 0x87}};
 #define BLE_SCS_UUID_SERVICE 0x0223
 #define BLE_SCS_UUID_DATA_DN_CHAR 0x0224
 #define BLE_SCS_UUID_DATA_UP_CHAR 0x0225
@@ -131,8 +130,6 @@ static void notif_enable(client_t * p_client)
     write_params.len      = sizeof(buf);
     write_params.p_value  = buf;
 
-    uart_put("sending down notification \n");
-
     err_code = sd_ble_gattc_write(p_client->srv_db.conn_handle, &write_params);
     APP_ERROR_CHECK(err_code);
 }
@@ -158,7 +155,7 @@ void on_write(client_t * p_client, ble_evt_t * p_ble_evt)
 
 	if (p_evt_write->len == 2 && p_evt_write->data[0] == 0x03 && p_evt_write->data[1] == 0x04) {
 		//got the EOS characters, write this to UART
-		spi_slave_set_tx_buffer(&ble_read_buffer, ble_read_buffer_length);
+		spi_slave_set_tx_buffer(ble_read_buffer, ble_read_buffer_length);
 		ble_read_buffer_length = 0;
 	}
 }
@@ -181,24 +178,6 @@ void client_send_data(uint16_t id, uint8_t *data, uint16_t len)
 	dataBufferWithID[1] = 0x00;
 	memcpy(dataBufferWithID+2, data, len);
 	len+=2;
-
-	uart_put("Millis at beginning: ");
-	char str10[80];
-	sprintf(str10, "%d", system_millis());
-	uart_put(str10);
-	uart_put("\n");
-
-	uart_put("Sending down ");
-	char str0[80];
-	sprintf(str0, "%d", len);
-	uart_put(str0);
-	uart_put(" bytes\n");
-
-	uart_put("To handle \n");
-	char str1[80];
-	sprintf(str1, "%d", m_client[id].srv_db.services[0].charateristics[m_client[id].up_char_index].characteristic.handle_value);
-	uart_put(str1);
-	uart_put("\n");
 
 	for (int i = 0; i < len; i+=20) {
 		uint16_t size = (len-i > 20 ? 20 : len-i);
@@ -233,24 +212,12 @@ void client_send_data(uint16_t id, uint8_t *data, uint16_t len)
 
 	err_code = sd_ble_gattc_write(m_client[id].srv_db.conn_handle, &write_params);
 	while (err_code == BLE_ERROR_NO_TX_BUFFERS) {
-		uart_put("hit a no buffer error \n");
 		while (waitForTxComplete) {
 			nrf_delay_us(500);
 		}
 		waitForTxComplete = true;
 		err_code = sd_ble_gattc_write(m_client[id].srv_db.conn_handle, &write_params);
 	}
-	uart_put("Done sending data, actually sent  ");
-	char str4[80];
-	sprintf(str4, "%d", actualBytesSent);
-	uart_put(str4);
-	uart_put("bytes \n");
-
-	uart_put("Millis at end: ");
-	char str20[80];
-	sprintf(str20, "%d", system_millis());
-	uart_put(str20);
-	uart_put("\n");
 }
 
 
@@ -268,7 +235,6 @@ static void db_discovery_evt_handler(ble_db_discovery_evt_t * p_evt)
     if (p_evt->evt_type == BLE_DB_DISCOVERY_COMPLETE)
     {
         uint8_t i;
-        uart_put("Looking for characterisitics \n");
         for (i = 0; i < p_evt->params.discovered_db.char_count; i++)
         {
             ble_db_discovery_char_t * p_characteristic;
@@ -282,7 +248,6 @@ static void db_discovery_evt_handler(ble_db_discovery_evt_t * p_evt)
                 // Characteristic found. Store the information needed and break.
                 p_client->dn_char_index = i;
                 is_valid_srv_found   = true;
-                uart_put("Found uplink char \n");
             }
             else if ((p_characteristic->characteristic.uuid.uuid == BLE_SCS_UUID_DATA_UP_CHAR)
 				&&
@@ -291,7 +256,6 @@ static void db_discovery_evt_handler(ble_db_discovery_evt_t * p_evt)
 				// Characteristic found. Store the information needed and break.
 				p_client->up_char_index = i;
 				is_valid_srv_found   = true;
-				uart_put("Found downlink char \n");
 			}
         }
     }
@@ -327,8 +291,6 @@ static void on_evt_write_rsp(ble_evt_t * p_ble_evt, client_t * p_client)
             p_client->state = STATE_RUNNING;
             nrf_gpio_pin_set(LED_PIN);
             peripheralConnected = true;
-            uart_put("received back notification \n");
-            uart_put("set state to running and set pins to tell core \n");
         }
     }
 }
@@ -345,14 +307,7 @@ static void on_evt_hvx(ble_evt_t * p_ble_evt, client_t * p_client, uint32_t inde
         if (p_ble_evt->evt.gattc_evt.params.hvx.handle ==
                                 p_client->srv_db.services[0].charateristics[p_client->dn_char_index].characteristic.handle_value)
         {
-			uart_put("got data back up! \n");
 			ble_gattc_evt_hvx_t * p_evt_write = &p_ble_evt->evt.gattc_evt.params.hvx;
-
-			uart_put("data lenth: ");
-			char str3[80];
-			sprintf(str3, "%d", p_evt_write->len);
-			uart_put(str3);
-			uart_put("\n");
 
 			if (p_evt_write->len == 2 && p_evt_write->data[0] == 0x03 && p_evt_write->data[1] == 0x04) {
 				if (peripheralConnected && !notifedParticle) {
@@ -360,14 +315,7 @@ static void on_evt_hvx(ble_evt_t * p_ble_evt, client_t * p_client, uint32_t inde
 					notifedParticle = true;
 				} else {
 					//got the EOS characters, write this to UART
-					uart_put("sending entire buffer back through SPI \n");
-					uart_put("total data lenth: ");
-					char str4[80];
-					sprintf(str4, "%d", ble_read_buffer_length);
-					uart_put(str4);
-					uart_put("\n");
-
-					spi_slave_set_tx_buffer(&ble_read_buffer, ble_read_buffer_length);
+					spi_slave_set_tx_buffer(ble_read_buffer, ble_read_buffer_length);
 				}
 				ble_read_buffer_length = 0;
 			} else {
@@ -435,7 +383,6 @@ void client_handling_ble_evt_handler(ble_evt_t * p_ble_evt)
     switch (p_ble_evt->header.evt_id)
     {
         case BLE_GATTC_EVT_WRITE_RSP:
-        	uart_put("BLE_GATTC_EVT_WRITE_RSP \n");
             if ((p_ble_evt->evt.gattc_evt.gatt_status == BLE_GATT_STATUS_ATTERR_INSUF_AUTHENTICATION) ||
                 (p_ble_evt->evt.gattc_evt.gatt_status == BLE_GATT_STATUS_ATTERR_INSUF_ENCRYPTION))
             {
@@ -447,48 +394,25 @@ void client_handling_ble_evt_handler(ble_evt_t * p_ble_evt)
             break;
 
         case BLE_GATTS_EVT_WRITE:
-        	uart_put("BLE_GATTS_EVT_WRITE \n");
         	on_write(p_client, p_ble_evt);
         	break;
 
         case BLE_GATTC_EVT_HVX:
-        	uart_put("BLE_GATTC_EVT_HVX \n");
             on_evt_hvx(p_ble_evt, p_client, index);
             break;
 
         case BLE_GATTC_EVT_TIMEOUT:
-        	uart_put("BLE_GATTC_EVT_TIMEOUT \n");
             on_evt_timeout(p_ble_evt, p_client);
             break;
 
         case BLE_EVT_TX_COMPLETE:
-        	uart_put("BLE_EVT_TX_COMPLETE \n");
 			waitForTxComplete = false;
 			break;
 
         case BLE_GAP_EVT_DISCONNECTED:
-			uart_put("BLE_GAP_EVT_DISCONNECTED for reason: ");
-			char str0[80];
-			sprintf(str0, "%d", p_ble_evt->evt.gap_evt.params.disconnected.reason);
-			uart_put(str0);
-			uart_put("\n");
 			break;
 
         case BLE_GAP_EVT_CONNECTED:
-			uart_put("BLE_GAP_EVT_CONNECTED with connection interval: ");
-			char str3[80];
-			sprintf(str3, "%d", p_ble_evt->evt.gap_evt.params.connected.conn_params.max_conn_interval);
-			uart_put(str3);
-			uart_put("(*0.625)mSec, slave latency: ");
-			char str4[80];
-			sprintf(str4, "%d", p_ble_evt->evt.gap_evt.params.connected.conn_params.slave_latency);
-			uart_put(str4);
-			uart_put("(*0.625)mSec, and conn supervisory timeout: ");
-			char str2[80];
-			sprintf(str2, "%d", p_ble_evt->evt.gap_evt.params.connected.conn_params.conn_sup_timeout);
-			uart_put(str2);
-
-			uart_put("\n");
 			break;
 
         default:
@@ -570,12 +494,7 @@ uint32_t client_handling_create(const dm_handle_t * p_handle, uint16_t conn_hand
                 m_client_count++;
     m_client[p_handle->connection_id].handle             = (*p_handle);
     service_discover(&m_client[p_handle->connection_id]);
-
-    uart_put("created handle ");
-    char str0[80];
-	sprintf(str0, "%d", p_handle->connection_id);
-	uart_put(str0);
-	uart_put("\n");
+    
     blink_led(p_handle->connection_id);
 
     return NRF_SUCCESS;
