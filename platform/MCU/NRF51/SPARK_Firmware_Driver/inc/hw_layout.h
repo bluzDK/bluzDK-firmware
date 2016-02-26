@@ -20,6 +20,7 @@
 
 #define BUTTON_PULL    NRF_GPIO_PIN_PULLUP
 
+#if PLATFORM_ID==103   /*--bluz*/
 //Board LED's and buttons
 #define RGB_LED_PIN_RED          		19                                       /**< Pin one for the RGB LED. */
 #define RGB_LED_PIN_GREEN          		18                                       /**< Pin one for the RGB LED. */
@@ -37,6 +38,23 @@
 #define SPIM1_MOSI_PIN  1u
 #define SPIM1_MISO_PIN  2u
 #define SPIM1_SS_PIN    4u
+
+#endif /*--bluz*/
+
+#if PLATFORM_ID==269   /*--bluz-gw*/
+//Board LED's and buttons
+#define RGB_LED_PIN_RED          		21                                       /**< Pin one for the RGB LED. */
+#define RGB_LED_PIN_GREEN          		22                                       /**< Pin one for the RGB LED. */
+#define RGB_LED_PIN_BLUE          		23                                       /**< Pin one for the RGB LED. */
+#define BOARD_BUTTON          			0                                        /**< Main LED on the board. */
+
+//Flash SPI address
+#define SPIM0_SCK_PIN       18u     /**< SPI clock GPIO pin number. */
+#define SPIM0_MOSI_PIN      17u     /**< SPI Master Out Slave In GPIO pin number. */
+#define SPIM0_MISO_PIN      19u     /**< SPI Master In Slave Out GPIO pin number. */
+#define SPIM0_SS_PIN        20u     /**< SPI Slave Select GPIO pin number. */
+
+#endif /*--bluz-gw*/
 
 //Bootloader section
 #define BOOTLOADER_FLASH_PAGES 0x00

@@ -5,7 +5,7 @@
  * 512-byte aligned.
  */
 system_part1_module_ram_end = 0x20007000;
-system_part1_start = 0x00018000;
+system_part1_start = 0x0001d000;
 
 system_part1_vtor_table_size = 0xc0;
 system_part1_module_info_size = 24;

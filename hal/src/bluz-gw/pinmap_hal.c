@@ -29,30 +29,30 @@ STM32_Pin_Info PIN_MAP[TOTAL_PINS] =
  * pin_mode (NONE by default, can be set to OUTPUT, INPUT, or other types)
  * adc (true if supports adc, false otherwise)
  */
-  { 21, PIN_MODE_NONE, false },  /*D0*/
-  { 22, PIN_MODE_NONE, false },
-  { 23, PIN_MODE_NONE, false  },
-  { 24, PIN_MODE_NONE, false  },
-  { 25, PIN_MODE_NONE, false  },
-  { 28, PIN_MODE_NONE, false  },
-  { 29, PIN_MODE_NONE, false  },
-  { 30, PIN_MODE_NONE, false  },
+  { 7, PIN_MODE_NONE, true },  /*D0*/
+  { 6, PIN_MODE_NONE, true },
+  { 5, PIN_MODE_NONE, true  },
+  { 4, PIN_MODE_NONE, true  },
+  { 3, PIN_MODE_NONE, true  },
+  { 2, PIN_MODE_NONE, true  },
+  { 1, PIN_MODE_NONE, true  },
+  { 0, PIN_MODE_NONE, false  },
   { NONE, PIN_MODE_NONE, false  }, /*??*/
   { NONE, PIN_MODE_NONE, false  }, /*??*/
-  { 6, PIN_MODE_NONE, true }, /*A0*/
-  { 5, PIN_MODE_NONE, true },
-  { 4, PIN_MODE_NONE, true },
-  { 3, PIN_MODE_NONE, true },
-  { 2, PIN_MODE_NONE, true },
-  { 1, PIN_MODE_NONE, true },
-  { 0, PIN_MODE_NONE, false },
-  { 13, PIN_MODE_NONE, false },
-  { 12, PIN_MODE_NONE, false }, /*RX*/
-  { 8, PIN_MODE_NONE, false }, /*TX*/
-  { 7, PIN_MODE_NONE, false }, /*BTN*/
-  { 19, PIN_MODE_NONE, false }, /*RGBR*/
-  { 18, PIN_MODE_NONE, false }, /*RGBG*/
-  { 17, PIN_MODE_NONE, false }, /*RGBB*/
+  { NONE, PIN_MODE_NONE, false }, /*A0*/
+  { NONE, PIN_MODE_NONE, false },
+  { NONE, PIN_MODE_NONE, false },
+  { NONE, PIN_MODE_NONE, false },
+  { NONE, PIN_MODE_NONE, false },
+  { NONE, PIN_MODE_NONE, false },
+  { NONE, PIN_MODE_NONE, false },
+  { NONE, PIN_MODE_NONE, false },
+  { 6, PIN_MODE_NONE, false }, /*RX*/
+  { 7, PIN_MODE_NONE, false }, /*TX*/
+  { NONE, PIN_MODE_NONE, false }, /*BTN*/
+  { 21, PIN_MODE_NONE, false }, /*RGBR*/
+  { 22, PIN_MODE_NONE, false }, /*RGBG*/
+  { 23, PIN_MODE_NONE, false }, /*RGBB*/
 };
 
 STM32_Pin_Info* HAL_Pin_Map() {
