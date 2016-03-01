@@ -76,7 +76,7 @@ static void spi_slave_event_handle(spi_slave_evt_t event)
 			}
     	}
     	//Set buffers.
-		err_code = spi_slave_buffers_set(m_tx_buf, m_rx_buf, SPI_SLAVE_TX_BUF_SIZE, SPI_SLAVE_RX_BUF_SIZE);
+		err_code = spi_slave_buffers_set(m_tx_buf, m_rx_buf, SPI_SLAVE_HW_TX_BUF_SIZE, SPI_SLAVE_HW_RX_BUF_SIZE);
 		APP_ERROR_CHECK(err_code);
     } else if (event.evt_type == SPI_SLAVE_BUFFERS_SET_DONE) {
 

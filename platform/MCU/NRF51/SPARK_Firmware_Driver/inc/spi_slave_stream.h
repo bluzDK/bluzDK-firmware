@@ -8,7 +8,9 @@
 #include "app_error.h"
 #include "nrf_gpio.h"
 #include "ble_radio_notification.h"
-#include "hw_gateway_config.h"
+
+#define SPI_SLAVE_HW_TX_BUF_SIZE 255u
+#define SPI_SLAVE_HW_RX_BUF_SIZE SPI_SLAVE_HW_TX_BUF_SIZE
 
 #define DEF_CHARACTER 0xAAu             /**< SPI default character. Character clocked out in case of an ignored transaction. */
 #define ORC_CHARACTER 0x55u             /**< SPI over-read character. Character clocked out after an over-read of the transmit buffer. */
@@ -21,8 +23,8 @@
 #define SPIS_CSN_PIN 8
 
 bool transmitting;
-uint8_t m_tx_buf[SPI_SLAVE_TX_BUF_SIZE];   /**< SPI TX buffer. */
-uint8_t m_rx_buf[SPI_SLAVE_RX_BUF_SIZE];   /**< SPI RX buffer. */
+uint8_t m_tx_buf[SPI_SLAVE_HW_TX_BUF_SIZE];   /**< SPI TX buffer. */
+uint8_t m_rx_buf[SPI_SLAVE_HW_RX_BUF_SIZE];   /**< SPI RX buffer. */
 
 uint8_t buf[1024];
 int currentRxBufferSize;

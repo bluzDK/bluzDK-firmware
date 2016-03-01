@@ -427,10 +427,13 @@ void client_handling_ble_evt_handler(ble_evt_t * p_ble_evt)
 			break;
 
         case BLE_GAP_EVT_CONNECTED:
-            DEBUG("BLE_GAP_EVT_CONNECTED");
+            DEBUG("BLE_GAP_EVT_CONNECTED with connection interval: %d", p_ble_evt->evt.gap_evt.params.connected.conn_params.max_conn_interval);
+            DEBUG("(*0.625)mSec, slave latency: %d", p_ble_evt->evt.gap_evt.params.connected.conn_params.slave_latency);
+            DEBUG("(*0.625)mSec, and conn supervisory timeout: %d", p_ble_evt->evt.gap_evt.params.connected.conn_params.conn_sup_timeout);
 			break;
 
         default:
+            DEBUG("client_handling_ble_evt_handler %d", p_ble_evt->header.evt_id);
             break;
     }
 

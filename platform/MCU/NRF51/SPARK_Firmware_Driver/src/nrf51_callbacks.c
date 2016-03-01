@@ -248,6 +248,7 @@ void on_ble_evt(ble_evt_t * p_ble_evt)
  */
 void ble_evt_dispatch(ble_evt_t * p_ble_evt)
 {
+    DEBUG("BLE EVT RECEIVED");
 #if PLATFORM_ID==269
     dm_ble_evt_handler(p_ble_evt);
     client_handling_ble_evt_handler(p_ble_evt);
@@ -259,6 +260,7 @@ void ble_evt_dispatch(ble_evt_t * p_ble_evt)
     ble_conn_params_on_ble_evt(p_ble_evt);
     scs_on_ble_evt(&m_scs, p_ble_evt);
 #endif
+    DEBUG("BLE EVT PROCESSED");
 }
 
 /**@brief Function for handling the Application's system events.
@@ -292,9 +294,11 @@ void on_sys_evt(uint32_t sys_evt)
  */
 void sys_evt_dispatch(uint32_t sys_evt)
 {
+    DEBUG("SYS EVT RECEIVED");
     //TO DO: When pstorage is turned back on, this is necessary
     pstorage_sys_event_handler(sys_evt);
     on_sys_evt(sys_evt);
+    DEBUG("SYS EVT PROCESSED");
 }
 
 void data_write_handler(scs_t * p_lbs, uint8_t *data, uint16_t length)
@@ -371,6 +375,7 @@ uint32_t device_manager_evt_handler(dm_handle_t const    * p_handle,
             break;
 #endif
         default:
+            DEBUG("device_manager_evt_handler default");
             break;
     }
 
