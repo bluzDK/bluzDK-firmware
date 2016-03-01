@@ -36,6 +36,17 @@ uint16_t Flash_Update_Index = 0;
 uint32_t External_Flash_Address = 0;
 uint32_t External_Flash_Start_Address = 0;
 
+static void blink_led(int count)
+{
+    for (int i = 0; i < count; i++) {
+        nrf_gpio_pin_set(0);
+        nrf_delay_us(250000);
+        nrf_gpio_pin_clear(0);
+        nrf_delay_us(250000);
+    }
+    nrf_delay_us(500000);
+}
+
 uint32_t system_millis(void)
 {
 //    return system_milliseconds;
@@ -61,6 +72,17 @@ void app_error_handler(uint32_t error_code, uint32_t line_num, const uint8_t * p
     DEBUG("Hit an app error of code %d", error_code);
     DEBUG("Error happened on line number %d in file %s", line_num, p_file_name);
     LED_SetRGBColor(RGB_COLOR_RED);
+
+
+    for (int i = 0; i < error_code; i++) {
+        nrf_gpio_pin_set(0);
+        nrf_delay_us(250000);
+        nrf_gpio_pin_clear(0);
+        nrf_delay_us(250000);
+    }
+    nrf_delay_us(500000);
+
+    nrf_gpio_pin_set(0);
     for (int count = 0; count < 2; count++) {
         //SOS Call
         for (int i = 0; i < 3; i++) {
@@ -225,6 +247,8 @@ void leds_init(void)
     nrf_gpio_pin_set(RGB_LED_PIN_RED);
     nrf_gpio_pin_set(RGB_LED_PIN_GREEN);
     nrf_gpio_pin_set(RGB_LED_PIN_BLUE);
+
+    nrf_gpio_cfg_output(0);
 }
 void timers_init(void)
 {
@@ -292,12 +316,10 @@ void device_manager_init(void)
     err_code = dm_handle_initialize(&m_bonded_peer_handle);
     APP_ERROR_CHECK(err_code);
     //blink(1);
-    
     // Initialize persistent storage module.
     err_code = pstorage_init();
     APP_ERROR_CHECK(err_code);
     //blink(2);
-    
     // Clear all bonded centrals if the "delete all bonds" button is pushed.
     //SO STUPID! Youmust hand the index of the button from the Init call data structure, not just the pin number
     //It is 8 by the way
@@ -305,11 +327,10 @@ void device_manager_init(void)
 //    APP_ERROR_CHECK(err_code);
     //    blink(3);
     init_data.clear_persistent_data = bonds_delete;
-    
+
     err_code = dm_init(&init_data);
     APP_ERROR_CHECK(err_code);
     //blink(4);
-    
     memset(&register_param.sec_param, 0, sizeof(ble_gap_sec_params_t));
     
     register_param.sec_param.bond         = SEC_PARAM_BOND;
@@ -319,7 +340,16 @@ void device_manager_init(void)
     register_param.sec_param.min_key_size = SEC_PARAM_MIN_KEY_SIZE;
     register_param.sec_param.max_key_size = SEC_PARAM_MAX_KEY_SIZE;
     register_param.evt_handler            = device_manager_evt_handler;
+
+    //platofrm specific settings
+#if PLATFORM_ID==103
+    //bluz
     register_param.service_type           = DM_PROTOCOL_CNTXT_GATT_SRVR_ID;
+#endif
+#if PLATFORM_ID==269
+    //bluz-gw
+    register_param.service_type           = DM_PROTOCOL_CNTXT_GATT_CLI_ID;
+#endif
     
     err_code = dm_register(&m_app_handle, &register_param);
     //blink(5);
@@ -400,22 +430,22 @@ void ble_stack_init(void)
 {
     //Need a new init procedure for SD7
     uint32_t err_code;
-    
+
     // Initialize the SoftDevice handler module.
     SOFTDEVICE_HANDLER_INIT(NRF_CLOCK_LFCLKSRC_XTAL_20_PPM, false);
-    
+
     // Enable BLE stack
-    
+
     ble_enable_params_t ble_enable_params;
     memset(&ble_enable_params, 0, sizeof(ble_enable_params));
     ble_enable_params.gatts_enable_params.service_changed = IS_SRVC_CHANGED_CHARACT_PRESENT;
     err_code = sd_ble_enable(&ble_enable_params);
     APP_ERROR_CHECK(err_code);
-    
+
     // Register with the SoftDevice handler module for BLE events.
     err_code = softdevice_ble_evt_handler_set(ble_evt_dispatch);
     APP_ERROR_CHECK(err_code);
-    
+
     // Register with the SoftDevice handler module for BLE events.
     err_code = softdevice_sys_evt_handler_set(sys_evt_dispatch);
     APP_ERROR_CHECK(err_code);

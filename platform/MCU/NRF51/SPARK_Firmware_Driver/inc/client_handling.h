@@ -24,8 +24,7 @@
 #include "ble.h"
 #include "device_manager.h"
 #include "spi_slave_stream.h"
-
-#define MAX_CLIENTS  DEVICE_MANAGER_MAX_CONNECTIONS  /**< Max number of clients. */
+#include "hw_gateway_config.h"
 
 void (*tx_callback)(uint8_t *m_tx_buf, uint16_t size);
 

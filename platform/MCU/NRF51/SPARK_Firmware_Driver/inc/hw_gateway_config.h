@@ -26,6 +26,8 @@
 #include "ble_gap.h"
 #include "app_util.h"
 
+#define MAX_CLIENTS  1  /**< Max number of clients. */
+
 //Gateway Constants
 #define SPI_SLAVE_TX_BUF_SIZE   255u                        /**< SPI TX buffer size. */
 #define SPI_SLAVE_RX_BUF_SIZE   SPI_SLAVE_TX_BUF_SIZE       /**< SPI RX buffer size. */
@@ -39,6 +41,12 @@
 
 #define SCAN_INTERVAL                    0x00A0                                         /**< Determines scan interval in units of 0.625 millisecond. */
 #define SCAN_WINDOW                      0x0050                                         /**< Determines scan window in units of 0.625 millisecond. */
+
+uint8_t                           m_peer_count;                    /**< Number of peer's connected. */
+bool                              m_memory_access_in_progress;     /**< Flag to keep track of ongoing operations on persistent memory. */
+
+#define GATEWAY_NOTIFICATION_LED         0
+#define CONNECTION_PIN					 13
 
 /**@brief Variable length data encapsulation in terms of length and pointer to data */
 typedef struct
@@ -72,6 +80,7 @@ static const ble_gap_conn_params_t m_connection_param =
 };
 
 //Gateway Init Functions
+void ble_gateway_stack_init(void);
 void gateway_init(void);
 void gateway_scan_start(void);
 void gateway_loop(void);

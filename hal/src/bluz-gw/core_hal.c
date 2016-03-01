@@ -41,7 +41,7 @@ void HAL_Core_Init(void)
 
 void HAL_Network_Init(void)
 {
-    ble_stack_init();
+    ble_gateway_stack_init();
     scheduler_init();
     device_manager_init();
     gateway_init();

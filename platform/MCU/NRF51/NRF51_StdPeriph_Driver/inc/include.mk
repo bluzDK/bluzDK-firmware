@@ -34,10 +34,16 @@ INCLUDE_DIRS += $(TARGET_STDPERIPH_PATH)/inc/libraries/fifo
 INCLUDE_DIRS += $(TARGET_STDPERIPH_PATH)/inc/libraries/button
 INCLUDE_DIRS += $(TARGET_STDPERIPH_PATH)/inc/libraries/trace
 INCLUDE_DIRS += $(TARGET_STDPERIPH_PATH)/inc/libraries/util
-INCLUDE_DIRS += $(TARGET_STDPERIPH_PATH)/inc/softdevice/s110/headers
-INCLUDE_DIRS += $(TARGET_STDPERIPH_PATH)/inc/softdevice/s120/headers
 INCLUDE_DIRS += $(TARGET_STDPERIPH_PATH)/inc/libraries/timer
 INCLUDE_DIRS += $(TARGET_STDPERIPH_PATH)/inc/toolchain
 INCLUDE_DIRS += $(TARGET_STDPERIPH_PATH)/inc/toolchain/gcc
+
+ifeq ("$(PLATFORM_ID)","103")
+INCLUDE_DIRS += $(TARGET_STDPERIPH_PATH)/inc/softdevice/s110/headers
+endif
+
+ifeq ("$(PLATFORM_ID)","269")
+INCLUDE_DIRS += $(TARGET_STDPERIPH_PATH)/inc/softdevice/s120/headers
+endif
 
 

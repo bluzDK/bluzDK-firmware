@@ -80,7 +80,7 @@ static __INLINE void spi_master_send_recv_irq(volatile spi_master_instance_t * c
 /**
  * @brief SPI0 interrupt handler.
  */
-void SPI1_TWI0_IRQHandler(void)
+void SPI0_TWI0_IRQHandler(void)
 {
     if ((NRF_SPI0->EVENTS_READY == 1) && (NRF_SPI0->INTENSET & SPI_INTENSET_READY_Msk))
     {

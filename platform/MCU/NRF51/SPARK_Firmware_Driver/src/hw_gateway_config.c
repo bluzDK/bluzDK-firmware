@@ -22,10 +22,46 @@
 #include "hw_gateway_config.h"
 #include "client_handling.h"
 #include "spi_slave_stream.h"
+#include "nrf51_config.h"
+#include "nrf51_callbacks.h"
+#include "nrf_gpio.h"
+#include "nrf_delay.h"
+
+/**@brief Function for initializing the BLE stack.
+ *
+ * @details Initializes the SoftDevice and the BLE event interrupt.
+ */
+void ble_gateway_stack_init(void)
+{
+    uint32_t err_code;
+
+    // Initialize the SoftDevice handler module.
+    SOFTDEVICE_HANDLER_INIT(NRF_CLOCK_LFCLKSRC_XTAL_20_PPM, false);
+
+    // Enable BLE stack.
+    ble_enable_params_t ble_enable_params;
+    memset(&ble_enable_params, 0, sizeof(ble_enable_params));
+
+    ble_enable_params.gatts_enable_params.service_changed = false;
+    ble_enable_params.gap_enable_params.role              = BLE_GAP_ROLE_CENTRAL;
+
+    err_code = sd_ble_enable(&ble_enable_params);
+    APP_ERROR_CHECK(err_code);
+
+    // Register with the SoftDevice handler module for BLE events.
+    err_code = softdevice_ble_evt_handler_set(ble_evt_dispatch);
+    APP_ERROR_CHECK(err_code);
+
+    // Register with the SoftDevice handler module for System events.
+    err_code = softdevice_sys_evt_handler_set(sys_evt_dispatch);
+    APP_ERROR_CHECK(err_code);
+}
 
 //HW Init Functions
 void gateway_init(void)
 {
+    m_peer_count = 0;
+    m_memory_access_in_progress = false;
     spi_slave_tx_buffer_size = 0;
     spi_slave_tx_buffer_start = 0;
     
@@ -48,6 +84,7 @@ void gateway_scan_start(void)
     
     if (count != 0)
     {
+        m_memory_access_in_progress = true;
         return;
     }
     err_code = sd_ble_gap_scan_start(&m_scan_param);
