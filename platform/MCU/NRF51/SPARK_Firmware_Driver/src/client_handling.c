@@ -128,8 +128,7 @@ static void notif_enable(client_t * p_client)
     write_params.offset   = 0;
     write_params.len      = sizeof(buf);
     write_params.p_value  = buf;
-
-    DEBUG("NOTIF ENABLE");
+    
     err_code = sd_ble_gattc_write(p_client->srv_db.conn_handle, &write_params);
     APP_ERROR_CHECK(err_code);
 }
@@ -146,6 +145,7 @@ void spi_slave_set_tx_buffer(uint8_t * data, uint16_t len)
  */
 void on_write(client_t * p_client, ble_evt_t * p_ble_evt)
 {
+    DEBUG("WHY ARE WE HERE?!?");
 	ble_gatts_evt_write_t * p_evt_write = &p_ble_evt->evt.gatts_evt.params.write;
 
 	for (int i = 0; i < p_evt_write->len; i++) {
@@ -223,7 +223,6 @@ void client_send_data(uint16_t id, uint8_t *data, uint16_t len)
 
 static void db_discovery_evt_handler(ble_db_discovery_evt_t * p_evt)
 {
-    DEBUG("DISCOVERING");
     // Find the client using the connection handle.
     client_t * p_client;
     uint32_t   index;
@@ -249,7 +248,6 @@ static void db_discovery_evt_handler(ble_db_discovery_evt_t * p_evt)
                 // Characteristic found. Store the information needed and break.
                 p_client->dn_char_index = i;
                 is_valid_srv_found   = true;
-                DEBUG("VALID SERVER");
             }
             else if ((p_characteristic->characteristic.uuid.uuid == BLE_SCS_UUID_DATA_UP_CHAR)
 				&&
@@ -258,7 +256,6 @@ static void db_discovery_evt_handler(ble_db_discovery_evt_t * p_evt)
 				// Characteristic found. Store the information needed and break.
 				p_client->up_char_index = i;
 				is_valid_srv_found   = true;
-                DEBUG("VALID SERVER");
 			}
         }
     }
@@ -266,7 +263,6 @@ static void db_discovery_evt_handler(ble_db_discovery_evt_t * p_evt)
     if (is_valid_srv_found)
     {
         // Enable notification.
-        DEBUG("Discovery Handle");
         notif_enable(p_client);
     }
     else
@@ -294,7 +290,6 @@ static void on_evt_write_rsp(ble_evt_t * p_ble_evt, client_t * p_client)
         {
             p_client->state = STATE_RUNNING;
             peripheralConnected = true;
-            DEBUG("WE ARE CONNECTED!");
         }
     }
 }
@@ -358,7 +353,6 @@ ret_code_t client_handling_dm_event_handler(const dm_handle_t    * p_handle,
                                               const dm_event_t     * p_event,
                                               const ret_code_t     event_result)
 {
-    DEBUG("CLIENT DM HANDLING");
     client_t * p_client = &m_client[p_handle->connection_id];
 
     switch (p_event->event_id)
@@ -390,11 +384,9 @@ void client_handling_ble_evt_handler(ble_evt_t * p_ble_evt)
     switch (p_ble_evt->header.evt_id)
     {
         case BLE_GATTC_EVT_WRITE_RSP:
-            DEBUG("BLE_GATTC_EVT_WRITE_RSP");
             if ((p_ble_evt->evt.gattc_evt.gatt_status == BLE_GATT_STATUS_ATTERR_INSUF_AUTHENTICATION) ||
                 (p_ble_evt->evt.gattc_evt.gatt_status == BLE_GATT_STATUS_ATTERR_INSUF_ENCRYPTION))
             {
-                DEBUG("Setting up further decruption");
                 uint32_t err_code = dm_security_setup_req(&p_client->handle);
                 APP_ERROR_CHECK(err_code);
 
@@ -403,27 +395,22 @@ void client_handling_ble_evt_handler(ble_evt_t * p_ble_evt)
             break;
 
         case BLE_GATTS_EVT_WRITE:
-            DEBUG("BLE_GATTS_EVT_WRITE");
         	on_write(p_client, p_ble_evt);
         	break;
 
         case BLE_GATTC_EVT_HVX:
-            DEBUG("BLE_GATTC_EVT_HVX");
             on_evt_hvx(p_ble_evt, p_client, index);
             break;
 
         case BLE_GATTC_EVT_TIMEOUT:
-            DEBUG("BLE_GATTC_EVT_TIMEOUT");
             on_evt_timeout(p_ble_evt, p_client);
             break;
 
         case BLE_EVT_TX_COMPLETE:
-            DEBUG("BLE_EVT_TX_COMPLETE");
 			waitForTxComplete = false;
 			break;
 
         case BLE_GAP_EVT_DISCONNECTED:
-            DEBUG("BLE_GAP_EVT_DISCONNECTED");
 			break;
 
         case BLE_GAP_EVT_CONNECTED:
@@ -433,7 +420,6 @@ void client_handling_ble_evt_handler(ble_evt_t * p_ble_evt)
 			break;
 
         default:
-            DEBUG("client_handling_ble_evt_handler %d", p_ble_evt->header.evt_id);
             break;
     }
 
@@ -458,7 +444,6 @@ static void db_discovery_init(void)
  */
 void client_handling_init(void (*b)(uint8_t *m_tx_buf, uint16_t size))
 {
-    DEBUG("Setting up client hhandling");
     blink_led(1);
 	tx_callback = b;
 	//used to indicate the a peripheral is connected to the Spark Core
@@ -511,8 +496,6 @@ uint32_t client_handling_create(const dm_handle_t * p_handle, uint16_t conn_hand
                 m_client_count++;
     m_client[p_handle->connection_id].handle             = (*p_handle);
     service_discover(&m_client[p_handle->connection_id]);
-
-    DEBUG("Created Handle %d", p_handle->connection_id);
 
     return NRF_SUCCESS;
 }

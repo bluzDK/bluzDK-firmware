@@ -127,8 +127,8 @@ uint32_t spi_slave_init(const spi_slave_config_t * p_spi_slave_config);
  */
 uint32_t spi_slave_buffers_set(uint8_t * p_tx_buf, 
                                uint8_t * p_rx_buf, 
-                               uint8_t   tx_buf_length, 
-                               uint8_t   rx_buf_length);
+                               uint16_t   tx_buf_length,
+                               uint16_t   rx_buf_length);
 
 /**@brief Function for changing defult pull-up configuration for CSN pin.
  *

@@ -29,7 +29,7 @@
 #define MAX_CLIENTS  1  /**< Max number of clients. */
 
 //Gateway Constants
-#define SPI_SLAVE_TX_BUF_SIZE   512u                        /**< SPI TX buffer size. */
+#define SPI_SLAVE_TX_BUF_SIZE   768u                        /**< SPI TX buffer size. */
 #define SPI_SLAVE_RX_BUF_SIZE   SPI_SLAVE_TX_BUF_SIZE       /**< SPI RX buffer size. */
 
 #define MIN_CONNECTION_INTERVAL          MSEC_TO_UNITS(7.5, UNIT_1_25_MS)                /**< Determines minimum connection interval in millisecond. */

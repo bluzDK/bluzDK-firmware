@@ -22,7 +22,6 @@
 #include "pstorage.h"
 #include "hw_gateway_config.h"
 #include "client_handling.h"
-#include "debug.h"
 
 void uart_error_handle(app_uart_evt_t * p_event)
 {
@@ -145,7 +144,6 @@ void on_ble_evt(ble_evt_t * p_ble_evt)
 #if PLATFORM_ID==269
         case BLE_GAP_EVT_ADV_REPORT:
         {
-            DEBUG("BLE_GAP_EVT_ADV_REPORT");
             data_t adv_data;
             data_t type_data;
             
@@ -179,7 +177,6 @@ void on_ble_evt(ble_evt_t * p_ble_evt)
                 {
                 }
 
-                DEBUG("CONNECTING");
                 err_code = sd_ble_gap_connect(&p_ble_evt->evt.gap_evt.params.adv_report.\
                                               peer_addr,
                                               &m_scan_param,
@@ -225,7 +222,6 @@ void on_ble_evt(ble_evt_t * p_ble_evt)
 //            break;
 
         case BLE_GAP_EVT_CONN_PARAM_UPDATE_REQUEST:
-            DEBUG("BLE_GAP_EVT_CONN_PARAM_UPDATE_REQUEST");
             // Accepting parameters requested by peer.
             err_code = sd_ble_gap_conn_param_update(p_ble_evt->evt.gap_evt.conn_handle,
                                                     &p_ble_evt->evt.gap_evt.params.conn_param_update_request.conn_params);
@@ -248,7 +244,6 @@ void on_ble_evt(ble_evt_t * p_ble_evt)
  */
 void ble_evt_dispatch(ble_evt_t * p_ble_evt)
 {
-    DEBUG("BLE EVT RECEIVED");
 #if PLATFORM_ID==269
     dm_ble_evt_handler(p_ble_evt);
     client_handling_ble_evt_handler(p_ble_evt);
@@ -260,7 +255,6 @@ void ble_evt_dispatch(ble_evt_t * p_ble_evt)
     ble_conn_params_on_ble_evt(p_ble_evt);
     scs_on_ble_evt(&m_scs, p_ble_evt);
 #endif
-    DEBUG("BLE EVT PROCESSED");
 }
 
 /**@brief Function for handling the Application's system events.
@@ -294,11 +288,9 @@ void on_sys_evt(uint32_t sys_evt)
  */
 void sys_evt_dispatch(uint32_t sys_evt)
 {
-    DEBUG("SYS EVT RECEIVED");
     //TO DO: When pstorage is turned back on, this is necessary
     pstorage_sys_event_handler(sys_evt);
     on_sys_evt(sys_evt);
-    DEBUG("SYS EVT PROCESSED");
 }
 
 void data_write_handler(scs_t * p_lbs, uint8_t *data, uint16_t length)
@@ -329,7 +321,6 @@ uint32_t device_manager_evt_handler(dm_handle_t const    * p_handle,
             break;
 #if PLATFORM_ID==269
         case DM_EVT_CONNECTION:
-            DEBUG("DM_EVT_CONNECTION");
             err_code = client_handling_create(p_handle, p_event->event_param.p_gap_param->conn_handle);
             APP_ERROR_CHECK(err_code);
             m_peer_count++;
@@ -339,7 +330,6 @@ uint32_t device_manager_evt_handler(dm_handle_t const    * p_handle,
             }
             break;
         case DM_EVT_DISCONNECTION:
-            DEBUG("DM_EVT_DISCONNECTION");
             nrf_gpio_pin_clear(GATEWAY_NOTIFICATION_LED);
             nrf_gpio_pin_clear(CONNECTION_PIN);
 
@@ -354,7 +344,6 @@ uint32_t device_manager_evt_handler(dm_handle_t const    * p_handle,
             break;
         case DM_EVT_SECURITY_SETUP:
         {
-            DEBUG("DM_EVT_SECURITY_SETUP");
             dm_handle_t handle = (*p_handle);
             // Slave securtiy request received from peer, if from a non bonded device,
             // initiate security setup, else, wait for encryption to complete.
@@ -363,19 +352,15 @@ uint32_t device_manager_evt_handler(dm_handle_t const    * p_handle,
             break;
         }
         case DM_EVT_LINK_SECURED:
-            DEBUG("DM_EVT_LINK_SECURED");
             break;
         case DM_EVT_DEVICE_CONTEXT_STORED:
-            DEBUG("DM_EVT_DEVICE_CONTEXT_STORED");
             APP_ERROR_CHECK(event_result);
             break;
         case DM_EVT_DEVICE_CONTEXT_DELETED:
-            DEBUG("DM_EVT_DEVICE_CONTEXT_DELETED");
             APP_ERROR_CHECK(event_result);
             break;
 #endif
         default:
-            DEBUG("device_manager_evt_handler default");
             break;
     }
 
