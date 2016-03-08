@@ -36,6 +36,7 @@
 
 APP_PWM_INSTANCE(PWM1,1);                   // Create the instance "PWM1" using TIMER1.
 
+static bool enabled = false;
 static volatile bool ready_flag;            // A flag indicating PWM status.
 void pwm_ready_callback(uint32_t pwm_id)    // PWM callback function
 {
@@ -44,6 +45,10 @@ void pwm_ready_callback(uint32_t pwm_id)    // PWM callback function
 
 void HAL_PWM_Write(uint16_t pin, uint8_t value)
 {
+    if (enabled) {
+        app_pwm_disable(&PWM1);
+        app_pwm_uninit(&PWM1);
+    }
     app_pwm_config_t pwm1_cfg = APP_PWM_DEFAULT_CONFIG_1CH(1000000/PWM_FREQUENCY_HZ, PIN_MAP[pin].gpio_pin);
     pwm1_cfg.pin_polarity[1] = APP_PWM_POLARITY_ACTIVE_HIGH;
     int err_code = app_pwm_init(&PWM1,&pwm1_cfg,pwm_ready_callback);
@@ -54,6 +59,7 @@ void HAL_PWM_Write(uint16_t pin, uint8_t value)
     ready_flag = false;
     /* Set the duty cycle - keep trying until PWM is ready... */
     while (app_pwm_channel_duty_set(&PWM1, 0, 255-value) == NRF_ERROR_BUSY);
+    enabled = true;
 }
 
 uint16_t HAL_PWM_Get_Frequency(uint16_t pin)
