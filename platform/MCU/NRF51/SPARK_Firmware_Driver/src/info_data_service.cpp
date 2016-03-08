@@ -24,8 +24,9 @@ InfoDataService* InfoDataService::m_pInstance = NULL;
 
 InfoDataService* InfoDataService::instance()
 {
-    if (!m_pInstance)   // Only allow one instance of class to be generated.
+    if (!m_pInstance) {  // Only allow one instance of class to be generated.
         m_pInstance = new InfoDataService;
+    }
     return m_pInstance;
 
 }

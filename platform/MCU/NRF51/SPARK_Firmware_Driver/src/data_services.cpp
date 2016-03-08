@@ -18,6 +18,7 @@
 #include "data_management_layer.h"
 #include "info_data_service.h"
 #include "socket_manager.h"
+#include "custom_data_service.h"
 
 //Data Services Functions
 extern "C" {
@@ -28,5 +29,8 @@ void data_service_init(void)
     
     InfoDataService* infoService = InfoDataService::instance();
     DataManagementLayer::registerService(infoService);
+
+    CustomDataService* customService = CustomDataService::instance();
+    DataManagementLayer::registerService(customService);
 }
 }

@@ -17,3 +17,4 @@
 
 #define SOCKET_DATA_SERVICE     1
 #define INFO_DATA_SERVICE     2
+#define CUSTOM_DATA_SERVICE 3
