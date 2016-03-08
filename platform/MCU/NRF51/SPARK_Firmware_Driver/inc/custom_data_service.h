@@ -15,19 +15,25 @@ public:
     //DataService functions
     virtual int32_t getServiceID();
     virtual int32_t DataCallback(uint8_t *data, int16_t length);
-    int32_t availableBytes;
+
+    void registerCallback(void (*dc)(uint8_t *data, uint16_t length));
 
 private:
     //this is a singleton class, so these all need to be private so they can't be called
-    CustomDataService(){
-    	availableBytes = 0;
-    };
-    CustomDataService(CustomDataService const&){
-    	availableBytes = 0;
-    };
+    CustomDataService(){ };
+    CustomDataService(CustomDataService const&){ };
     CustomDataService& operator=(CustomDataService const&);
     static CustomDataService* m_pInstance;
+    void (*data_callback)(uint8_t *m_tx_buf, uint16_t size);
 };
 
 #endif
 #endif	/* _CUSTOM_DATA_SERVICE_H */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+void customDataServiceRegisterCallback(void (*data_callback)(uint8_t *data, uint16_t length));
+#ifdef __cplusplus
+}
+#endif

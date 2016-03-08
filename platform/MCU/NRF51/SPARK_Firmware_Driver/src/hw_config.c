@@ -30,6 +30,7 @@
 #include "ble_radio_notification.h"
 #include "ble_conn_params.h"
 #include "ble_hci.h"
+#include "custom_data_service.h"
 
 uint32_t NbrOfPage = 0;
 uint16_t Flash_Update_Index = 0;
@@ -391,6 +392,12 @@ int register_radio_callback(void (*radio_callback)(bool radio_active))
 {
     return ble_radio_notification_init(NRF_APP_PRIORITY_LOW,NRF_RADIO_NOTIFICATION_DISTANCE_800US,radio_callback);
 }
+
+void register_data_callback(void (*data_callback)(uint8_t *data, uint16_t length))
+{
+    customDataServiceRegisterCallback(data_callback);
+}
+
 
 /**@brief Function for initializing the BLE stack.
  *

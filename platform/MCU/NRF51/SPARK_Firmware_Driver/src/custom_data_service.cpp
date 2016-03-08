@@ -23,7 +23,18 @@ int32_t CustomDataService::getServiceID()
 }
 int32_t CustomDataService::DataCallback(uint8_t *data, int16_t length)
 {
-    nrf_gpio_cfg_output(30);
-    nrf_gpio_pin_set(30);
+    if (data_callback != NULL) {
+        data_callback(data, length);
+    }
     return 1;
+}
+
+void CustomDataService::registerCallback(void (*dc)(uint8_t *data, uint16_t length))
+{
+    data_callback = dc;
+}
+
+void customDataServiceRegisterCallback(void (*data_callback)(uint8_t *data, uint16_t length))
+{
+    CustomDataService::instance()->registerCallback(data_callback);
 }
