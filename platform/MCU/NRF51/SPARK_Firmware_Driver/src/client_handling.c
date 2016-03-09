@@ -29,8 +29,6 @@
 
 #define RX_BUFFER_SIZE 					  512
 
-bool peripheralConnected = false;
-bool notifedParticle = false;
 bool waitForTxComplete = true;
 
 /**@brief Client states. */
@@ -62,6 +60,8 @@ typedef struct
     uint8_t                      ble_read_buffer[RX_BUFFER_SIZE];
     uint16_t                     ble_read_buffer_length;
     uint8_t                      id;
+    bool                         socketedParticle;
+    bool                         peripheralConnected;
 } client_t;
 
 static client_t         m_client[MAX_CLIENTS];      /**< Client context information list. */
@@ -312,7 +312,7 @@ static void on_evt_write_rsp(ble_evt_t * p_ble_evt, client_t * p_client)
         else
         {
             p_client->state = STATE_RUNNING;
-            peripheralConnected = true;
+            p_client->peripheralConnected = true;
         }
     }
 }
@@ -333,9 +333,9 @@ static void on_evt_hvx(ble_evt_t * p_ble_evt, client_t * p_client, uint32_t inde
 
             DEBUG("Read bytes %d", p_evt_write->len);
 			if (p_evt_write->len == 2 && p_evt_write->data[0] == 0x03 && p_evt_write->data[1] == 0x04) {
-				if (peripheralConnected && !notifedParticle) {
+				if ( p_client->peripheralConnected && !p_client->socketedParticle) {
 					nrf_gpio_pin_set(CONNECTION_PIN);
-					notifedParticle = true;
+                    p_client->socketedParticle = true;
                     spi_slave_set_tx_buffer(p_client, CONNECT, p_client->ble_read_buffer, p_client->ble_read_buffer_length);
 				} else {
 					//got the EOS characters, write this to UART
@@ -522,6 +522,8 @@ uint32_t client_handling_create(const dm_handle_t * p_handle, uint16_t conn_hand
                 m_client_count++;
     m_client[p_handle->connection_id].handle             = (*p_handle);
     m_client[p_handle->connection_id].id                 = p_handle->connection_id;
+    m_client[p_handle->connection_id].socketedParticle   = false;
+    m_client[p_handle->connection_id].peripheralConnected = false;
     service_discover(&m_client[p_handle->connection_id]);
 
     return NRF_SUCCESS;
@@ -534,8 +536,7 @@ uint32_t client_handling_destroy(const dm_handle_t * p_handle)
 {
     uint32_t      err_code = NRF_SUCCESS;
     client_t    * p_client = &m_client[p_handle->connection_id];
-	
-    notifedParticle = false;
+
     if (p_client->state != IDLE)
     {
             m_client_count--;
