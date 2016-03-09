@@ -26,7 +26,7 @@
 #include "ble_gap.h"
 #include "app_util.h"
 
-#define MAX_CLIENTS  1  /**< Max number of clients. */
+#define MAX_CLIENTS  8  /**< Max number of clients. */
 
 //Gateway Constants
 #define SPI_SLAVE_TX_BUF_SIZE   768u                        /**< SPI TX buffer size. */

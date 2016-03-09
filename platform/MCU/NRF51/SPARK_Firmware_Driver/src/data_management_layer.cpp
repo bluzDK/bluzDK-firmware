@@ -49,6 +49,9 @@ void DataManagementLayer::sendData(int16_t length, uint8_t *data)
 #if PLATFORM_ID==103
     particle_service_send_data(data, length);
 #endif
+#if PLATFORM_ID==269
+
+#endif
 }
 
 void dataManagementFeedData(uint16_t id, int16_t length, uint8_t *data)

@@ -108,7 +108,7 @@ void spi_slave_rx_data(uint8_t *rx_buffer, uint16_t size)
 void gateway_loop(void)
 {
     if (spi_slave_rx_buffer_size > 0) {
-        client_send_data(0, spi_slave_rx_buffer+spi_slave_rx_buffer_start, spi_slave_rx_buffer_size);
+        client_send_data(spi_slave_rx_buffer+spi_slave_rx_buffer_start, spi_slave_rx_buffer_size);
         spi_slave_rx_buffer_size -= spi_slave_rx_buffer_size;
         spi_slave_rx_buffer_start += spi_slave_rx_buffer_size;
         if (spi_slave_rx_buffer_size == 0) {

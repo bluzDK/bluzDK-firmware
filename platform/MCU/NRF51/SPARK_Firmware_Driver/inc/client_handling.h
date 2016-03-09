@@ -26,6 +26,9 @@
 #include "spi_slave_stream.h"
 #include "hw_gateway_config.h"
 
+#define BLE_HEADER_SIZE  2
+#define SPI_HEADER_SIZE  4
+
 void (*tx_callback)(uint8_t *m_tx_buf, uint16_t size);
 
 /**@brief Funtion for initializing the module.
@@ -68,7 +71,7 @@ void client_handling_ble_evt_handler(ble_evt_t * p_ble_evt);
  * @param[in] data  Data to be sent to the client.
  * @param[in] len   Lengthof the data to be sent to the client.
  */
-void client_send_data(uint16_t id, uint8_t *data, uint16_t len);
+void client_send_data(uint8_t *data, uint16_t len);
 
 
 /**@brief Funtion for handling device manager events.

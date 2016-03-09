@@ -43,10 +43,7 @@ void spi_slave_send_data(uint8_t *buf, uint16_t size)
 	DEBUG("Trying to copy data of size %d to the TX Buffer", size);
 	nrf_gpio_pin_set(SPIS_PTS_PIN);
 	transmitting = true;
-	m_tx_buf[0] = ((size & 0xFF00) >> 8);
-	m_tx_buf[1] = (size & 0xFF);
-	memcpy(m_tx_buf+2, buf, size);
-	DEBUG("But really, we are copying %d", size+2);
+	memcpy(m_tx_buf, buf, size);
 	//alert the particle board we have data to send
 	nrf_gpio_pin_set(SPIS_SA_PIN);
 }
@@ -68,6 +65,7 @@ static void spi_slave_event_handle(spi_slave_evt_t event)
     		nrf_gpio_pin_clear(SPIS_PTS_PIN);
     		transmitting = false;
     	} else {
+			DEBUG("Got %d bytes from SPI", event.rx_amount);
 			if (event.rx_amount == 255) {
 				memcpy(buf+currentRxBufferSize, m_rx_buf, 254);
 				currentRxBufferSize+=254;
@@ -100,8 +98,7 @@ uint32_t spi_slave_stream_init(void (*a)(uint8_t *m_tx_buf, uint16_t size))
     nrf_gpio_cfg_output(SPIS_PTS_PIN);
     nrf_gpio_pin_clear(SPIS_PTS_PIN);
 
-    currentRxBufferSize = 0;
-
+	currentRxBufferSize = 0;
     // Enable Radio Notification, allows us to alert the master when we are busy
 	err_code = ble_radio_notification_init(NRF_APP_PRIORITY_LOW,NRF_RADIO_NOTIFICATION_DISTANCE_800US,ble_radio_ntf_handler);
 	APP_ERROR_CHECK(err_code);
