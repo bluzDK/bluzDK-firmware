@@ -108,21 +108,30 @@ void spi_slave_rx_data(uint8_t *rx_buffer, uint16_t size)
 void gateway_loop(void)
 {
     if (spi_slave_rx_buffer_size > 0) {
-        client_send_data(spi_slave_rx_buffer+spi_slave_rx_buffer_start, spi_slave_rx_buffer_size);
+        int initSize = spi_slave_rx_buffer_size;
+        int initStart = spi_slave_rx_buffer_start;
+
         spi_slave_rx_buffer_size -= spi_slave_rx_buffer_size;
         spi_slave_rx_buffer_start += spi_slave_rx_buffer_size;
         if (spi_slave_rx_buffer_size == 0) {
             spi_slave_rx_buffer_start = 0;
         }
+
+        client_send_data(spi_slave_rx_buffer+initStart, initSize);
     }
     
     if (spi_slave_tx_buffer_size > 0) {
-        spi_slave_send_data(spi_slave_tx_buffer+spi_slave_tx_buffer_start, spi_slave_tx_buffer_size);
+        while (!spi_slave_ready()) { }
+        int initSize = spi_slave_tx_buffer_size;
+        int initStart = spi_slave_tx_buffer_start;
+
         spi_slave_tx_buffer_size -= spi_slave_tx_buffer_size;
         spi_slave_tx_buffer_start += spi_slave_tx_buffer_size;
         if (spi_slave_tx_buffer_size == 0) {
             spi_slave_tx_buffer_start = 0;
         }
+
+        spi_slave_send_data(spi_slave_tx_buffer+initStart, initSize);
     }
 }
 

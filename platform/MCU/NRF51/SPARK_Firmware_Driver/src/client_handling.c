@@ -198,7 +198,7 @@ void client_send_data(uint8_t *data, uint16_t len)
         dataBufferWithID[1] = 0x00;
         memcpy(dataBufferWithID + BLE_HEADER_SIZE, data+SPI_HEADER_SIZE, chunkLength);
 
-        DEBUG("Sending down %d bytes", formattedLength);
+        DEBUG("Sending down %d bytes on %d", formattedLength, id);
         for (int i = 0; i < formattedLength; i += 20) {
             uint16_t size = (formattedLength - i > 20 ? 20 : formattedLength - i);
             actualBytesSent += size;

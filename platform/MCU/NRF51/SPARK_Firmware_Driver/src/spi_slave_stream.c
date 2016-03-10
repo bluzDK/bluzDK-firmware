@@ -39,10 +39,11 @@ void ble_radio_ntf_handler(bool radio_state)
  */
 void spi_slave_send_data(uint8_t *buf, uint16_t size)
 {
-	while (NRF_SPIS1->EVENTS_END != 0) { }
+	while (transmitting) { }
+	transmitting = true;
+//	while (NRF_SPIS1->EVENTS_END != 0) { }
 	DEBUG("Trying to copy data of size %d to the TX Buffer", size);
 	nrf_gpio_pin_set(SPIS_PTS_PIN);
-	transmitting = true;
 	memcpy(m_tx_buf, buf, size);
 	//alert the particle board we have data to send
 	nrf_gpio_pin_set(SPIS_SA_PIN);
@@ -61,6 +62,7 @@ static void spi_slave_event_handle(spi_slave_evt_t event)
     if (event.evt_type == SPI_SLAVE_XFER_DONE)
     {
     	if (transmitting) {
+			DEBUG("Done transmitting SPI data");
     		nrf_gpio_pin_clear(SPIS_SA_PIN);
     		nrf_gpio_pin_clear(SPIS_PTS_PIN);
     		transmitting = false;
@@ -129,3 +131,7 @@ uint32_t spi_slave_stream_init(void (*a)(uint8_t *m_tx_buf, uint16_t size))
     return NRF_SUCCESS;
 }
 
+bool spi_slave_ready()
+{
+	return transmitting == false;
+}

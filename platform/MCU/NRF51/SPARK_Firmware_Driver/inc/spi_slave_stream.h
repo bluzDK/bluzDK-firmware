@@ -22,7 +22,7 @@
 #define SPIS_SCK_PIN 9
 #define SPIS_CSN_PIN 8
 
-bool transmitting;
+volatile bool transmitting;
 uint8_t m_tx_buf[SPI_SLAVE_HW_TX_BUF_SIZE];   /**< SPI TX buffer. */
 uint8_t m_rx_buf[SPI_SLAVE_HW_RX_BUF_SIZE];   /**< SPI RX buffer. */
 
@@ -33,6 +33,8 @@ void (*rx_callback)(uint8_t *m_tx_buf, uint16_t size);
 
 uint32_t spi_slave_stream_init(void (*a)(uint8_t *m_tx_buf, uint16_t size));
 void spi_slave_send_data(uint8_t *buf, uint16_t size);
+
+bool spi_slave_ready();
 
 
 #endif
