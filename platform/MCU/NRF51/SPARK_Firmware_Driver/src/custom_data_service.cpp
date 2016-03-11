@@ -34,7 +34,21 @@ void CustomDataService::registerCallback(void (*dc)(uint8_t *data, uint16_t leng
     data_callback = dc;
 }
 
+void CustomDataService::sendData(uint8_t *data, uint16_t length)
+{
+    uint8_t rsp[length+1];
+    rsp[0] = CUSTOM_DATA_SERVICE & 0xFF;
+    memcpy(rsp+1, data, length);
+
+    DataManagementLayer::sendData(length+1, rsp);
+}
+
 void customDataServiceRegisterCallback(void (*data_callback)(uint8_t *data, uint16_t length))
 {
     CustomDataService::instance()->registerCallback(data_callback);
+}
+
+void customDataServiceSendData(uint8_t *data, uint16_t length)
+{
+    CustomDataService::instance()->sendData(data, length);
 }

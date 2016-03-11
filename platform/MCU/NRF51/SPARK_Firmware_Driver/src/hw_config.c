@@ -398,6 +398,10 @@ void register_data_callback(void (*data_callback)(uint8_t *data, uint16_t length
     customDataServiceRegisterCallback(data_callback);
 }
 
+void send_data(uint8_t *data, uint16_t length)
+{
+    customDataServiceSendData(data, length);
+}
 
 /**@brief Function for initializing the BLE stack.
  *
