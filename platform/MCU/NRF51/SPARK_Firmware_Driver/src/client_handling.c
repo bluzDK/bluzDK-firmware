@@ -144,7 +144,7 @@ static void notif_enable(client_t * p_client)
 
 void spi_slave_set_tx_buffer(client_t * p_client, gateway_function_t type, uint8_t * data, uint16_t len)
 {
-    DEBUG("Calling SPI callback with %d bytes on id %d", len, p_client->id);
+    DEBUG("Data->Client Callback: %d  ON  %d", len, p_client->id);
     data[0] = (( (len-SPI_HEADER_SIZE) & 0xFF00) >> 8);
     data[1] = ( (len-SPI_HEADER_SIZE) & 0xFF);
     data[2] = p_client->id;
@@ -181,7 +181,6 @@ void on_write(client_t * p_client, ble_evt_t * p_ble_evt)
  */
 void client_send_data(uint8_t *data, uint16_t len)
 {
-    DEBUG("send_data with %d bytes", len);
     while (len > 0) {
         int chunkLength = (data[0] << 8) | data[1];
         int id = data[2];
@@ -198,7 +197,6 @@ void client_send_data(uint8_t *data, uint16_t len)
         dataBufferWithID[1] = 0x00;
         memcpy(dataBufferWithID + BLE_HEADER_SIZE, data+SPI_HEADER_SIZE, chunkLength);
 
-        DEBUG("Sending down %d bytes on %d", formattedLength, id);
         for (int i = 0; i < formattedLength; i += 20) {
             uint16_t size = (formattedLength - i > 20 ? 20 : formattedLength - i);
             actualBytesSent += size;
@@ -239,7 +237,6 @@ void client_send_data(uint8_t *data, uint16_t len)
             err_code = sd_ble_gattc_write(m_client[id].srv_db.conn_handle, &write_params);
         }
         len-=(chunkLength+SPI_HEADER_SIZE);
-        DEBUG("After, SPI buffer length is %d bytes", len);
     }
 }
 
@@ -331,7 +328,6 @@ static void on_evt_hvx(ble_evt_t * p_ble_evt, client_t * p_client, uint32_t inde
         {
 			ble_gattc_evt_hvx_t * p_evt_write = &p_ble_evt->evt.gattc_evt.params.hvx;
 
-            DEBUG("Read bytes %d", p_evt_write->len);
 			if (p_evt_write->len == 2 && p_evt_write->data[0] == 0x03 && p_evt_write->data[1] == 0x04) {
 				if ( p_client->peripheralConnected && !p_client->socketedParticle) {
 					nrf_gpio_pin_set(CONNECTION_PIN);
@@ -347,7 +343,6 @@ static void on_evt_hvx(ble_evt_t * p_ble_evt, client_t * p_client, uint32_t inde
 					//this is a new packet. read the header
 					memcpy(p_client->ble_read_buffer+p_client->ble_read_buffer_length, p_evt_write->data+2, p_evt_write->len-2);
                     p_client->ble_read_buffer_length += (p_evt_write->len-2);
-                    DEBUG("Start of data, we have %d bytes on id %d", p_client->ble_read_buffer_length, p_client->id);
 				} else {
 					memcpy(p_client->ble_read_buffer+p_client->ble_read_buffer_length, p_evt_write->data, p_evt_write->len);
                     p_client->ble_read_buffer_length += p_evt_write->len;
@@ -438,9 +433,7 @@ void client_handling_ble_evt_handler(ble_evt_t * p_ble_evt)
 			break;
 
         case BLE_GAP_EVT_CONNECTED:
-            DEBUG("BLE_GAP_EVT_CONNECTED with connection interval: %d", p_ble_evt->evt.gap_evt.params.connected.conn_params.max_conn_interval);
-            DEBUG("(*0.625)mSec, slave latency: %d", p_ble_evt->evt.gap_evt.params.connected.conn_params.slave_latency);
-            DEBUG("(*0.625)mSec, and conn supervisory timeout: %d", p_ble_evt->evt.gap_evt.params.connected.conn_params.conn_sup_timeout);
+            DEBUG("BLE_GAP_EVT_CONNECTED");
 			break;
 
         default:
@@ -539,8 +532,10 @@ uint32_t client_handling_destroy(const dm_handle_t * p_handle)
 
     if (p_client->state != IDLE)
     {
-            m_client_count--;
-            p_client->state = IDLE;
+        m_client_count--;
+        p_client->state = IDLE;
+        uint8_t dummy[6] = {0, 0, 0, 0, 9, 8};
+        spi_slave_set_tx_buffer(p_client, DISCONNECT, dummy, 6);
     }
     else
     {

@@ -9,7 +9,7 @@
 #include "nrf_gpio.h"
 #include "ble_radio_notification.h"
 
-#define SPI_SLAVE_HW_TX_BUF_SIZE 768u
+#define SPI_SLAVE_HW_TX_BUF_SIZE 255u
 #define SPI_SLAVE_HW_RX_BUF_SIZE SPI_SLAVE_HW_TX_BUF_SIZE
 
 #define DEF_CHARACTER 0xAAu             /**< SPI default character. Character clocked out in case of an ignored transaction. */
@@ -22,7 +22,9 @@
 #define SPIS_SCK_PIN 9
 #define SPIS_CSN_PIN 8
 
+volatile bool busy;
 volatile bool transmitting;
+volatile bool downStreamTransactionInProgress;
 uint8_t m_tx_buf[SPI_SLAVE_HW_TX_BUF_SIZE];   /**< SPI TX buffer. */
 uint8_t m_rx_buf[SPI_SLAVE_HW_RX_BUF_SIZE];   /**< SPI RX buffer. */
 

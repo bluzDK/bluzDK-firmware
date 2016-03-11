@@ -27,6 +27,8 @@
 #include "nrf_gpio.h"
 #include "nrf_delay.h"
 
+#include "debug.h"
+
 /**@brief Function for initializing the BLE stack.
  *
  * @details Initializes the SoftDevice and the BLE event interrupt.
@@ -94,6 +96,7 @@ void gateway_scan_start(void)
 //interrupt driven function to put data into buffers for process in gateway_loop
 void spi_slave_tx_data(uint8_t *tx_buffer, uint16_t size)
 {
+    DEBUG("Data->BLE Callback: %d @ %d", size, spi_slave_tx_buffer_size);
     memcpy(spi_slave_tx_buffer+spi_slave_tx_buffer_start+spi_slave_tx_buffer_size, tx_buffer, size);
     spi_slave_tx_buffer_size += size;
 }
@@ -130,7 +133,7 @@ void gateway_loop(void)
         if (spi_slave_tx_buffer_size == 0) {
             spi_slave_tx_buffer_start = 0;
         }
-
+        DEBUG("Data->SPI Function: %d  @ %d", initSize, initStart);
         spi_slave_send_data(spi_slave_tx_buffer+initStart, initSize);
     }
 }

@@ -232,8 +232,8 @@ static void sm_state_change(spi_state_t new_state)
 
 uint32_t spi_slave_buffers_set(uint8_t * p_tx_buf, 
                                uint8_t * p_rx_buf, 
-                               uint16_t   tx_buf_length,
-                               uint16_t   rx_buf_length)
+                               uint8_t   tx_buf_length,
+                               uint8_t   rx_buf_length)
 {
     uint32_t err_code;
 

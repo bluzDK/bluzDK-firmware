@@ -39,14 +39,36 @@ void ble_radio_ntf_handler(bool radio_state)
  */
 void spi_slave_send_data(uint8_t *buf, uint16_t size)
 {
+	//let the Photon know we are about to transmit
+	nrf_gpio_pin_set(SPIS_PTS_PIN);
+
+	//just in case, wait for any previous transactions
 	while (transmitting) { }
 	transmitting = true;
-//	while (NRF_SPIS1->EVENTS_END != 0) { }
-	DEBUG("Trying to copy data of size %d to the TX Buffer", size);
-	nrf_gpio_pin_set(SPIS_PTS_PIN);
-	memcpy(m_tx_buf, buf, size);
-	//alert the particle board we have data to send
+
+	//also, just in case, wait for any downstream transmissions to finish
+	while (nrf_gpio_pin_read(SPIS_CSN_PIN) == 0 || downStreamTransactionInProgress) {  }
+	busy = true;
+
+	//now let's send the size of the data first
+	m_tx_buf[0] = (( (size) & 0xFF00) >> 8);
+	m_tx_buf[1] = ( (size) & 0xFF);
 	nrf_gpio_pin_set(SPIS_SA_PIN);
+	//and wait for that to finish
+	busy = true;
+	while (busy) { }
+
+	//now lets send the data one chunk at a time
+	for (int i = 0; i < size; i+=SPI_SLAVE_HW_TX_BUF_SIZE) {
+		uint16_t chunkLength = (size-i > SPI_SLAVE_HW_TX_BUF_SIZE ? SPI_SLAVE_HW_TX_BUF_SIZE : size-i);
+		memcpy(m_tx_buf, buf+i, chunkLength);
+		//alert the particle board we have data to send
+		nrf_gpio_pin_set(SPIS_SA_PIN);
+
+		busy = true;
+		while (busy) { }
+	}
+	transmitting = false;
 }
 
 /**@brief Function for SPI slave event callback.
@@ -61,22 +83,22 @@ static void spi_slave_event_handle(spi_slave_evt_t event)
 
     if (event.evt_type == SPI_SLAVE_XFER_DONE)
     {
-    	if (transmitting) {
-			DEBUG("Done transmitting SPI data");
+    	if (busy) {
     		nrf_gpio_pin_clear(SPIS_SA_PIN);
     		nrf_gpio_pin_clear(SPIS_PTS_PIN);
-    		transmitting = false;
+			busy = false;
+			DEBUG("Done Transmitting");
     	} else {
-			DEBUG("Got %d bytes from SPI", event.rx_amount);
 			if (event.rx_amount == 255) {
 				memcpy(buf+currentRxBufferSize, m_rx_buf, 254);
 				currentRxBufferSize+=254;
+				downStreamTransactionInProgress = true;
 			} else {
 				memcpy(buf+currentRxBufferSize, m_rx_buf, event.rx_amount);
 				currentRxBufferSize += event.rx_amount;
 				rx_callback(buf, currentRxBufferSize);
 				currentRxBufferSize = 0;
-
+				downStreamTransactionInProgress = false;
 			}
     	}
     	//Set buffers.
@@ -106,7 +128,9 @@ uint32_t spi_slave_stream_init(void (*a)(uint8_t *m_tx_buf, uint16_t size))
 	APP_ERROR_CHECK(err_code);
 
     rx_callback = a;
+	busy = false;
     transmitting = false;
+	downStreamTransactionInProgress = false;
 
     err_code = spi_slave_evt_handler_register(spi_slave_event_handle);
     APP_ERROR_CHECK(err_code);
@@ -133,5 +157,5 @@ uint32_t spi_slave_stream_init(void (*a)(uint8_t *m_tx_buf, uint16_t size))
 
 bool spi_slave_ready()
 {
-	return transmitting == false;
+	return transmitting == false && nrf_gpio_pin_read(SPIS_CSN_PIN) == 1;
 }
