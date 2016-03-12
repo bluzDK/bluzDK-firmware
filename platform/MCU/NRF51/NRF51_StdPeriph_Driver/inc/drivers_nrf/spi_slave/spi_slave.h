@@ -58,8 +58,9 @@ typedef struct
 typedef enum
 {
     SPI_SLAVE_BUFFERS_SET_DONE,             /**< Memory buffer set event. Memory buffers have been set successfully to the SPI slave device and SPI transactions can be done. */
-    SPI_SLAVE_XFER_DONE,                    /**< SPI transaction event. SPI transaction has been completed. */  
-    SPI_SLAVE_EVT_TYPE_MAX                  /**< Enumeration upper bound. */      
+    SPI_SLAVE_XFER_DONE,                    /**< SPI transaction event. SPI transaction has been completed. */
+    SPI_SLAVE_RESOURCE_HELD,                /**< The semaphore is being held, the SPI will not receive data and will clock out DEF. */
+    SPI_SLAVE_EVT_TYPE_MAX                  /**< Enumeration upper bound. */
 } spi_slave_evt_type_t;
 
 /**@brief Struct containing event context from the SPI slave driver. */
@@ -129,6 +130,23 @@ uint32_t spi_slave_buffers_set(uint8_t * p_tx_buf,
                                uint8_t * p_rx_buf, 
                                uint8_t   tx_buf_length,
                                uint8_t   rx_buf_length);
+
+/**@brief Function for putting the SPI slave into a state where a transaction isn't possible
+ *
+ * Function holds the semaphore from the SPI Slave, thus meaning transactions are not possible.
+ * Until spi_slave_buffers_set is called again, the DEF character will be clocked out during
+ * any transaction and all incoming data will be discarded
+ *
+ * The @ref spi_slave_event_handler_t will be called with appropriate event @ref
+ * spi_slave_evt_type_t when the SPI slave has been returned to the init state
+ *
+ *
+ *
+ * @retval NRF_SUCCESS              Operation success.
+ * @retval NRF_ERROR_INVALID_STATE  Operation failure. SPI slave device in incorrect state.
+ * @retval NRF_ERROR_INTERNAL       Operation failure. Internal error ocurred.
+ */
+uint32_t spi_slave_buffers_unset();
 
 /**@brief Function for changing defult pull-up configuration for CSN pin.
  *

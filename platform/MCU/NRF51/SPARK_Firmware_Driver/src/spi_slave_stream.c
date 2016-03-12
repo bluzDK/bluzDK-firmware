@@ -46,14 +46,23 @@ void spi_slave_send_data(uint8_t *buf, uint16_t size)
 	while (transmitting) { }
 	transmitting = true;
 
-	//also, just in case, wait for any downstream transmissions to finish
-	while (nrf_gpio_pin_read(SPIS_CSN_PIN) == 0 || downStreamTransactionInProgress) {  }
+	//grab the semaphore, this way our data can't be clocked out until we are ready
+	DEBUG("Attempting to grab the semaphore");
+	while (spi_slave_buffers_unset() != NRF_SUCCESS) { }
+	while (!spiSlaveSemaphoreHeld) {  }
+	while (moreData) {
+		spi_slave_buffers_set(m_tx_buf, m_rx_buf, SPI_SLAVE_HW_TX_BUF_SIZE, SPI_SLAVE_HW_RX_BUF_SIZE);
+		while (spi_slave_buffers_unset() != NRF_SUCCESS) { }
+		while (!spiSlaveSemaphoreHeld) {  }
+	}
 	busy = true;
 
+	DEBUG("Proceeding");
 	//now let's send the size of the data first
 	m_tx_buf[0] = (( (size) & 0xFF00) >> 8);
 	m_tx_buf[1] = ( (size) & 0xFF);
 	nrf_gpio_pin_set(SPIS_SA_PIN);
+	spi_slave_buffers_set(m_tx_buf, m_rx_buf, SPI_SLAVE_HW_TX_BUF_SIZE, SPI_SLAVE_HW_RX_BUF_SIZE);
 	//and wait for that to finish
 	busy = true;
 	while (busy) { }
@@ -69,6 +78,7 @@ void spi_slave_send_data(uint8_t *buf, uint16_t size)
 		while (busy) { }
 	}
 	transmitting = false;
+	DEBUG("Done in spi_slave_send_data");
 }
 
 /**@brief Function for SPI slave event callback.
@@ -87,27 +97,26 @@ static void spi_slave_event_handle(spi_slave_evt_t event)
     		nrf_gpio_pin_clear(SPIS_SA_PIN);
     		nrf_gpio_pin_clear(SPIS_PTS_PIN);
 			busy = false;
-			DEBUG("Done Transmitting");
     	} else {
 			if (event.rx_amount == 255) {
 				memcpy(buf+currentRxBufferSize, m_rx_buf, 254);
 				currentRxBufferSize+=254;
-				downStreamTransactionInProgress = true;
+				moreData = true;
 			} else {
 				memcpy(buf+currentRxBufferSize, m_rx_buf, event.rx_amount);
 				currentRxBufferSize += event.rx_amount;
 				rx_callback(buf, currentRxBufferSize);
 				currentRxBufferSize = 0;
-				downStreamTransactionInProgress = false;
+				moreData = false;
 			}
     	}
     	//Set buffers.
 		err_code = spi_slave_buffers_set(m_tx_buf, m_rx_buf, SPI_SLAVE_HW_TX_BUF_SIZE, SPI_SLAVE_HW_RX_BUF_SIZE);
 		APP_ERROR_CHECK(err_code);
     } else if (event.evt_type == SPI_SLAVE_BUFFERS_SET_DONE) {
-
-    } else if (event.evt_type == SPI_SLAVE_EVT_TYPE_MAX) {
-
+		spiSlaveSemaphoreHeld = false;
+    } else if (event.evt_type == SPI_SLAVE_RESOURCE_HELD) {
+		spiSlaveSemaphoreHeld = true;
     }
 }
 
@@ -130,7 +139,8 @@ uint32_t spi_slave_stream_init(void (*a)(uint8_t *m_tx_buf, uint16_t size))
     rx_callback = a;
 	busy = false;
     transmitting = false;
-	downStreamTransactionInProgress = false;
+	spiSlaveSemaphoreHeld = false;
+	moreData = false;
 
     err_code = spi_slave_evt_handler_register(spi_slave_event_handle);
     APP_ERROR_CHECK(err_code);

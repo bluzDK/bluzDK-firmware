@@ -30,6 +30,8 @@ typedef enum
 {
     SPI_STATE_INIT,                                 /**< Initialization state. In this state the module waits for a call to @ref spi_slave_buffers_set. */                                                                                             
     SPI_BUFFER_RESOURCE_REQUESTED,                  /**< State where the configuration of the memory buffers, which are to be used in SPI transaction, has started. */
+    SPI_BUFFER_RESOURCE_HOLD_REQUESTED,             /**< State where the request of holding resources, that is the HW semaphore will be held, has started */
+    SPI_BUFFER_RESOURCE_HOLD_COMPLETED,             /**< State where the request of holding resources, that is the HW semaphore will be held, has completed */
     SPI_BUFFER_RESOURCE_CONFIGURED,                 /**< State where the configuration of the memory buffers, which are to be used in SPI transaction, has completed. */
     SPI_XFER_COMPLETED                              /**< State where SPI transaction has been completed. */
 } spi_state_t;
@@ -189,10 +191,20 @@ static __INLINE void state_entry_action_execute(void)
     spi_slave_evt_t event;
     
     switch (m_spi_state)
-    {                             
+    {
+        case SPI_BUFFER_RESOURCE_HOLD_REQUESTED:
         case SPI_BUFFER_RESOURCE_REQUESTED:
             NRF_SPIS1->TASKS_ACQUIRE = 1u;                                  
-            break;            
+            break;
+
+        case SPI_BUFFER_RESOURCE_HOLD_COMPLETED:
+            event.evt_type  = SPI_SLAVE_RESOURCE_HELD;
+            event.rx_amount = 0;
+            event.tx_amount = 0;
+
+            APP_ERROR_CHECK_BOOL(m_event_callback != NULL);
+            m_event_callback(event);
+            break;
      
         case SPI_BUFFER_RESOURCE_CONFIGURED:
             event.evt_type  = SPI_SLAVE_BUFFERS_SET_DONE;
@@ -244,6 +256,7 @@ uint32_t spi_slave_buffers_set(uint8_t * p_tx_buf,
     
     switch (m_spi_state)
     {
+        case SPI_BUFFER_RESOURCE_HOLD_COMPLETED:
         case SPI_STATE_INIT:
         case SPI_XFER_COMPLETED:
         case SPI_BUFFER_RESOURCE_CONFIGURED:        
@@ -256,6 +269,7 @@ uint32_t spi_slave_buffers_set(uint8_t * p_tx_buf,
             sm_state_change(SPI_BUFFER_RESOURCE_REQUESTED);             
             break;
 
+        case SPI_BUFFER_RESOURCE_HOLD_REQUESTED:
         case SPI_BUFFER_RESOURCE_REQUESTED:
             err_code = NRF_ERROR_INVALID_STATE; 
             break;
@@ -266,6 +280,33 @@ uint32_t spi_slave_buffers_set(uint8_t * p_tx_buf,
             break;
     }
     
+    return err_code;
+}
+
+uint32_t spi_slave_buffers_unset()
+{
+    uint32_t err_code = NRF_SUCCESS;
+
+    switch (m_spi_state)
+    {
+        case SPI_BUFFER_RESOURCE_HOLD_COMPLETED:
+        case SPI_STATE_INIT:
+        case SPI_XFER_COMPLETED:
+        case SPI_BUFFER_RESOURCE_CONFIGURED:
+            sm_state_change(SPI_BUFFER_RESOURCE_HOLD_REQUESTED);
+            break;
+
+        case SPI_BUFFER_RESOURCE_HOLD_REQUESTED:
+        case SPI_BUFFER_RESOURCE_REQUESTED:
+            err_code = NRF_ERROR_INVALID_STATE;
+            break;
+
+        default:
+            // @note: execution of this code path would imply internal error in the design.
+            err_code = NRF_ERROR_INTERNAL;
+            break;
+    }
+
     return err_code;
 }
 
@@ -298,7 +339,9 @@ void SPI1_TWI1_IRQHandler(void)
                 
                 sm_state_change(SPI_BUFFER_RESOURCE_CONFIGURED);                                                                         
                 break;
-                
+            case SPI_BUFFER_RESOURCE_HOLD_REQUESTED:
+                sm_state_change(SPI_BUFFER_RESOURCE_HOLD_COMPLETED);
+                break;
             default:
                 // No implementation required.                    
                 break;

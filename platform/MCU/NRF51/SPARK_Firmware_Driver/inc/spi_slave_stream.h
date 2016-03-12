@@ -24,7 +24,8 @@
 
 volatile bool busy;
 volatile bool transmitting;
-volatile bool downStreamTransactionInProgress;
+volatile bool moreData;
+volatile bool spiSlaveSemaphoreHeld;
 uint8_t m_tx_buf[SPI_SLAVE_HW_TX_BUF_SIZE];   /**< SPI TX buffer. */
 uint8_t m_rx_buf[SPI_SLAVE_HW_RX_BUF_SIZE];   /**< SPI RX buffer. */
 
