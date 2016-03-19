@@ -340,6 +340,11 @@ void SPI1_TWI1_IRQHandler(void)
                 sm_state_change(SPI_BUFFER_RESOURCE_CONFIGURED);                                                                         
                 break;
             case SPI_BUFFER_RESOURCE_HOLD_REQUESTED:
+                NRF_SPIS1->TXDPTR = (uint32_t)mp_spi_tx_buf;
+                NRF_SPIS1->RXDPTR = (uint32_t)mp_spi_rx_buf;
+                NRF_SPIS1->MAXRX  = m_spi_rx_buf_size;
+                NRF_SPIS1->MAXTX  = m_spi_tx_buf_size;
+
                 sm_state_change(SPI_BUFFER_RESOURCE_HOLD_COMPLETED);
                 break;
             default:
