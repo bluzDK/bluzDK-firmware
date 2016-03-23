@@ -36,6 +36,12 @@ SECTIONS
 	
   } > BOOTLOADER_SETTINGS
 
+  /* Ensures the Bootloader start address in flash is written to UICR when flashing the image. */
+  .uicrBootStartAddress :
+  {
+    KEEP(*(.uicrBootStartAddress))
+  } > UICR_BOOTLOADER
+
   /* No init RAM section in bootloader. Used for bond information exchange. */
   .noinit(NOLOAD) :
   {

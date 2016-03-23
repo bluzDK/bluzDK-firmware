@@ -3,6 +3,8 @@ CPPFLAGS += -std=gnu++11
 
 ifeq ("$(PLATFORM_ID)","103")
 ASRC += $(COMMON_BUILD)/arm/startup/startup_$(STM32_DEVICE).S
+else ifeq ("$(PLATFORM_ID)","269")
+ASRC += $(COMMON_BUILD)/arm/startup/startup_$(STM32_DEVICE).S
 else
 ASRC += $(COMMON_BUILD)/arm/startup/startup_$(STM32_DEVICE_LC).S
 endif
@@ -14,6 +16,9 @@ ASFLAGS += -I$(COMMON_BUILD)/arm/startup
 ifeq ("$(PLATFORM_ID)","103")
 LDFLAGS += -T$(COMMON_BUILD)/arm/linker/bootloader_nrf51.ld
 LDFLAGS += -T$(COMMON_BUILD)/arm/linker/bootloader_nrf51_common.ld
+else ifeq ("$(PLATFORM_ID)","269")
+LDFLAGS += -T$(COMMON_BUILD)/arm/linker/bootloader_nrf51.ld
+LDFLAGS += -T$(COMMON_BUILD)/arm/linker/bootloader_nrf51_common.ld
 else
 LDFLAGS += -T$(COMMON_BUILD)/arm/linker/linker_$(STM32_DEVICE_LC).ld
 endif
@@ -22,6 +27,9 @@ LDFLAGS += -Wl,-Map,$(TARGET_BASE).map
 
 
 ifeq ("$(PLATFORM_ID)","103")
+LINKER_DEPS += $(COMMON_BUILD)/arm/linker/bootloader_nrf51.ld
+LINKER_DEPS += $(COMMON_BUILD)/arm/linker/bootloader_nrf51_common.ld
+else ifeq ("$(PLATFORM_ID)","269")
 LINKER_DEPS += $(COMMON_BUILD)/arm/linker/bootloader_nrf51.ld
 LINKER_DEPS += $(COMMON_BUILD)/arm/linker/bootloader_nrf51_common.ld
 else
