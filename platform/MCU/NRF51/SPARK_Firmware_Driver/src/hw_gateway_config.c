@@ -111,10 +111,11 @@ void spi_slave_rx_data(uint8_t *rx_buffer, uint16_t size)
 void gateway_loop(void)
 {
     if (spi_slave_rx_buffer_size > 0) {
-        client_send_data(spi_slave_rx_buffer+spi_slave_rx_buffer_start, spi_slave_rx_buffer_size);
+        int bytesRx = spi_slave_rx_buffer_size;
+        client_send_data(spi_slave_rx_buffer+spi_slave_rx_buffer_start, bytesRx);
 
-        spi_slave_rx_buffer_size -= spi_slave_rx_buffer_size;
-        spi_slave_rx_buffer_start += spi_slave_rx_buffer_size;
+        spi_slave_rx_buffer_size -= bytesRx;
+        spi_slave_rx_buffer_start += bytesRx;
         if (spi_slave_rx_buffer_size == 0) {
             spi_slave_rx_buffer_start = 0;
         }
@@ -124,10 +125,11 @@ void gateway_loop(void)
         while (!spi_slave_ready()) { }
 
         DEBUG("Data->SPI Function: %d  @ %d", spi_slave_tx_buffer_size, spi_slave_tx_buffer_start);
-        spi_slave_send_data(spi_slave_tx_buffer+spi_slave_tx_buffer_start, spi_slave_tx_buffer_size);
+        int bytesTx = spi_slave_tx_buffer_size;
+        spi_slave_send_data(spi_slave_tx_buffer+spi_slave_tx_buffer_start, bytesTx);
 
-        spi_slave_tx_buffer_size -= spi_slave_tx_buffer_size;
-        spi_slave_tx_buffer_start += spi_slave_tx_buffer_size;
+        spi_slave_tx_buffer_size -= bytesTx;
+        spi_slave_tx_buffer_start += bytesTx;
         if (spi_slave_tx_buffer_size == 0) {
             spi_slave_tx_buffer_start = 0;
         }
