@@ -51,7 +51,6 @@ void spi_slave_send_data(uint8_t *buf, uint16_t size)
 		while (busy) { }
 	}
 	DEBUG("Done in spi_slave_send_data");
-	nrf_gpio_pin_clear(SPIS_PTS_PIN);
 }
 
 /**@brief Function for SPI slave event callback.
@@ -66,6 +65,7 @@ static void spi_slave_event_handle(spi_slave_evt_t event)
     {
     	if (busy) {
     		nrf_gpio_pin_clear(SPIS_SA_PIN);
+			nrf_gpio_pin_clear(SPIS_PTS_PIN);
     	} else {
 			if (event.rx_amount == 255) {
 				memcpy(buf+currentRxBufferSize, m_rx_buf, 254);
