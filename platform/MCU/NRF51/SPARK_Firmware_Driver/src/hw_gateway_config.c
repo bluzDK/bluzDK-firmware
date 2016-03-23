@@ -122,7 +122,6 @@ void gateway_loop(void)
     }
     
     if (spi_slave_tx_buffer_size > 0) {
-        while (!spi_slave_ready()) { }
 
         DEBUG("Data->SPI Function: %d  @ %d", spi_slave_tx_buffer_size, spi_slave_tx_buffer_start);
         int bytesTx = spi_slave_tx_buffer_size;
