@@ -18,9 +18,14 @@
 #include <stdint.h>
 #include <cstdlib>
 #include "data_management_layer.h"
+#include "socket.h"
 extern "C" {
 #include "particle_data_service.h"
+#include "hw_gateway_config.h"
+#include "spi_slave_stream.h"
 }
+
+#include "debug.h"
 
 int16_t DataManagementLayer::dataServicesRegistered = 0;
 DataService* DataManagementLayer::services[MAX_NUMBER_OF_SERVICES] = {NULL};
@@ -50,8 +55,21 @@ void DataManagementLayer::sendData(int16_t length, uint8_t *data)
     particle_service_send_data(data, length);
 #endif
 #if PLATFORM_ID==269
-
 #endif
+    switch ((data[1] >> 4) & 0xF) {
+        case SOCKET_CONNECT:
+            data[3] = SPI_BUS_CONNECT;
+            break;
+        case SOCKET_DATA:
+            data[3] = SPI_BUS_DATA;
+            break;
+        default:
+            break;
+    }
+    data[0] = (( (length-SPI_HEADER_SIZE) & 0xFF00) >> 8);
+    data[1] = ( (length-SPI_HEADER_SIZE) & 0xFF);
+    data[2] = GATEWAY_ID;
+    spi_slave_send_data(data, length);
 }
 
 void dataManagementFeedData(uint16_t id, int16_t length, uint8_t *data)

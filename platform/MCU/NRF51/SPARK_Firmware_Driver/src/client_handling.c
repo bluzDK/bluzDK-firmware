@@ -41,14 +41,6 @@ typedef enum
     STATE_ERROR                                     /**< Error state. */
 } client_state_t;
 
-/**@brief Gateway Protocol states. */
-typedef enum
-{
-    CONNECT,
-    DISCONNECT,
-    DATA
-} gateway_function_t;
-
 /**@brief Client context information. */
 typedef struct
 {
@@ -169,7 +161,7 @@ void on_write(client_t * p_client, ble_evt_t * p_ble_evt)
 
 	if (p_evt_write->len == 2 && p_evt_write->data[0] == 0x03 && p_evt_write->data[1] == 0x04) {
 		//got the EOS characters, write this to UART
-		spi_slave_set_tx_buffer(p_client, DATA, p_client->ble_read_buffer, p_client->ble_read_buffer_length);
+		spi_slave_set_tx_buffer(p_client, SPI_BUS_DATA, p_client->ble_read_buffer, p_client->ble_read_buffer_length);
         p_client->ble_read_buffer_length = SPI_HEADER_SIZE;
 	}
 }
@@ -332,10 +324,10 @@ static void on_evt_hvx(ble_evt_t * p_ble_evt, client_t * p_client, uint32_t inde
 				if ( p_client->peripheralConnected && !p_client->socketedParticle) {
 					nrf_gpio_pin_set(CONNECTION_PIN);
                     p_client->socketedParticle = true;
-                    spi_slave_set_tx_buffer(p_client, CONNECT, p_client->ble_read_buffer, p_client->ble_read_buffer_length);
+                    spi_slave_set_tx_buffer(p_client, SPI_BUS_CONNECT, p_client->ble_read_buffer, p_client->ble_read_buffer_length);
 				} else {
 					//got the EOS characters, write this to UART
-					spi_slave_set_tx_buffer(p_client, DATA, p_client->ble_read_buffer, p_client->ble_read_buffer_length);
+					spi_slave_set_tx_buffer(p_client, SPI_BUS_DATA, p_client->ble_read_buffer, p_client->ble_read_buffer_length);
 				}
                 p_client->ble_read_buffer_length = SPI_HEADER_SIZE;
 			} else {
@@ -535,7 +527,7 @@ uint32_t client_handling_destroy(const dm_handle_t * p_handle)
         m_client_count--;
         p_client->state = IDLE;
         uint8_t dummy[6] = {0, 0, 0, 0, 9, 8};
-        spi_slave_set_tx_buffer(p_client, DISCONNECT, dummy, 6);
+        spi_slave_set_tx_buffer(p_client, SPI_BUS_DISCONNECT, dummy, 6);
     }
     else
     {

@@ -80,12 +80,10 @@ void HAL_USART_Begin(HAL_USART_Serial serial, uint32_t baud)
           nrfBaudRate
       };
 
-    APP_UART_FIFO_INIT(&comm_params,
-                         1024,
-                         1024,
-                         uart_error_handle,
-                         APP_IRQ_PRIORITY_LOW,
-                         err_code);
+    APP_UART_INIT(&comm_params,
+                  uart_error_handle,
+                  APP_IRQ_PRIORITY_LOW,
+                  err_code);
 
     APP_ERROR_CHECK(err_code);
     uartConfigured = true;
@@ -100,8 +98,8 @@ void HAL_USART_End(HAL_USART_Serial serial)
 uint32_t HAL_USART_Write_Data(HAL_USART_Serial serial, uint8_t data)
 {
     if (!uartConfigured) {return -1;}
-//    while (app_uart_put(data) == NRF_ERROR_NO_MEM) { }
-    app_uart_put(data);
+    while (app_uart_put(data) == NRF_ERROR_NO_MEM) { }
+//    app_uart_put(data);
     return 1;
 }
 

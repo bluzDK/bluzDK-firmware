@@ -68,7 +68,7 @@ void HAL_Events_Manage(void)
 
 bool HAL_Network_Connection(void)
 {
-    return state == BLE_CONNECTED;
+    return true;
 }
 
 bool HAL_Is_Advertising(void)

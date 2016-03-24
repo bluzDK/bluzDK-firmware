@@ -26,9 +26,6 @@
 #include "spi_slave_stream.h"
 #include "hw_gateway_config.h"
 
-#define BLE_HEADER_SIZE  2
-#define SPI_HEADER_SIZE  4
-
 void (*tx_callback)(uint8_t *m_tx_buf, uint16_t size);
 
 /**@brief Funtion for initializing the module.

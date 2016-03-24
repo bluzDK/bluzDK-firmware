@@ -26,6 +26,8 @@
 #include "nrf51_callbacks.h"
 #include "nrf_gpio.h"
 #include "nrf_delay.h"
+#include "data_management_layer.h"
+#include "registered_data_services.h"
 
 #include "debug.h"
 
@@ -94,7 +96,7 @@ void gateway_scan_start(void)
 }
 
 //interrupt driven function to put data into buffers for process in gateway_loop
-void spi_slave_tx_data(uint8_t *tx_buffer, uint16_t size)
+void spi_slave_tx_data(uint8_t* tx_buffer, uint16_t size)
 {
     DEBUG("Data->BLE Callback: %d @ %d", size, spi_slave_tx_buffer_size);
     memcpy(spi_slave_tx_buffer+spi_slave_tx_buffer_start+spi_slave_tx_buffer_size, tx_buffer, size);
@@ -103,21 +105,34 @@ void spi_slave_tx_data(uint8_t *tx_buffer, uint16_t size)
 
 void spi_slave_rx_data(uint8_t *rx_buffer, uint16_t size)
 {
-    memcpy(spi_slave_rx_buffer+spi_slave_rx_buffer_start+spi_slave_rx_buffer_size, rx_buffer, size);
-    spi_slave_rx_buffer_size += size;
+    //this data is for the gateways cloud connection
+    //hack - set the third byte to the socket ID, which is always 0 for now
+    //then send only the data starting at the third byte, which is 1 byte longer than the length reported
+    if (rx_buffer[2] == GATEWAY_ID) {
+        int length = (rx_buffer[0] << 8) | rx_buffer[1];
+        rx_buffer[3] = 0;
+        dataManagementFeedData(SOCKET_DATA_SERVICE, length+1, rx_buffer+3);
+    } else {
+        memcpy(spi_slave_rx_buffer+spi_slave_rx_buffer_start+spi_slave_rx_buffer_size, rx_buffer, size);
+        spi_slave_rx_buffer_size += size;
+    }
 }
 
 //needs to be called in the main loop to process data through the gateway
 void gateway_loop(void)
 {
     if (spi_slave_rx_buffer_size > 0) {
+        int id = spi_slave_rx_buffer[2];
         int bytesRx = spi_slave_rx_buffer_size;
-        client_send_data(spi_slave_rx_buffer+spi_slave_rx_buffer_start, bytesRx);
 
-        spi_slave_rx_buffer_size -= bytesRx;
-        spi_slave_rx_buffer_start += bytesRx;
-        if (spi_slave_rx_buffer_size == 0) {
-            spi_slave_rx_buffer_start = 0;
+        if (id < MAX_CLIENTS) {
+            //this data is for one of the connected bluz DK boards
+            client_send_data(spi_slave_rx_buffer + spi_slave_rx_buffer_start, bytesRx);
+            spi_slave_rx_buffer_size -= bytesRx;
+            spi_slave_rx_buffer_start += bytesRx;
+            if (spi_slave_rx_buffer_size == 0) {
+                spi_slave_rx_buffer_start = 0;
+            }
         }
     }
     

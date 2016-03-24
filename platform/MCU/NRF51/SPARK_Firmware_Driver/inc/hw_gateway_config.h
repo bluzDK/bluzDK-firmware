@@ -26,7 +26,8 @@
 #include "ble_gap.h"
 #include "app_util.h"
 
-#define MAX_CLIENTS  8  /**< Max number of clients. */
+#define MAX_CLIENTS  2  /**< Max number of clients. */
+#define GATEWAY_ID MAX_CLIENTS
 
 //Gateway Constants
 #define SPI_SLAVE_TX_BUF_SIZE   768u                        /**< SPI TX buffer size. */
@@ -47,6 +48,17 @@ bool                              m_memory_access_in_progress;     /**< Flag to 
 
 #define GATEWAY_NOTIFICATION_LED         0
 #define CONNECTION_PIN					 13
+
+#define BLE_HEADER_SIZE  2
+#define SPI_HEADER_SIZE  4
+
+/**@brief Gateway Protocol states. */
+typedef enum
+{
+    SPI_BUS_CONNECT,
+    SPI_BUS_DISCONNECT,
+    SPI_BUS_DATA
+} gateway_function_t;
 
 /**@brief Variable length data encapsulation in terms of length and pointer to data */
 typedef struct
@@ -90,7 +102,7 @@ void gateway_loop(void);
 uint8_t spi_slave_tx_buffer[SPI_SLAVE_TX_BUF_SIZE];
 volatile uint16_t spi_slave_tx_buffer_size;
 volatile uint16_t spi_slave_tx_buffer_start;
-void spi_slave_tx_data(uint8_t *tx_buffer, uint16_t size);
+void spi_slave_tx_data(uint8_t* tx_buffer, uint16_t size);
 
 uint8_t spi_slave_rx_buffer[SPI_SLAVE_RX_BUF_SIZE];
 volatile uint16_t spi_slave_rx_buffer_size;
