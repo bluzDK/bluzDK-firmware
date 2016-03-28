@@ -46,7 +46,7 @@
 #define RGB_LED_PIN_RED          		21                                       /**< Pin one for the RGB LED. */
 #define RGB_LED_PIN_GREEN          		22                                       /**< Pin one for the RGB LED. */
 #define RGB_LED_PIN_BLUE          		23                                       /**< Pin one for the RGB LED. */
-#define BOARD_BUTTON          			0                                        /**< Main LED on the board. */
+#define BOARD_BUTTON          			1                                        /**< Main LED on the board. */
 
 //Flash SPI address
 #define SPIM0_SCK_PIN       18u     /**< SPI clock GPIO pin number. */
@@ -60,7 +60,12 @@
 #define BOOTLOADER_FLASH_PAGES 0x00
 
 #ifndef USER_FIRMWARE_IMAGE_LOCATION
+#if PLATFORM_ID==103   /*--bluz*/
 #define USER_FIRMWARE_IMAGE_LOCATION 0x00037000
+#endif
+#if PLATFORM_ID==269   /*--bluz-gw*/
+#define USER_FIRMWARE_IMAGE_LOCATION 0x00037000
+#endif
 #endif
 
 #define BOOTLOADER_IMAGE_LOCATION 0x0003C000

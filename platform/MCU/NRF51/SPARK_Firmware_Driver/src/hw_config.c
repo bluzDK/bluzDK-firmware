@@ -249,6 +249,7 @@ void leds_init(void)
     nrf_gpio_pin_set(RGB_LED_PIN_BLUE);
 
     nrf_gpio_cfg_output(0);
+    nrf_gpio_pin_clear(0);
 }
 void timers_init(void)
 {
