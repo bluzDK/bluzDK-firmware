@@ -99,8 +99,10 @@ void gateway_scan_start(void)
 void spi_slave_tx_data(uint8_t* tx_buffer, uint16_t size)
 {
     DEBUG("Data->BLE Callback: %d @ %d", size, spi_slave_tx_buffer_size);
-    memcpy(spi_slave_tx_buffer+spi_slave_tx_buffer_start+spi_slave_tx_buffer_size, tx_buffer, size);
-    spi_slave_tx_buffer_size += size;
+    if (spi_slave_tx_buffer_start+spi_slave_tx_buffer_size+size <= SPI_SLAVE_TX_BUF_SIZE) {
+        memcpy(spi_slave_tx_buffer+spi_slave_tx_buffer_start+spi_slave_tx_buffer_size, tx_buffer, size);
+        spi_slave_tx_buffer_size += size;
+    }
 }
 
 void spi_slave_rx_data(uint8_t *rx_buffer, uint16_t size)
@@ -113,8 +115,10 @@ void spi_slave_rx_data(uint8_t *rx_buffer, uint16_t size)
         rx_buffer[3] = 0;
         dataManagementFeedData(SOCKET_DATA_SERVICE, length+1, rx_buffer+3);
     } else {
-        memcpy(spi_slave_rx_buffer+spi_slave_rx_buffer_start+spi_slave_rx_buffer_size, rx_buffer, size);
-        spi_slave_rx_buffer_size += size;
+        if (spi_slave_rx_buffer_start+spi_slave_rx_buffer_size+size <= SPI_SLAVE_RX_BUF_SIZE) {
+            memcpy(spi_slave_rx_buffer+spi_slave_rx_buffer_start+spi_slave_rx_buffer_size, rx_buffer, size);
+            spi_slave_rx_buffer_size += size;
+        }
     }
 }
 

@@ -26,11 +26,11 @@
 #include "ble_gap.h"
 #include "app_util.h"
 
-#define MAX_CLIENTS  2  /**< Max number of clients. */
+#define MAX_CLIENTS  3  /**< Max number of clients. */
 #define GATEWAY_ID MAX_CLIENTS
 
 //Gateway Constants
-#define SPI_SLAVE_TX_BUF_SIZE   768u                        /**< SPI TX buffer size. */
+#define SPI_SLAVE_TX_BUF_SIZE   1024                        /**< SPI TX buffer size. */
 #define SPI_SLAVE_RX_BUF_SIZE   SPI_SLAVE_TX_BUF_SIZE       /**< SPI RX buffer size. */
 
 #define MIN_CONNECTION_INTERVAL          MSEC_TO_UNITS(7.5, UNIT_1_25_MS)                /**< Determines minimum connection interval in millisecond. */
