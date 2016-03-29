@@ -332,6 +332,10 @@ int main(void)
 //    APP_ERROR_CHECK(err_code);
 //
 //    uart_put("STARTING!\n");
+    
+    uart_init();
+    uart_put("STARTING!\n");
+    
     if (app_reset)
     {
         NRF_POWER->GPREGRET = 0;
@@ -443,8 +447,20 @@ int main(void)
     else {
         uint8_t byte0 = sFLASH_ReadSingleByte(FLASH_FW_STATUS);
         if (byte0 == 0x01) {
+            char str0[8];
 //            uart_put("FW Waiting!\n");
             //we have an app waiting for us. let's first find out the length
+            uart_put("Firmware Length: " );
+            sprintf(str0, "%d", (int)fw_length);
+            uart_put(str0);
+            uart_put("\n");
+            
+            uart_put("Firmware Length: " );
+            sprintf(str0, "%d", (int)fw_length);
+            uart_put(str0);
+            uart_put("\n");
+            
+            
             uint32_t fw_len = 0;
             uint8_t byte1 = sFLASH_ReadSingleByte(FLASH_FW_LENGTH1);
             uint8_t byte2 = sFLASH_ReadSingleByte(FLASH_FW_LENGTH2);

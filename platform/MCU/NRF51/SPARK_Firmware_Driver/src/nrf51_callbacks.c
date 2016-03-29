@@ -15,6 +15,7 @@
  License along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "nrf51_config.h"
 #include "nrf51_callbacks.h"
 #include "data_management_layer.h"
 #include "core_hal.h"
@@ -170,7 +171,8 @@ void on_ble_evt(ble_evt_t * p_ble_evt)
             
             // Verify if short or complete name matches target.
             if ((err_code == NRF_SUCCESS) &&
-                (0 == memcmp(TARGET_DEV_NAME,type_data.p_data,type_data.data_len)))
+                (0 == memcmp(TARGET_DEV_NAME,type_data.p_data,type_data.data_len)) &&
+                isCloudConnected)
             {
                 err_code = sd_ble_gap_scan_stop();
                 if (err_code != NRF_SUCCESS)

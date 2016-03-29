@@ -105,6 +105,7 @@ void app_setup_and_loop_passive(void)
     //Set some Particle flags to bypass functionality we don't need
     SPARK_CLOUD_SOCKETED = 0;
     SPARK_CLOUD_CONNECTED = 0;
+    HAL_Set_Cloud_Connection(false);
     
     //setup all peripherals
     HAL_Core_Init();
@@ -179,6 +180,7 @@ void app_setup_and_loop_passive(void)
                     CLOUD_CONNECTED = true;
                     SPARK_CLOUD_CONNECTED = 1;
                     ledOffTime = 2000;
+                    HAL_Set_Cloud_Connection(true);
                 }
             }
         } else {
@@ -189,6 +191,7 @@ void app_setup_and_loop_passive(void)
 
                 SPARK_CLOUD_SOCKETED = 0;
                 SPARK_CLOUD_CONNECTED = 0;
+                HAL_Set_Cloud_Connection(false);
 
                 ledOffTime = 2000;
                 LED_SetRGBColor(system_mode()==SAFE_MODE ? RGB_COLOR_MAGENTA : RGB_COLOR_GREEN);

@@ -537,6 +537,11 @@ void ble_disconnect(void)
     }
 }
 
+void set_cloud_connection_state(bool connected)
+{
+    isCloudConnected = connected;
+}
+
 /**@brief Function for the Power manager.
  */
 void power_manage(void)

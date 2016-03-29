@@ -121,6 +121,7 @@ bool HAL_Network_Connection(void);
 bool HAL_Is_Advertising(void);
 void HAL_Handle_Cloud_Disconnect(void);
 void HAL_Loop_Iteration(void);
+void HAL_Set_Cloud_Connection(bool connected);
 
 typedef enum _BootloaderFlag_t {
     BOOTLOADER_FLAG_VERSION,

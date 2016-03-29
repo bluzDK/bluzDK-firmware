@@ -64,6 +64,11 @@ void HAL_Loop_Iteration(void)
     
 }
 
+void HAL_Set_Cloud_Connection(bool connected)
+{
+    set_cloud_connection_state(connected);
+}
+
 void HAL_Events_Manage(void)
 {
 }

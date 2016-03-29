@@ -30,8 +30,8 @@
 #define __NRF51_CONFIG_H
 
 #define APP_TIMER_PRESCALER             0                                           /**< Value of the RTC1 PRESCALER register. */
-#define APP_TIMER_MAX_TIMERS            6						                    /**< Maximum number of simultaneously created timers. */
-#define APP_TIMER_OP_QUEUE_SIZE         12                                          /**< Size of timer operation queues. */
+#define APP_TIMER_MAX_TIMERS            2						                    /**< Maximum number of simultaneously created timers. */
+#define APP_TIMER_OP_QUEUE_SIZE         6                                          /**< Size of timer operation queues. */
 
 #define TIME_KEPPER_INTERVAL     		APP_TIMER_TICKS(100, APP_TIMER_PRESCALER)     /**< Keep track of time in roughly 100 mSecond intervals. */
 
@@ -81,6 +81,9 @@ uint16_t m_conn_handle; /**< Handle of the current connection. */
 uint32_t system_milliseconds;
 uint32_t system_microseconds;
 uint32_t system_connection_interval;
+
+//cloud variables
+bool isCloudConnected;
 
 //device manager
 dm_application_instance_t         m_app_handle;                                  /**< Application identifier allocated by device manager. */

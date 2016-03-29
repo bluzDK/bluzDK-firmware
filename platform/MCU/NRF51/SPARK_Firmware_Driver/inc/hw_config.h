@@ -83,6 +83,7 @@ void blinkLED(int times);
 void heartBeat(void);
 uint32_t system_millis(void);
 uint32_t system_micros(void);
+void set_cloud_connection_state(bool connected);
 
 //Flash functions
 uint16_t FLASH_GetDeviceInt(void);

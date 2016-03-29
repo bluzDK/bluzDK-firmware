@@ -68,13 +68,13 @@ static void spi_slave_event_handle(spi_slave_evt_t event)
 			nrf_gpio_pin_clear(SPIS_PTS_PIN);
     	} else {
 			if (event.rx_amount == 255) {
-				memcpy(buf+currentRxBufferSize, m_rx_buf, 254);
-				currentRxBufferSize+=254;
+				memcpy(buf+currentSPISlaveBufferSize, m_rx_buf, 254);
+				currentSPISlaveBufferSize+=254;
 			} else {
-				memcpy(buf+currentRxBufferSize, m_rx_buf, event.rx_amount);
-				currentRxBufferSize += event.rx_amount;
-				rx_callback(buf, currentRxBufferSize);
-				currentRxBufferSize = 0;
+				memcpy(buf+currentSPISlaveBufferSize, m_rx_buf, event.rx_amount);
+				currentSPISlaveBufferSize += event.rx_amount;
+				rx_callback(buf, currentSPISlaveBufferSize);
+				currentSPISlaveBufferSize = 0;
 			}
     	}
 		//Set buffers.
@@ -100,7 +100,7 @@ uint32_t spi_slave_stream_init(void (*a)(uint8_t *m_tx_buf, uint16_t size))
 
 	nrf_gpio_cfg_input(SPIS_MR_PIN, NRF_GPIO_PIN_NOPULL);
 
-	currentRxBufferSize = 0;
+	currentSPISlaveBufferSize = 0;
     // Enable Radio Notification, allows us to alert the master when we are busy
 	err_code = ble_radio_notification_init(NRF_APP_PRIORITY_LOW,NRF_RADIO_NOTIFICATION_DISTANCE_800US,ble_radio_ntf_handler);
 	APP_ERROR_CHECK(err_code);
