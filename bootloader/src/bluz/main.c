@@ -222,13 +222,12 @@ static void ble_stack_init(bool init_softdevice)
     
     
     // Need distinction from s120 and s110
+    ble_enable_params.gatts_enable_params.service_changed = IS_SRVC_CHANGED_CHARACT_PRESENT;
 #if PLATFORM_ID==103
     ble_enable_params.gatts_enable_params.attr_tab_size   = BLE_GATTS_ATTR_TAB_SIZE_DEFAULT;
-    ble_enable_params.gatts_enable_params.service_changed = IS_SRVC_CHANGED_CHARACT_PRESENT;
 #endif
 #if PLATFORM_ID==269
-    ble_enable_params.gatts_enable_params.service_changed = false;
-    ble_enable_params.gap_enable_params.role              = BLE_GAP_ROLE_CENTRAL;
+    ble_enable_params.gap_enable_params.role              = BLE_GAP_ROLE_PERIPH;
 #endif
     
     err_code = sd_ble_enable(&ble_enable_params);
@@ -333,9 +332,7 @@ int main(void)
 //
 //    uart_put("STARTING!\n");
     
-    uart_init();
-    uart_put("STARTING!\n");
-    
+
     if (app_reset)
     {
         NRF_POWER->GPREGRET = 0;
@@ -358,6 +355,8 @@ int main(void)
 
     //init external flash then check if update is ready
     sFLASH_Init();
+
+
     uint16_t colors[3] = {0x00, 0x00, 0x00};
     bool setup_mode = ((nrf_gpio_pin_read(BOOTLOADER_BUTTON) == 0) ? true: false);
     if (setup_mode) {
@@ -447,25 +446,14 @@ int main(void)
     else {
         uint8_t byte0 = sFLASH_ReadSingleByte(FLASH_FW_STATUS);
         if (byte0 == 0x01) {
-            char str0[8];
 //            uart_put("FW Waiting!\n");
             //we have an app waiting for us. let's first find out the length
-            uart_put("Firmware Length: " );
-            sprintf(str0, "%d", (int)fw_length);
-            uart_put(str0);
-            uart_put("\n");
-            
-            uart_put("Firmware Length: " );
-            sprintf(str0, "%d", (int)fw_length);
-            uart_put(str0);
-            uart_put("\n");
-            
-            
             uint32_t fw_len = 0;
             uint8_t byte1 = sFLASH_ReadSingleByte(FLASH_FW_LENGTH1);
             uint8_t byte2 = sFLASH_ReadSingleByte(FLASH_FW_LENGTH2);
             uint8_t byte3 = sFLASH_ReadSingleByte(FLASH_FW_LENGTH3);
             fw_len = (byte1 << 16) | (byte2 << 8)  |  byte3;
+
             if (!FLASH_CopyFW(FLASH_FW_ADDRESS, fw_len, false, false)) {
 //                uart_put("Didn't Copy Module!\n");
             }

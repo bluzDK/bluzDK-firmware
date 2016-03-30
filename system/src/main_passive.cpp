@@ -132,14 +132,16 @@ void app_setup_and_loop_passive(void)
 
         //Execute user application loop
         DECLARE_SYS_HEALTH(ENTERED_Loop);
-        if (system_mode()!=SAFE_MODE) {
+        if (system_mode()!=SAFE_MODE && !SPARK_FLASH_UPDATE) {
 //            DEBUG("Entering User Loop");
             loop();
             DECLARE_SYS_HEALTH(RAN_Loop);
 //            DEBUG("Exited User Loop");
         }
-        
-        HAL_Loop_Iteration();
+
+        if (!SPARK_FLASH_UPDATE) {
+            HAL_Loop_Iteration();
+        }
         
         //we may not be connected. if not, don't try to manage anything cloud related
         if (HAL_Network_Connection()){

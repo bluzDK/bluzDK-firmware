@@ -63,7 +63,7 @@ typedef struct
     pstorage_block_t    block_id;       /**< Block ID.*/
 } pstorage_handle_t;
 
-typedef uint16_t pstorage_size_t;      /** Size of length and offset fields. */
+typedef uint32_t pstorage_size_t;      /** Size of length and offset fields. */
 
 /**@brief Handles Flash Access Result Events. To be called in the system event dispatcher of the application. */
 void pstorage_sys_event_handler (uint32_t sys_evt);
