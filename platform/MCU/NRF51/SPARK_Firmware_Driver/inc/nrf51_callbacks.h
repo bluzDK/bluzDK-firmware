@@ -26,6 +26,7 @@ void conn_params_error_handler(uint32_t nrf_error);
 void button_event_handler(uint8_t pin_no, uint8_t button_action);
 void millis_timer_timeout(void * p_context);
 void micros_timer_timeout(nrf_timer_event_t event_type, void* p_context);
+void wdt_event_handler(void);
 void ble_evt_dispatch(ble_evt_t * p_ble_evt);
 void sys_evt_dispatch(uint32_t sys_evt);
 uint32_t device_manager_evt_handler(dm_handle_t const    * p_handle,

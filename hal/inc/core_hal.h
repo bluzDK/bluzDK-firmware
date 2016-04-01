@@ -120,6 +120,7 @@ void HAL_Events_Manage(void);
 bool HAL_Network_Connection(void);
 bool HAL_Is_Advertising(void);
 void HAL_Handle_Cloud_Disconnect(void);
+uint32_t HAL_Get_Sys_Tick_Interval(void);
 
 typedef enum _BootloaderFlag_t {
     BOOTLOADER_FLAG_VERSION,

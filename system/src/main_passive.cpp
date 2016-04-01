@@ -75,6 +75,17 @@ extern "C" void HAL_SysTick_Handler(void) {
             LED_Off(LED_RGB);
         }
     }
+
+    if (TimingIWDGReload >= TIMING_IWDG_RELOAD)
+    {
+        TimingIWDGReload = 0;
+        /* Reload WDG counter */
+        HAL_Notify_WDT();
+    }
+    else
+    {
+        TimingIWDGReload+=HAL_Get_Sys_Tick_Interval();
+    }
 }
 
 //stubs

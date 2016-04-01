@@ -31,6 +31,7 @@
 #include "ble_conn_params.h"
 #include "ble_hci.h"
 #include "custom_data_service.h"
+#include "nrf_drv_wdt.h"
 
 uint32_t NbrOfPage = 0;
 uint16_t Flash_Update_Index = 0;
@@ -277,6 +278,22 @@ void external_flash_init(void)
 void scheduler_init(void)
 {
     APP_SCHED_INIT(SCHED_MAX_EVENT_DATA_SIZE, SCHED_QUEUE_SIZE);
+}
+
+void wdt_init(void)
+{
+    //Configure WDT.
+    nrf_drv_wdt_config_t config = NRF_DRV_WDT_DEAFULT_CONFIG;
+    uint32_t err_code = nrf_drv_wdt_init(&config, wdt_event_handler);
+    APP_ERROR_CHECK(err_code);
+    err_code = nrf_drv_wdt_channel_alloc(&m_channel_id);
+    APP_ERROR_CHECK(err_code);
+    nrf_drv_wdt_enable();
+}
+
+void wtd_feed(void)
+{
+    nrf_drv_wdt_channel_feed(m_channel_id);
 }
 
 /**@brief Function for the Device Manager initialization.

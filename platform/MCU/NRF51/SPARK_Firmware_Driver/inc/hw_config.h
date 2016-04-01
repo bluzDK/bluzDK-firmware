@@ -54,6 +54,7 @@ void external_flash_init(void);
 void gap_params_init(void);
 void device_manager_init(void);
 void scheduler_init(void);
+void wdt_init(void);
 
 //BLE Stack Functions
 void ble_stack_init(void);
@@ -85,6 +86,7 @@ void blinkLED(int times);
 void heartBeat(void);
 uint32_t system_millis(void);
 uint32_t system_micros(void);
+void wtd_feed(void);
 
 //Flash functions
 uint16_t FLASH_GetDeviceInt(void);
