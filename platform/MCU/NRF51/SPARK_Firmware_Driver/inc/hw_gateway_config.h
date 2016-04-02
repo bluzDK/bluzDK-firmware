@@ -30,7 +30,7 @@
 #define GATEWAY_ID MAX_CLIENTS
 
 //Gateway Constants
-#define SPI_SLAVE_TX_BUF_SIZE   1024                        /**< SPI TX buffer size. */
+#define SPI_SLAVE_TX_BUF_SIZE   1096                        /**< SPI TX buffer size. */
 #define SPI_SLAVE_RX_BUF_SIZE   SPI_SLAVE_TX_BUF_SIZE       /**< SPI RX buffer size. */
 
 #define MIN_CONNECTION_INTERVAL          MSEC_TO_UNITS(7.5, UNIT_1_25_MS)                /**< Determines minimum connection interval in millisecond. */
@@ -51,6 +51,9 @@ bool                              m_memory_access_in_progress;     /**< Flag to 
 
 #define BLE_HEADER_SIZE  2
 #define SPI_HEADER_SIZE  4
+
+#define TIME_BETWEEN_CONNECTIONS        8000
+uint32_t lastConnectionTime;
 
 /**@brief Gateway Protocol states. */
 typedef enum

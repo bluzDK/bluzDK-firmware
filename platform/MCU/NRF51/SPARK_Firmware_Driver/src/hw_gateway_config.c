@@ -64,6 +64,7 @@ void ble_gateway_stack_init(void)
 //HW Init Functions
 void gateway_init(void)
 {
+    lastConnectionTime = 0;
     m_peer_count = 0;
     m_memory_access_in_progress = false;
     spi_slave_tx_buffer_size = 0;
