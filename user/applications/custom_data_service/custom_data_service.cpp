@@ -1,5 +1,5 @@
 #include "application.h"
-
+SYSTEM_MODE(MANUAL);
 bool sendResponse = false;
 void dataCallbackHandler(uint8_t *data, uint16_t length) {
     digitalWrite(D7, HIGH);
