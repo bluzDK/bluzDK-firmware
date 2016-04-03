@@ -55,6 +55,8 @@ bool                              m_memory_access_in_progress;     /**< Flag to 
 #define TIME_BETWEEN_CONNECTIONS        8000
 uint32_t lastConnectionTime;
 
+bool gatewayHardwareConnected;
+
 /**@brief Gateway Protocol states. */
 typedef enum
 {

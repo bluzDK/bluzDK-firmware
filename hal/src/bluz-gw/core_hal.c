@@ -32,6 +32,7 @@
 
 void HAL_Core_Init(void)
 {
+    gatewayHardwareConnected = true;
     system_init();
     leds_init();
     timers_init();
@@ -54,7 +55,7 @@ void HAL_Network_Init(void)
 
 void HAL_Handle_Cloud_Disconnect(void)
 {
-    ble_disconnect();
+    gatewayHardwareConnected = false;
 }
 
 void HAL_Loop_Iteration(void)
@@ -73,7 +74,11 @@ void HAL_Events_Manage(void)
 
 bool HAL_Network_Connection(void)
 {
-    return true;
+    if (!gatewayHardwareConnected) {
+        gatewayHardwareConnected = true;
+        return false;
+    }
+    return gatewayHardwareConnected;
 }
 
 bool HAL_Is_Advertising(void)
