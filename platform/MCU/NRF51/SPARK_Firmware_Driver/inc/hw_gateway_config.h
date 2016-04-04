@@ -52,7 +52,7 @@ bool                              m_memory_access_in_progress;     /**< Flag to 
 #define BLE_HEADER_SIZE  2
 #define SPI_HEADER_SIZE  4
 
-#define TIME_BETWEEN_CONNECTIONS        8000
+#define TIME_BETWEEN_CONNECTIONS        15000
 uint32_t lastConnectionTime;
 
 bool gatewayHardwareConnected;
