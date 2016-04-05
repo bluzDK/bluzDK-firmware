@@ -31,6 +31,7 @@
 #include "ble_conn_params.h"
 #include "ble_hci.h"
 #include "nrf_drv_wdt.h"
+#include "client_handling.h"
 
 uint32_t NbrOfPage = 0;
 uint16_t Flash_Update_Index = 0;
@@ -145,6 +146,9 @@ void FLASH_Begin(uint32_t sFLASH_Address, uint32_t fileSize)
     //OTA_FLASHED_Status_SysFlag = 0x0000;
     //Save_SystemFlags();
 
+    disconnect_all_peripherals();
+    isCloudUpdating = true;
+
     Flash_Update_Index = 0;
     External_Flash_Start_Address = sFLASH_Address;
     External_Flash_Address = External_Flash_Start_Address;
@@ -200,7 +204,6 @@ uint16_t FLASH_Update(const uint8_t *pBuffer, uint32_t address, uint32_t bufferS
         sFLASH_EraseSector(External_Flash_Address);
         Flash_Update_Index = (uint16_t)((External_Flash_Address - External_Flash_Start_Address) / bufferSize);
     }
-
     return Flash_Update_Index;
 }
 

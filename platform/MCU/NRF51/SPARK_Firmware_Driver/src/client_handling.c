@@ -16,6 +16,7 @@
 #include "app_trace.h"
 #include "ble_db_discovery.h"
 #include "ble_srv_common.h"
+#include "ble_hci.h"
 #include "nrf_delay.h"
 #include "spi_slave_stream.h"
 #include "app_uart.h"
@@ -536,3 +537,11 @@ uint32_t client_handling_destroy(const dm_handle_t * p_handle)
     return err_code;
 }
 
+void disconnect_all_peripherals(void) {
+    for (int i = 0; i < MAX_CLIENTS; i++) {
+        if (m_client[i].state == STATE_RUNNING) {
+            sd_ble_gap_disconnect(m_client[i].srv_db.conn_handle, BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
+        }
+
+    }
+}

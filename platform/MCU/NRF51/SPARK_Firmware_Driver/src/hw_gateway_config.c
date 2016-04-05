@@ -61,6 +61,17 @@ void ble_gateway_stack_init(void)
     APP_ERROR_CHECK(err_code);
 }
 
+void gateway_notify_disconnect_all(void) {
+    for (int i = 0; i <= MAX_CLIENTS; i++) {
+        uint8_t dummy[6] = {0, 0, 0, 0, 9, 8};
+        dummy[0] = (( (6-SPI_HEADER_SIZE) & 0xFF00) >> 8);
+        dummy[1] = ( (6-SPI_HEADER_SIZE) & 0xFF);
+        dummy[2] = i;
+        dummy[3] = SPI_BUS_DISCONNECT;
+        spi_slave_send_data(dummy, 6);
+    }
+}
+
 //HW Init Functions
 void gateway_init(void)
 {
@@ -75,6 +86,8 @@ void gateway_init(void)
     
     client_handling_init(spi_slave_tx_data);
     spi_slave_stream_init(spi_slave_rx_data);
+    gateway_notify_disconnect_all();
+
 }
 
 //starts scanning for peripherals

@@ -32,6 +32,7 @@
 
 void HAL_Core_Init(void)
 {
+    isCloudUpdating =  false;
     gatewayHardwareConnected = true;
     system_init();
     leds_init();

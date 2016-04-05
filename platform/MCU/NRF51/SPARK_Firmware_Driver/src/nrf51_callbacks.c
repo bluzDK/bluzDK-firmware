@@ -181,6 +181,7 @@ void on_ble_evt(ble_evt_t * p_ble_evt)
             if ((err_code == NRF_SUCCESS) &&
                 (0 == memcmp(TARGET_DEV_NAME,type_data.p_data,type_data.data_len)) &&
                 isCloudConnected &&
+                !isCloudUpdating &&
                 system_millis() - lastConnectionTime > TIME_BETWEEN_CONNECTIONS)
             {
                 err_code = sd_ble_gap_scan_stop();

@@ -31,6 +31,7 @@
 
 void HAL_Core_Init(void)
 {
+    isCloudUpdating =  false;
     system_init();
     leds_init();
     timers_init();
