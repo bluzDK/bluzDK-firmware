@@ -38,6 +38,7 @@ void HAL_Core_Init(void)
     timers_init();
     gpiote_init();
     buttons_init();
+    wdt_init();
 }
 
 void HAL_Network_Init(void)
@@ -148,6 +149,10 @@ void HAL_Core_Enter_Safe_Mode(void* reserved)
 {
 }
 
+uint32_t HAL_Get_Sys_Tick_Interval(void)
+{
+    return TIME_KEPPER_MILLISECONDS;
+}
 /**
  * @brief  Computes the 32-bit CRC of a given buffer of byte data.
  * @param  pBuffer: pointer to the buffer containing the data to be computed
@@ -167,7 +172,8 @@ bool HAL_watchdog_reset_flagged()
 }
 
 void HAL_Notify_WDT()
-{    
+{
+    wtd_feed();
 }
 
 void CallConstructors(void);

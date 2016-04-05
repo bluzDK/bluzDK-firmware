@@ -21,6 +21,7 @@
 #include "nrf_gpiote.h"
 #include "softdevice_handler.h"
 #include "nrf_drv_timer.h"
+#include "nrf_drv_wdt.h"
 //#include "ble_conn_params.h"
 #include "ble_scs.h"
 #include "ble_advdata.h"
@@ -33,7 +34,8 @@
 #define APP_TIMER_MAX_TIMERS            2						                    /**< Maximum number of simultaneously created timers. */
 #define APP_TIMER_OP_QUEUE_SIZE         6                                          /**< Size of timer operation queues. */
 
-#define TIME_KEPPER_INTERVAL     		APP_TIMER_TICKS(100, APP_TIMER_PRESCALER)     /**< Keep track of time in roughly 100 mSecond intervals. */
+#define TIME_KEPPER_MILLISECONDS     	100                                         /**< Keep track of time in roughly 100 mSecond intervals. */
+#define TIME_KEPPER_INTERVAL     		APP_TIMER_TICKS(TIME_KEPPER_MILLISECONDS, APP_TIMER_PRESCALER)     /**< Convert to clock ticks. */
 
 #define APP_GPIOTE_MAX_USERS            1                                           /**< Maximum number of users of the GPIOTE handler. */
 
@@ -69,6 +71,9 @@
 //timers
 app_timer_id_t millis_timer;
 nrf_drv_timer_t micros_timer;
+
+//wdt channel id
+nrf_drv_wdt_channel_id m_channel_id;
 
 //parameters
 ble_gap_sec_params_t m_sec_params; /**< Security requirements for this application. */

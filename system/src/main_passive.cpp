@@ -75,6 +75,17 @@ extern "C" void HAL_SysTick_Handler(void) {
             LED_Off(LED_RGB);
         }
     }
+
+    if (TimingIWDGReload >= TIMING_IWDG_RELOAD)
+    {
+        TimingIWDGReload = 0;
+        /* Reload WDG counter */
+        HAL_Notify_WDT();
+    }
+    else
+    {
+        TimingIWDGReload+=HAL_Get_Sys_Tick_Interval();
+    }
 }
 
 //stubs
@@ -144,8 +155,9 @@ void app_setup_and_loop_passive(void)
         }
         
         //we may not be connected. if not, don't try to manage anything cloud related
-        if (HAL_Network_Connection()){
-            if (CLOUD_CONNECTED) {
+        if (system_mode()!=MANUAL) {
+            if (HAL_Network_Connection()) {
+                if (CLOUD_CONNECTED) {
 //                DEBUG("Calling Spark Comm Loop");
 //                Spark_Process_Events();
                 if (!Spark_Communication_Loop()) {
@@ -205,7 +217,10 @@ void app_setup_and_loop_passive(void)
             } else {
                 ledOffTime = 2000;
 //                LED_SetRGBColor(RGB_COLOR_GREEN);
+                }
             }
+        } else {
+            LED_SetRGBColor(HAL_Network_Connection() ? RGB_COLOR_WHITE : RGB_COLOR_GREEN);
         }
     }
 }

@@ -86,6 +86,14 @@ void micros_timer_timeout(nrf_timer_event_t event_type, void* p_context)
     }
 }
 
+/**
+ * @brief WDT events handler.
+ */
+void wdt_event_handler(void)
+{
+    //NOTE: The max amount of time we can spend in WDT interrupt is two cycles of 32768[Hz] clock - after that, reset occurs
+}
+
 /**@brief Function for handling the Application's BLE Stack events.
  *
  * @param[in]   p_ble_evt   Bluetooth stack event.

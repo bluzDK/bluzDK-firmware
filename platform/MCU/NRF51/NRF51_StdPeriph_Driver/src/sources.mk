@@ -33,6 +33,7 @@ CSRC += $(TARGET_STDPERIPH_SRC_PATH)/nrf_drv_ppi.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/nrf_drv_twi.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/nrf_drv_timer.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/nrf_drv_interrupts.c
+CSRC += $(TARGET_STDPERIPH_SRC_PATH)/nrf_drv_wdt.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/pstorage.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/softdevice_handler.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/softdevice_handler_appsh.c

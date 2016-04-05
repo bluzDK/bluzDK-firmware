@@ -16,6 +16,7 @@ INCLUDE_DIRS += $(TARGET_STDPERIPH_PATH)/inc/drivers_nrf/pstorage/config
 INCLUDE_DIRS += $(TARGET_STDPERIPH_PATH)/inc/drivers_nrf/timer
 INCLUDE_DIRS += $(TARGET_STDPERIPH_PATH)/inc/drivers_nrf/twi_master
 INCLUDE_DIRS += $(TARGET_STDPERIPH_PATH)/inc/drivers_nrf/uart
+INCLUDE_DIRS += $(TARGET_STDPERIPH_PATH)/inc/drivers_nrf/wdt
 INCLUDE_DIRS += $(TARGET_STDPERIPH_PATH)/inc/softdevice/common/softdevice_handler
 INCLUDE_DIRS += $(TARGET_STDPERIPH_PATH)/inc/ble/common
 INCLUDE_DIRS += $(TARGET_STDPERIPH_PATH)/inc/ble/ble_db_discovery
