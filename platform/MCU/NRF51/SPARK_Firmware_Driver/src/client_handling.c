@@ -20,6 +20,7 @@
 #include "nrf_delay.h"
 #include "spi_slave_stream.h"
 #include "app_uart.h"
+#include "registered_data_services.h"
 
 #include "debug.h"
 
@@ -137,11 +138,9 @@ static void notif_enable(client_t * p_client)
 
 void spi_slave_set_tx_buffer(client_t * p_client, gateway_function_t type, uint8_t * data, uint16_t len)
 {
-    DEBUG("Data->Client Callback: %d  ON  %d", len, p_client->id);
-    data[0] = (( (len-SPI_HEADER_SIZE) & 0xFF00) >> 8);
-    data[1] = ( (len-SPI_HEADER_SIZE) & 0xFF);
+    data[0] = (( (len-SPI_HEADER_SIZE-BLE_HEADER_SIZE) & 0xFF00) >> 8);
+    data[1] = ( (len-SPI_HEADER_SIZE-BLE_HEADER_SIZE) & 0xFF);
     data[2] = p_client->id;
-    data[3] = type;
 	tx_callback(data, len);
 }
 
@@ -152,7 +151,6 @@ void spi_slave_set_tx_buffer(client_t * p_client, gateway_function_t type, uint8
  */
 void on_write(client_t * p_client, ble_evt_t * p_ble_evt)
 {
-    DEBUG("WHY ARE WE HERE?!?");
 	ble_gatts_evt_write_t * p_evt_write = &p_ble_evt->evt.gatts_evt.params.write;
 
 	for (int i = 0; i < p_evt_write->len; i++) {
@@ -185,16 +183,12 @@ void client_send_data(uint8_t *data, uint16_t len)
         int actualBytesSent = 0;
 
         int formattedLength = chunkLength + BLE_HEADER_SIZE;
-        uint8_t dataBufferWithID[formattedLength];
-        dataBufferWithID[0] = 0x01;
-        dataBufferWithID[1] = 0x00;
-        memcpy(dataBufferWithID + BLE_HEADER_SIZE, data+SPI_HEADER_SIZE, chunkLength);
-
+        DEBUG("Sending data of size %d", formattedLength);
         for (int i = 0; i < formattedLength; i += 20) {
             uint16_t size = (formattedLength - i > 20 ? 20 : formattedLength - i);
             actualBytesSent += size;
-            memcpy(buffer, dataBufferWithID + i, size);
-
+            memcpy(buffer, data + i + SPI_HEADER_SIZE, size);
+            DEBUG("Sending packaet of size %d", size);
             write_params.write_op = BLE_GATT_OP_WRITE_CMD;
             write_params.handle = m_client[id].srv_db.services[0].charateristics[m_client[id].up_char_index].characteristic.handle_value;
             write_params.offset = 0;
@@ -229,7 +223,7 @@ void client_send_data(uint8_t *data, uint16_t len)
             waitForTxComplete = true;
             err_code = sd_ble_gattc_write(m_client[id].srv_db.conn_handle, &write_params);
         }
-        len-=(chunkLength+SPI_HEADER_SIZE);
+        len-=(chunkLength+SPI_HEADER_SIZE + BLE_HEADER_SIZE);
     }
 }
 
@@ -323,8 +317,11 @@ static void on_evt_hvx(ble_evt_t * p_ble_evt, client_t * p_client, uint32_t inde
 
 			if (p_evt_write->len == 2 && p_evt_write->data[0] == 0x03 && p_evt_write->data[1] == 0x04) {
 				if ( p_client->peripheralConnected && !p_client->socketedParticle) {
-					nrf_gpio_pin_set(CONNECTION_PIN);
                     p_client->socketedParticle = true;
+
+                    //this is a hack-fx. v1.0.47 of bluz FW didn't properly fill out the connection field of the BLE header, so we have to do it here
+                    p_client->ble_read_buffer[SPI_HEADER_SIZE+1] = ((SPI_BUS_CONNECT << 4) & 0xF0) | (p_client->ble_read_buffer[1] & 0x0F);
+
                     spi_slave_set_tx_buffer(p_client, SPI_BUS_CONNECT, p_client->ble_read_buffer, p_client->ble_read_buffer_length);
 				} else {
 					//got the EOS characters, write this to UART
@@ -332,14 +329,8 @@ static void on_evt_hvx(ble_evt_t * p_ble_evt, client_t * p_client, uint32_t inde
 				}
                 p_client->ble_read_buffer_length = SPI_HEADER_SIZE;
 			} else {
-				if (p_client->ble_read_buffer_length == SPI_HEADER_SIZE) {
-					//this is a new packet. read the header
-					memcpy(p_client->ble_read_buffer+p_client->ble_read_buffer_length, p_evt_write->data+2, p_evt_write->len-2);
-                    p_client->ble_read_buffer_length += (p_evt_write->len-2);
-				} else {
-					memcpy(p_client->ble_read_buffer+p_client->ble_read_buffer_length, p_evt_write->data, p_evt_write->len);
-                    p_client->ble_read_buffer_length += p_evt_write->len;
-				}
+				memcpy(p_client->ble_read_buffer+p_client->ble_read_buffer_length, p_evt_write->data, p_evt_write->len);
+                p_client->ble_read_buffer_length += p_evt_write->len;
 			}
         }
     }
@@ -422,11 +413,9 @@ void client_handling_ble_evt_handler(ble_evt_t * p_ble_evt)
 			break;
 
         case BLE_GAP_EVT_DISCONNECTED:
-            DEBUG("BLE_GAP_EVT_DISCONNECTED");
 			break;
 
         case BLE_GAP_EVT_CONNECTED:
-            DEBUG("BLE_GAP_EVT_CONNECTED");
 			break;
 
         default:
@@ -456,9 +445,6 @@ void client_handling_init(void (*b)(uint8_t *m_tx_buf, uint16_t size))
 {
     blink_led(1);
 	tx_callback = b;
-	//used to indicate the a peripheral is connected to the Spark Core
-	nrf_gpio_cfg_output(CONNECTION_PIN);
-	nrf_gpio_pin_clear(CONNECTION_PIN);
 
 	uint32_t err_code;
     uint32_t i;
@@ -501,7 +487,6 @@ uint8_t client_handling_count(void)
  */
 uint32_t client_handling_create(const dm_handle_t * p_handle, uint16_t conn_handle)
 {
-    DEBUG("Creating handle with id %d", p_handle->connection_id);
     m_client[p_handle->connection_id].ble_read_buffer_length = SPI_HEADER_SIZE;
     m_client[p_handle->connection_id].state              = STATE_SERVICE_DISC;
     m_client[p_handle->connection_id].srv_db.conn_handle = conn_handle;
@@ -527,7 +512,8 @@ uint32_t client_handling_destroy(const dm_handle_t * p_handle)
     {
         m_client_count--;
         p_client->state = IDLE;
-        uint8_t dummy[6] = {0, 0, 0, 0, 9, 8};
+        //first 3 bytes are SPI header, will get filled in by function. next two bytes are BLE header
+        uint8_t dummy[6] = {0, 0, 0, SOCKET_DATA_SERVICE, (((SPI_BUS_DISCONNECT << 4) & 0xF0) | (0 & 0x0F)), 22};
         spi_slave_set_tx_buffer(p_client, SPI_BUS_DISCONNECT, dummy, 6);
     }
     else

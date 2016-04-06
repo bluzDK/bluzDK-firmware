@@ -308,9 +308,7 @@ void sys_evt_dispatch(uint32_t sys_evt)
 
 void data_write_handler(scs_t * p_lbs, uint8_t *data, uint16_t length)
 {
-
-    uint16_t serviceID = 0x00 | data[0];
-    dataManagementFeedData(serviceID, length-1, data+1);
+    dataManagementFeedData(length, data);
 //    uint16_t serviceID = 0x01;
 //    dataManagementFeedData(serviceID, length, data);
 }
@@ -344,7 +342,6 @@ uint32_t device_manager_evt_handler(dm_handle_t const    * p_handle,
             break;
         case DM_EVT_DISCONNECTION:
             nrf_gpio_pin_clear(GATEWAY_NOTIFICATION_LED);
-            nrf_gpio_pin_clear(CONNECTION_PIN);
 
             err_code = client_handling_destroy(p_handle);
             APP_ERROR_CHECK(err_code);

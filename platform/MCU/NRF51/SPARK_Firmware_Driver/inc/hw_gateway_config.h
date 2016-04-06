@@ -33,6 +33,8 @@
 #define SPI_SLAVE_TX_BUF_SIZE   1096                        /**< SPI TX buffer size. */
 #define SPI_SLAVE_RX_BUF_SIZE   SPI_SLAVE_TX_BUF_SIZE       /**< SPI RX buffer size. */
 
+#define INFO_DATA_SERVICE_BUF_SIZE  8
+
 #define MIN_CONNECTION_INTERVAL          MSEC_TO_UNITS(7.5, UNIT_1_25_MS)                /**< Determines minimum connection interval in millisecond. */
 #define MAX_CONNECTION_INTERVAL          MSEC_TO_UNITS(30, UNIT_1_25_MS)                /**< Determines maximum connection interval in millisecond. */
 #define SLAVE_LATENCY                    0                                              /**< Determines slave latency in counts of connection events. */
@@ -47,10 +49,9 @@ uint8_t                           m_peer_count;                    /**< Number o
 bool                              m_memory_access_in_progress;     /**< Flag to keep track of ongoing operations on persistent memory. */
 
 #define GATEWAY_NOTIFICATION_LED         0
-#define CONNECTION_PIN					 13
 
 #define BLE_HEADER_SIZE  2
-#define SPI_HEADER_SIZE  4
+#define SPI_HEADER_SIZE  3
 
 #define TIME_BETWEEN_CONNECTIONS        15000
 uint32_t lastConnectionTime;
@@ -60,9 +61,9 @@ bool gatewayHardwareConnected;
 /**@brief Gateway Protocol states. */
 typedef enum
 {
+    SPI_BUS_DATA,
     SPI_BUS_CONNECT,
-    SPI_BUS_DISCONNECT,
-    SPI_BUS_DATA
+    SPI_BUS_DISCONNECT
 } gateway_function_t;
 
 /**@brief Variable length data encapsulation in terms of length and pointer to data */
@@ -113,6 +114,9 @@ uint8_t spi_slave_rx_buffer[SPI_SLAVE_RX_BUF_SIZE];
 volatile uint16_t spi_slave_rx_buffer_size;
 volatile uint16_t spi_slave_rx_buffer_start;
 void spi_slave_rx_data(uint8_t *rx_buffer, uint16_t size);
+
+uint8_t info_data_service_buffer_size;
+uint8_t info_data_service_buffer[INFO_DATA_SERVICE_BUF_SIZE];
 #endif
 
 uint32_t adv_report_parse(uint8_t type, data_t * p_advdata, data_t * p_typedata);

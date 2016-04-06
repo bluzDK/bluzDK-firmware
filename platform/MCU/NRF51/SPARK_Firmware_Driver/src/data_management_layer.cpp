@@ -37,12 +37,13 @@ void DataManagementLayer::registerService(DataService* service)
     services[dataServicesRegistered++] = service;
 }
 
-void DataManagementLayer::feedData(uint16_t id, int16_t length, uint8_t *data)
+void DataManagementLayer::feedData(int16_t length, uint8_t *data)
 {
+    uint16_t serviceID = 0x00 | data[0];
     for (int i = 0; i < dataServicesRegistered; i++)
     {
-        if (services[i] != NULL && id == services[i]->getServiceID()) {
-            services[i]->DataCallback(data, length);
+        if (services[i] != NULL && serviceID == services[i]->getServiceID()) {
+            services[i]->DataCallback(data+1, length-1);
             break;
         }
     }
@@ -56,25 +57,16 @@ void DataManagementLayer::sendData(int16_t length, uint8_t *data)
 #endif
 #if PLATFORM_ID==269
 #endif
-    switch ((data[1] >> 4) & 0xF) {
-        case SOCKET_CONNECT:
-            data[3] = SPI_BUS_CONNECT;
-            break;
-        case SOCKET_DATA:
-            data[3] = SPI_BUS_DATA;
-            break;
-        default:
-            break;
-    }
-    data[0] = (( (length-SPI_HEADER_SIZE) & 0xFF00) >> 8);
-    data[1] = ( (length-SPI_HEADER_SIZE) & 0xFF);
+    data[0] = (( (length-BLE_HEADER_SIZE-SPI_HEADER_SIZE) & 0xFF00) >> 8);
+    data[1] = ( (length-BLE_HEADER_SIZE-SPI_HEADER_SIZE) & 0xFF);
     data[2] = GATEWAY_ID;
+
     spi_slave_send_data(data, length);
 }
 
-void dataManagementFeedData(uint16_t id, int16_t length, uint8_t *data)
+void dataManagementFeedData(int16_t length, uint8_t *data)
 {
-    DataManagementLayer::feedData(id, length, data);
+    DataManagementLayer::feedData(length, data);
 }
     
 void dataManagementSendData(int16_t length, uint8_t *data)

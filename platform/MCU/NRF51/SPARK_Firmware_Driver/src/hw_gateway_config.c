@@ -63,11 +63,7 @@ void ble_gateway_stack_init(void)
 
 void gateway_notify_disconnect_all(void) {
     for (int i = 0; i <= MAX_CLIENTS; i++) {
-        uint8_t dummy[6] = {0, 0, 0, 0, 9, 8};
-        dummy[0] = (( (6-SPI_HEADER_SIZE) & 0xFF00) >> 8);
-        dummy[1] = ( (6-SPI_HEADER_SIZE) & 0xFF);
-        dummy[2] = i;
-        dummy[3] = SPI_BUS_DISCONNECT;
+        uint8_t dummy[6] = {(( (6-SPI_HEADER_SIZE-BLE_HEADER_SIZE) & 0xFF00) >> 8), ( (6-SPI_HEADER_SIZE-BLE_HEADER_SIZE) & 0xFF), i, SOCKET_DATA_SERVICE, (((SPI_BUS_DISCONNECT << 4) & 0xF0) | (0 & 0x0F)), 22};
         spi_slave_send_data(dummy, 6);
     }
 }
@@ -83,6 +79,8 @@ void gateway_init(void)
     
     spi_slave_rx_buffer_size = 0;
     spi_slave_rx_buffer_start = 0;
+
+    info_data_service_buffer_size = 0;
     
     client_handling_init(spi_slave_tx_data);
     spi_slave_stream_init(spi_slave_rx_data);
@@ -112,7 +110,6 @@ void gateway_scan_start(void)
 //interrupt driven function to put data into buffers for process in gateway_loop
 void spi_slave_tx_data(uint8_t* tx_buffer, uint16_t size)
 {
-    DEBUG("Data->BLE Callback: %d @ %d", size, spi_slave_tx_buffer_size);
     if (spi_slave_tx_buffer_start+spi_slave_tx_buffer_size+size <= SPI_SLAVE_TX_BUF_SIZE) {
         memcpy(spi_slave_tx_buffer+spi_slave_tx_buffer_start+spi_slave_tx_buffer_size, tx_buffer, size);
         spi_slave_tx_buffer_size += size;
@@ -125,9 +122,14 @@ void spi_slave_rx_data(uint8_t *rx_buffer, uint16_t size)
     //hack - set the third byte to the socket ID, which is always 0 for now
     //then send only the data starting at the third byte, which is 1 byte longer than the length reported
     if (rx_buffer[2] == GATEWAY_ID) {
+        int serviceID = rx_buffer[3];
         int length = (rx_buffer[0] << 8) | rx_buffer[1];
-        rx_buffer[3] = 0;
-        dataManagementFeedData(SOCKET_DATA_SERVICE, length+1, rx_buffer+3);
+        if (serviceID == INFO_DATA_SERVICE) {
+            info_data_service_buffer_size = length;
+            memcpy(info_data_service_buffer, rx_buffer, size);
+        } else {
+            dataManagementFeedData(length + BLE_HEADER_SIZE, rx_buffer + SPI_HEADER_SIZE);
+        }
     } else {
         if (spi_slave_rx_buffer_start+spi_slave_rx_buffer_size+size <= SPI_SLAVE_RX_BUF_SIZE) {
             memcpy(spi_slave_rx_buffer+spi_slave_rx_buffer_start+spi_slave_rx_buffer_size, rx_buffer, size);
@@ -142,8 +144,9 @@ void gateway_loop(void)
     if (spi_slave_rx_buffer_size > 0) {
         int id = spi_slave_rx_buffer[2];
         int bytesRx = spi_slave_rx_buffer_size;
-
+        DEBUG("Starting!");
         if (id < MAX_CLIENTS) {
+            DEBUG("Sending down data of size %d on id %d", spi_slave_rx_buffer_size, id);
             //this data is for one of the connected bluz DK boards
             client_send_data(spi_slave_rx_buffer + spi_slave_rx_buffer_start, bytesRx);
             spi_slave_rx_buffer_size -= bytesRx;
@@ -155,8 +158,6 @@ void gateway_loop(void)
     }
     
     if (spi_slave_tx_buffer_size > 0) {
-
-        DEBUG("Data->SPI Function: %d  @ %d", spi_slave_tx_buffer_size, spi_slave_tx_buffer_start);
         int bytesTx = spi_slave_tx_buffer_size;
         spi_slave_send_data(spi_slave_tx_buffer+spi_slave_tx_buffer_start, bytesTx);
 
@@ -165,6 +166,12 @@ void gateway_loop(void)
         if (spi_slave_tx_buffer_size == 0) {
             spi_slave_tx_buffer_start = 0;
         }
+    }
+
+    if (info_data_service_buffer_size > 0) {
+        int length = (info_data_service_buffer[0] << 8) | info_data_service_buffer[1];
+        dataManagementFeedData(length + BLE_HEADER_SIZE, info_data_service_buffer + SPI_HEADER_SIZE);
+        info_data_service_buffer_size = 0;
     }
 }
 
