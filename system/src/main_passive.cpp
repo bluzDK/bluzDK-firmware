@@ -98,7 +98,7 @@ extern "C" void HAL_SysTick_Handler(void) {
         }
         else
         {
-            TimingFlashUpdateTimeout++;
+            TimingFlashUpdateTimeout+=HAL_Get_Sys_Tick_Interval();
         }
     }
 
