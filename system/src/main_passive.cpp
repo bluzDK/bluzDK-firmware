@@ -76,6 +76,7 @@ extern "C" void HAL_SysTick_Handler(void) {
         }
     }
 
+    //feed the dog
     if (TimingIWDGReload >= TIMING_IWDG_RELOAD)
     {
         TimingIWDGReload = 0;
@@ -86,6 +87,22 @@ extern "C" void HAL_SysTick_Handler(void) {
     {
         TimingIWDGReload+=HAL_Get_Sys_Tick_Interval();
     }
+
+    //check on system updates and reset if necessary
+    if(SPARK_FLASH_UPDATE)
+    {
+        if (TimingFlashUpdateTimeout >= TIMING_FLASH_UPDATE_TIMEOUT)
+        {
+            //Reset is the only way now to recover from stuck OTA update
+            HAL_Core_System_Reset();
+        }
+        else
+        {
+            TimingFlashUpdateTimeout++;
+        }
+    }
+
+
 }
 
 //stubs

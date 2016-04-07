@@ -154,7 +154,7 @@ SparkProtocol* system_cloud_protocol_instance(void);
 #define SPARK_LOOP_DELAY_MILLIS		        1000    //1sec
 #define SPARK_RECEIVE_DELAY_MILLIS              10      //10ms
 
-#define TIMING_FLASH_UPDATE_TIMEOUT             30000   //30sec
+#define TIMING_FLASH_UPDATE_TIMEOUT             600000   //10 minutes
 
 #define USER_VAR_MAX_COUNT		        10
 #define USER_VAR_KEY_LENGTH		        12
