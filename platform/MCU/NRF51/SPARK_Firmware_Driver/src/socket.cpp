@@ -46,7 +46,7 @@ int32_t Socket::connect(uint32_t sockid, const sockaddr_b *addr, long addrlen)
     data[0] = SOCKET_DATA_SERVICE & 0xFF;
     
     //next, the socket ID
-    data[1] = (SOCKET_CONNECT & 0xF0) | (id & 0x0F);
+    data[1] = ((SOCKET_CONNECT << 4) & 0xF0) | (id & 0x0F);
     
     //then the connection code
     data[2] = (SOCKET_CONNECT & 0xFF00) >> 8;
