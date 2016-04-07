@@ -40,6 +40,7 @@ typedef enum {
     BLE_ADVERTISING,
     BLE_SLEEPING,
     BLE_CONNECTED,
+    BLE_SCANNING,
 } BLE_STATE;
 
 volatile BLE_STATE state;

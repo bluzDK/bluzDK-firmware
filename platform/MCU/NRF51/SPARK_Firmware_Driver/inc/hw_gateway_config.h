@@ -54,7 +54,10 @@ bool                              m_memory_access_in_progress;     /**< Flag to 
 #define SPI_HEADER_SIZE  3
 
 #define TIME_BETWEEN_CONNECTIONS        15000
+#define CONNECTION_FAILURE_TIMEOUT      30
 uint32_t lastConnectionTime;
+uint32_t lastConnectionErrorTime;
+uint8_t connectionErrors;
 
 bool gatewayHardwareConnected;
 
@@ -102,6 +105,8 @@ void ble_gateway_stack_init(void);
 void gateway_init(void);
 void gateway_scan_start(void);
 void gateway_loop(void);
+
+void gateway_cancel_connect_and_start_scanning(void);
 
 //Gateway Callback Functions
 #if PLATFORM_ID==269

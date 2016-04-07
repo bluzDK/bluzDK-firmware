@@ -185,6 +185,7 @@ void on_ble_evt(ble_evt_t * p_ble_evt)
                 system_millis() - lastConnectionTime > TIME_BETWEEN_CONNECTIONS)
             {
                 err_code = sd_ble_gap_scan_stop();
+                state = BLE_OFF;
                 if (err_code != NRF_SUCCESS)
                 {
                 }

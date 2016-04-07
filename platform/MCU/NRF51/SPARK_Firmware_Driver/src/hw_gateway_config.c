@@ -71,6 +71,8 @@ void gateway_notify_disconnect_all(void) {
 //HW Init Functions
 void gateway_init(void)
 {
+    lastConnectionErrorTime = 0;
+    connectionErrors = 0;
     lastConnectionTime = 0;
     m_peer_count = 0;
     m_memory_access_in_progress = false;
@@ -105,6 +107,7 @@ void gateway_scan_start(void)
     }
     err_code = sd_ble_gap_scan_start(&m_scan_param);
     APP_ERROR_CHECK(err_code);
+    state = BLE_SCANNING;
 }
 
 //interrupt driven function to put data into buffers for process in gateway_loop
@@ -173,6 +176,33 @@ void gateway_loop(void)
         dataManagementFeedData(length + BLE_HEADER_SIZE, info_data_service_buffer + SPI_HEADER_SIZE);
         info_data_service_buffer_size = 0;
     }
+
+    //sort of a connection watchdog timer
+    //if a connection timed out, but didn't explicitly fail, then scanning would never start again
+    if (state==BLE_OFF && m_peer_count < MAX_CLIENTS) {
+        if (lastConnectionErrorTime == 0) {
+            lastConnectionErrorTime = system_millis();
+        }
+        if (system_millis() - lastConnectionErrorTime > (connectionErrors*1000)) {
+            connectionErrors++;
+        }
+        if (connectionErrors > CONNECTION_FAILURE_TIMEOUT) {
+            gateway_cancel_connect_and_start_scanning();
+        }
+    } else if (state==BLE_SCANNING) {
+        if (connectionErrors != 0) {
+            connectionErrors = 0;
+            lastConnectionErrorTime = 0;
+        }
+    }
+}
+
+void gateway_cancel_connect_and_start_scanning(void)
+{
+    sd_ble_gap_connect_cancel();
+    gateway_scan_start();
+    connectionErrors = 0;
+    lastConnectionErrorTime = 0;
 }
 
 //parse the advertisement data for type
