@@ -40,6 +40,8 @@ void HAL_Core_Init(void)
     gpiote_init();
     buttons_init();
     wdt_init();
+
+    timers_start();
 }
 
 void HAL_Network_Init(void)
@@ -47,11 +49,11 @@ void HAL_Network_Init(void)
     ble_gateway_stack_init();
     scheduler_init();
     device_manager_init();
+    timers_start();
     gateway_init();
     data_service_init();
     external_flash_init();
-    
-    timers_start();
+
     gateway_scan_start();
 }
 
