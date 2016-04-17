@@ -98,7 +98,7 @@ uint32_t spi_slave_stream_init(void (*a)(uint8_t *m_tx_buf, uint16_t size))
     nrf_gpio_cfg_output(SPIS_PTS_PIN);
     nrf_gpio_pin_clear(SPIS_PTS_PIN);
 
-	nrf_gpio_cfg_input(SPIS_MR_PIN, NRF_GPIO_PIN_NOPULL);
+	nrf_gpio_cfg_input(SPIS_MR_PIN, NRF_GPIO_PIN_PULLDOWN);
 
 	currentSPISlaveBufferSize = 0;
     // Enable Radio Notification, allows us to alert the master when we are busy
@@ -107,6 +107,8 @@ uint32_t spi_slave_stream_init(void (*a)(uint8_t *m_tx_buf, uint16_t size))
 
     rx_callback = a;
 	busy = false;
+
+	spi_slave_set_cs_pull_up_config(NRF_GPIO_PIN_PULLUP);
 
     err_code = spi_slave_evt_handler_register(spi_slave_event_handle);
     APP_ERROR_CHECK(err_code);
@@ -124,8 +126,12 @@ uint32_t spi_slave_stream_init(void (*a)(uint8_t *m_tx_buf, uint16_t size))
     APP_ERROR_CHECK(err_code);
 
     //Set buffers.
+	busy = true;
     err_code = spi_slave_buffers_set(m_tx_buf, m_rx_buf, sizeof(m_tx_buf), sizeof(m_rx_buf));
     APP_ERROR_CHECK(err_code);
+
+	//wait for the buffers to get set, otherwise we can cause weird race conditions
+	while (busy) { }
 
 
     return NRF_SUCCESS;
