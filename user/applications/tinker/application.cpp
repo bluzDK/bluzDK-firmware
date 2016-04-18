@@ -26,6 +26,9 @@
 /* Includes ------------------------------------------------------------------*/
 #include "application.h"
 
+#define xstr(s) str(s)
+#define str(s) #s
+
 /* Function prototypes -------------------------------------------------------*/
 int tinkerDigitalRead(String pin);
 int tinkerDigitalWrite(String command);
@@ -34,6 +37,9 @@ int tinkerAnalogWrite(String command);
 
 SYSTEM_MODE(AUTOMATIC);
 
+String version = xstr(SYSTEM_VERSION_STRING);
+
+
 /* This function is called once at start up ----------------------------------*/
 void setup()
 {
@@ -41,11 +47,12 @@ void setup()
 
 	//Register all the Tinker functions
 	Particle.function("digitalread", tinkerDigitalRead);
-        Particle.function("digitalwrite", tinkerDigitalWrite);
+	Particle.function("digitalwrite", tinkerDigitalWrite);
 
 	Particle.function("analogread", tinkerAnalogRead);
 	Particle.function("analogwrite", tinkerAnalogWrite);
 
+	Particle.variable("version", version);
 }
 
 /* This function loops forever --------------------------------------------*/
