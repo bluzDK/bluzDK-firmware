@@ -21,6 +21,7 @@
 #include "hw_config.h"
 #include "sst25vf_spi.h"
 
+
 #if MODULAR_FIRMWARE
 
 #if PLATFORM_ID==103   /*--bluz*/
@@ -30,6 +31,7 @@ const module_bounds_t module_user = { 0x5000, 0x37000, 0x3C000, MODULE_FUNCTION_
 const module_bounds_t module_factory = { 0x1F000, 0x1021000, 0x1040000, MODULE_FUNCTION_USER_PART, 1, MODULE_STORE_FACTORY};
 const module_bounds_t* module_bounds[] = { &module_bootloader, &module_system_part1, &module_user, &module_factory };
 const module_bounds_t module_ota = { 0x1D000, 0x1004000, 0x1021000, MODULE_FUNCTION_NONE, 0, MODULE_STORE_SCRATCHPAD};
+const unsigned module_bounds_length = 4;
 #endif
 
 #if PLATFORM_ID==269   /*--bluz-gw*/
@@ -39,6 +41,7 @@ const module_bounds_t module_user = { 0x5000, 0x37000, 0x3C000, MODULE_FUNCTION_
 const module_bounds_t module_factory = { 0x1F000, 0x1021000, 0x1040000, MODULE_FUNCTION_USER_PART, 1, MODULE_STORE_FACTORY};
 const module_bounds_t* module_bounds[] = { &module_bootloader, &module_system_part1, &module_user, &module_factory };
 const module_bounds_t module_ota = { 0x1D000, 0x1004000, 0x1021000, MODULE_FUNCTION_NONE, 0, MODULE_STORE_SCRATCHPAD};
+const unsigned module_bounds_length = 4;
 #endif
 
 #else
@@ -46,11 +49,10 @@ const module_bounds_t module_bootloader = { 0x4000, 0x3C000, 0x40000, MODULE_FUN
 const module_bounds_t module_user = { 0x24000, 0x18000, 0x3C000, MODULE_FUNCTION_MONO_FIRMWARE, 0, MODULE_STORE_MAIN};
 const module_bounds_t module_factory = { 0x1F000, 0x1021000, 0x1040000, MODULE_FUNCTION_MONO_FIRMWARE, 0, MODULE_STORE_FACTORY};
 const module_bounds_t* module_bounds[] = { &module_bootloader, &module_user, &module_factory };
-
 const module_bounds_t module_ota = { 0x1D000, 0x1004000, 0x1021000, MODULE_FUNCTION_NONE, 0, MODULE_STORE_SCRATCHPAD};
+const unsigned module_bounds_length = 3;
 #endif
 
-const unsigned module_bounds_length = 3;
 void HAL_OTA_Add_System_Info(hal_system_info_t* info, bool create, void* reserved);
 
 /**
