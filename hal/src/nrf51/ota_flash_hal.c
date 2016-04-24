@@ -50,7 +50,7 @@ const module_bounds_t* module_bounds[] = { &module_bootloader, &module_user, &mo
 const module_bounds_t module_ota = { 0x1D000, 0x1004000, 0x1021000, MODULE_FUNCTION_NONE, 0, MODULE_STORE_SCRATCHPAD};
 #endif
 
-const unsigned module_bounds_length = 4;
+const unsigned module_bounds_length = 3;
 void HAL_OTA_Add_System_Info(hal_system_info_t* info, bool create, void* reserved);
 
 /**
