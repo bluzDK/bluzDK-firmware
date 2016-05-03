@@ -24,8 +24,8 @@
  ******************************************************************************
  */
 
-#ifndef __RTC_TIMER_HAL_H
-#define	__RTC_TIMER_HAL_H
+#ifndef __RTC_TIMER_H_
+#define	__RTC_TIMER_H_
 #include <stdint.h>
 #include <stddef.h> // NULL
 
@@ -83,5 +83,5 @@ private:
 
 };
 
-#endif	/* __RTC_TIMER_HAL_H */
+#endif	/* __RTC_TIMER_H_ */
 

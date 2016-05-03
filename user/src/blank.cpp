@@ -1,10 +1,12 @@
 #include "application.h"
+#include "rtc_timer.h"
 
 Serial1DebugOutput debugOutput(38400);          // default is 9600 and log everything
 
 char message[25];
 
 //char *hello = "Hello World";
+
 
 uint32_t m = 0;
 int blink(String command)
@@ -20,9 +22,16 @@ void radioCallbackHandler(bool radio_active) {
     //Do something about it
 }
 
+void timerCallback(void *context)
+{
+  Particle.publish("OMG IT WORKED!!");
+}
+
+RTCTimer testTimer(2000, timerCallback);
 
 /* executes once at startup */
 void setup() {
+  testTimer.start();
 //    Particle.variable("hello", hello, STRING);
 //    Particle.variable("mess", message, STRING);
 //    BLE.registerNotifications(radioCallbackHandler);
