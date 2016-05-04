@@ -24,14 +24,15 @@ void radioCallbackHandler(bool radio_active) {
 
 void timerCallback(void *context)
 {
-  Particle.publish("OMG IT WORKED!!");
+  if (BLE.getState() == BLE_CONNECTED)
+    Particle.publish("OMG IT WORKED!!");
 }
 
-RTCTimer testTimer(2000, timerCallback);
+RTCTimer testTimer(20, timerCallback);
 
 /* executes once at startup */
 void setup() {
-  testTimer.start();
+//  testTimer.start();
 //    Particle.variable("hello", hello, STRING);
 //    Particle.variable("mess", message, STRING);
 //    BLE.registerNotifications(radioCallbackHandler);
@@ -64,6 +65,12 @@ bool ledOn = false;
 bool once = false;
 /* executes continuously after setup() runs */
 void loop() {
+  static bool one = true;
+  if (one && BLE.getState() == BLE_CONNECTED) {
+    one = false;
+    Spark.publish("ERROR CODE: ", String(testTimer.getError()) );
+  }
+
     if (Particle.connected() && once == false && millis() > 30000) {
 //        DEBUG("Connection Interval: %d", BLE.getConnectionInterval());
         once = true;

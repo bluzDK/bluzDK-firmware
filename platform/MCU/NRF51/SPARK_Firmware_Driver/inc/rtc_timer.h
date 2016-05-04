@@ -66,20 +66,23 @@ extern "C" {
 class RTCTimer
 {
 public:
-    RTCTimer(uint32_t interval, app_timer_timeout_handler_t callback );
+    RTCTimer(uint32_t interval, app_timer_timeout_handler_t callback);
     RTCTimer(uint32_t interval, app_timer_timeout_handler_t callback, bool oneshot);
     void start();
     void stop();
     void changePeriod();
     void dispose();
     bool isActive();
+    uint32_t getError();
 
 private:
     void _init();
     app_timer_id_t timerID;
     uint32_t timerInterval;
     app_timer_timeout_handler_t callbackFunc;
+    bool oneShot;
     void *callbackContextPointer;
+    uint32_t errorCode;
 
 };
 

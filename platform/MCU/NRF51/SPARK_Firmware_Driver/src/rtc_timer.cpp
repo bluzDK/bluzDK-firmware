@@ -32,15 +32,11 @@
 
 /* Private function prototypes ----------------------------------------------*/
 
-RTCTimer::RTCTimer(uint32_t interval, app_timer_timeout_handler_t callback )
+RTCTimer::RTCTimer(uint32_t interval, app_timer_timeout_handler_t callback)
 {
   this->_init();
-  this->callbackFunc = callback;
+  callbackFunc = callback;
   this->timerInterval = interval;
-  if (0 == app_timer_create( &this->timerID, APP_TIMER_MODE_REPEATED, this->callbackFunc) )
-  {
-    app_timer_start(this->timerID, this->timerInterval, this->callbackContextPointer);
-  }
 };
 
 RTCTimer::RTCTimer(uint32_t interval, app_timer_timeout_handler_t callback, bool oneshot = true)
@@ -48,23 +44,26 @@ RTCTimer::RTCTimer(uint32_t interval, app_timer_timeout_handler_t callback, bool
   this->_init();
   callbackFunc = callback;
   this->timerInterval = interval;
-  if (0 == app_timer_create( &this->timerID, APP_TIMER_MODE_SINGLE_SHOT, this->callbackFunc) )
-  {
-    app_timer_start(this->timerID, this->timerInterval, this->callbackContextPointer);
-  }
+  this->oneShot = oneshot;
 };
 
 void RTCTimer::_init() 
 { 
   this->callbackFunc = (app_timer_timeout_handler_t)0x00; 
   this->callbackContextPointer = (void *)0x00;
+  this->oneShot = false;
+  this->errorCode = NRF_ERROR_INVALID_STATE;
+  this->timerID = 0;
 };
 
 void RTCTimer::start()
 {
-  if (callbackFunc) {
-     app_timer_start(this->timerID, this->timerInterval, this->callbackContextPointer);
-  }
+  if (!this->timerID)  // don't repeat this call if we already have a valid timerID
+    this->errorCode = app_timer_create( &this->timerID, APP_TIMER_MODE_REPEATED, this->callbackFunc);
+
+  if (this->timerID) // errorCode (there only for user-land debugging) may have changed elswhere, so don't rely on it here
+    this->errorCode = app_timer_start(this->timerID, this->timerInterval, this->callbackContextPointer);
+
 };
 
 void RTCTimer::stop()
@@ -83,5 +82,10 @@ void RTCTimer::dispose()
 bool RTCTimer::isActive()
 {
   return false;
+};
+
+uint32_t RTCTimer::getError()
+{
+  return this->errorCode;
 };
 
