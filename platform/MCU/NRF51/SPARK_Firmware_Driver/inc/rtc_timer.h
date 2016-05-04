@@ -1,11 +1,5 @@
 /**
  ******************************************************************************
- * @file    delay_hal.h
- * @author  Bryan J. Rentoul (aka Gruvin)
- * @version V1.0.0
- * @date    25-Sept-2014
- * @brief
- ******************************************************************************
   Copyright (c) 2013-2015 Particle Industries, Inc.  All rights reserved.
   Copyright (c) 2016 Bryan J. Rentoul (aka Gruvin).  All rights reserved.
 
