@@ -39,10 +39,7 @@ void setup() {
 void loop() {
   static bool once = true;
   if (once && BLE.getState() == BLE_CONNECTED) {
-    Particle.publish("GDERR_CODE:", String(global_debug_err_code) );
-    Particle.publish("ERROR1:", String(testTimer.getError()) );
     testTimer.start();
-    Particle.publish("ERROR2:", String(testTimer.getError()) );
     once = false;
   }
 

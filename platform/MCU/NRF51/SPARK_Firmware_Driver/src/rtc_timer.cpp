@@ -52,7 +52,6 @@ void RTCTimer::_init()
   this->callbackFunc = (app_timer_timeout_handler_t)0x00; 
   this->callbackContextPointer = (void *)0x00;
   this->oneShot = false;
-  this->errorCode = NRF_ERROR_INVALID_STATE;
   this->timerID = 0;
 };
 
@@ -61,13 +60,13 @@ void RTCTimer::start()
   uint32_t err_code;
   if (!this->timerID)  // don't repeat this call if we already have a valid timerID
   {
-    this->errorCode = app_timer_create( &this->timerID, APP_TIMER_MODE_REPEATED, this->callbackFunc);
+    err_code = app_timer_create( &this->timerID, APP_TIMER_MODE_REPEATED, this->callbackFunc);
     APP_ERROR_CHECK(err_code);    
   }
 
   if (this->timerID) 
   {
-    this->errorCode = app_timer_start(this->timerID, this->timerInterval, this->callbackContextPointer);
+    err_code = app_timer_start(this->timerID, this->timerInterval, this->callbackContextPointer);
     APP_ERROR_CHECK(err_code);    
   }
 };
