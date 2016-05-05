@@ -56,12 +56,12 @@ void DataManagementLayer::sendData(int16_t length, uint8_t *data)
     particle_service_send_data(data, length);
 #endif
 #if PLATFORM_ID==269
-#endif
     data[0] = (( (length-BLE_HEADER_SIZE-SPI_HEADER_SIZE) & 0xFF00) >> 8);
     data[1] = ( (length-BLE_HEADER_SIZE-SPI_HEADER_SIZE) & 0xFF);
     data[2] = GATEWAY_ID;
 
     spi_slave_send_data(data, length);
+#endif
 }
 
 void dataManagementFeedData(int16_t length, uint8_t *data)

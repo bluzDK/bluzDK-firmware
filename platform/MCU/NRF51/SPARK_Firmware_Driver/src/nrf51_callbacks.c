@@ -100,7 +100,6 @@ void wdt_event_handler(void)
  */
 void on_ble_evt(ble_evt_t * p_ble_evt)
 {
-    uint32_t                         err_code;
 //    static ble_gap_evt_auth_status_t m_auth_status;
 //    ble_gap_enc_info_t *             p_enc_info;
     
@@ -151,6 +150,7 @@ void on_ble_evt(ble_evt_t * p_ble_evt)
 #endif
 
 #if PLATFORM_ID==269
+        uint32_t err_code;
         case BLE_GAP_EVT_ADV_REPORT:
         {
             data_t adv_data;
@@ -277,6 +277,7 @@ void ble_evt_dispatch(ble_evt_t * p_ble_evt)
  */
 void on_sys_evt(uint32_t sys_evt)
 {
+#if PLATFORM_ID==269
     switch(sys_evt)
     {
         case NRF_EVT_FLASH_OPERATION_SUCCESS:
@@ -291,6 +292,7 @@ void on_sys_evt(uint32_t sys_evt)
             // No implementation needed.
             break;
     }
+#endif
 }
 
 /**@brief Function for dispatching a system event to interested modules.
@@ -322,7 +324,6 @@ uint32_t device_manager_evt_handler(dm_handle_t const    * p_handle,
                                            dm_event_t const     * p_event,
                                            ret_code_t           event_result)
 {
-    uint32_t       err_code;
     APP_ERROR_CHECK(event_result);
     
     switch(p_event->event_id)
@@ -332,6 +333,7 @@ uint32_t device_manager_evt_handler(dm_handle_t const    * p_handle,
             m_bonded_peer_handle = (*p_handle);
             break;
 #if PLATFORM_ID==269
+        uint32_t  err_code;
         case DM_EVT_CONNECTION:
             err_code = client_handling_create(p_handle, p_event->event_param.p_gap_param->conn_handle);
             APP_ERROR_CHECK(err_code);
@@ -377,7 +379,7 @@ uint32_t device_manager_evt_handler(dm_handle_t const    * p_handle,
 
 #if PLATFORM_ID==269
     // Relay the event to client handling module.
-    err_code = client_handling_dm_event_handler(p_handle, p_event, event_result);
+    uint32_t err_code = client_handling_dm_event_handler(p_handle, p_event, event_result);
     APP_ERROR_CHECK(err_code);
 #endif
     
