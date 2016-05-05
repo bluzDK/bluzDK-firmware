@@ -58,12 +58,18 @@ void RTCTimer::_init()
 
 void RTCTimer::start()
 {
+  uint32_t err_code;
   if (!this->timerID)  // don't repeat this call if we already have a valid timerID
+  {
     this->errorCode = app_timer_create( &this->timerID, APP_TIMER_MODE_REPEATED, this->callbackFunc);
+    APP_ERROR_CHECK(err_code);    
+  }
 
-  if (this->timerID) // errorCode (there only for user-land debugging) may have changed elswhere, so don't rely on it here
+  if (this->timerID) 
+  {
     this->errorCode = app_timer_start(this->timerID, this->timerInterval, this->callbackContextPointer);
-
+    APP_ERROR_CHECK(err_code);    
+  }
 };
 
 void RTCTimer::stop()
@@ -82,10 +88,5 @@ void RTCTimer::dispose()
 bool RTCTimer::isActive()
 {
   return false;
-};
-
-uint32_t RTCTimer::getError()
-{
-  return this->errorCode;
 };
 

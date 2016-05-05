@@ -28,6 +28,7 @@ extern "C" {
 #endif
 
 #include "nrf_error.h"
+#include "app_error.h"
 
 //#include "app_timer.h"
 // [Grrr!!]
@@ -52,6 +53,9 @@ extern "C" {
   extern uint32_t app_timer_start(app_timer_id_t timer_id, uint32_t timeout_ticks, void * p_context);
   extern uint32_t app_timer_stop(app_timer_id_t timer_id);
 // [/Grrr!!]
+  
+  extern uint32_t global_debug_err_code;
+  
 
 #ifdef __cplusplus
 }
@@ -76,9 +80,8 @@ private:
     app_timer_timeout_handler_t callbackFunc;
     bool oneShot;
     void *callbackContextPointer;
-    uint32_t errorCode;
-
 };
+
 
 #endif	/* __RTC_TIMER_H_ */
 
