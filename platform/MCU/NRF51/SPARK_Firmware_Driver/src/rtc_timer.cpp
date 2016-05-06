@@ -38,6 +38,7 @@ RTCTimer::RTCTimer(uint32_t interval, app_timer_timeout_handler_t callback)
   this->_init();
   callbackFunc = callback;
   this->timerInterval = interval;
+  this->timerMode = APP_TIMER_MODE_REPEATED;
 };
 
 RTCTimer::RTCTimer(uint32_t interval, app_timer_timeout_handler_t callback, bool oneshot = true)
@@ -45,23 +46,27 @@ RTCTimer::RTCTimer(uint32_t interval, app_timer_timeout_handler_t callback, bool
   this->_init();
   callbackFunc = callback;
   this->timerInterval = interval;
-  this->oneShot = oneshot;
+  this->timerMode = APP_TIMER_MODE_SINGLE_SHOT;
 };
+
+RTCTimer::~RTCTimer() {
+  if (this->timerID) app_timer_stop(this->timerID);
+}
 
 void RTCTimer::_init() 
 { 
   this->callbackFunc = (app_timer_timeout_handler_t)0x00; 
   this->callbackContextPointer = (void *)0x00;
-  this->oneShot = false;
+  this->timerMode = APP_TIMER_MODE_REPEATED;
   this->timerID = 0;
 };
 
 void RTCTimer::start()
 {
   uint32_t err_code;
-  if (!this->timerID)  // don't repeat this call if we already have a valid timerID
+  if (!this->timerID)  // don't repeat if we already have a valid timerID
   {
-    err_code = HAL_app_timer_create( &this->timerID, APP_TIMER_MODE_REPEATED, this->callbackFunc);
+    err_code = HAL_app_timer_create( &this->timerID, this->timerMode, this->callbackFunc);
     APP_ERROR_CHECK(err_code);    
   }
 

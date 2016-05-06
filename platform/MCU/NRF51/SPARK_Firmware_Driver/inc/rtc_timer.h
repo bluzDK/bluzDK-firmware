@@ -35,11 +35,15 @@ extern "C" {
 }
 #endif
 
+#include "stddef.h"
+#include <functional>
+
 class RTCTimer
 {
 public:
     RTCTimer(uint32_t interval, app_timer_timeout_handler_t callback);
     RTCTimer(uint32_t interval, app_timer_timeout_handler_t callback, bool oneshot);
+    ~RTCTimer();
     void start();
     void stop();
     void changePeriod();
@@ -52,7 +56,7 @@ private:
     app_timer_id_t timerID;
     uint32_t timerInterval;
     app_timer_timeout_handler_t callbackFunc;
-    bool oneShot;
+    app_timer_mode_t timerMode;
     void *callbackContextPointer;
 };
 

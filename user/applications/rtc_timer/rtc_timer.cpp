@@ -22,25 +22,25 @@
 
 void timerCallback(void *context)
 {
-  if (BLE.getState() == BLE_CONNECTED)
+  digitalWrite(D7, 1);
+  if (BLE.getState() == BLE_CONNECTED && Particle.connected())
     Particle.publish("OMG IT WORKED!!");
 }
 
-
-RTCTimer testTimer(2000, timerCallback);
-
+RTCTimer testTimer(2000000L, timerCallback);
 
 /* executes once at startup */
 void setup() {
-  
+  pinMode(D7, OUTPUT);  
 }
 
 /* executes continuously after setup() runs */
 void loop() {
   static bool once = true;
-  if (once && BLE.getState() == BLE_CONNECTED) {
-    testTimer.start();
+  if (once && Particle.connected()) {
     once = false;
+    Particle.publish("I'm back!");
+    testTimer.start();
   }
 
 }
