@@ -37,4 +37,5 @@ PROVIDE ( dynalib_location_system_net = system_part1_module_table + 48 );
 PROVIDE ( dynalib_location_system_cloud = system_part1_module_table + 52 );
 PROVIDE ( dynalib_location_hal_concurrent = system_part1_module_table + 56 );
 PROVIDE ( dynalib_location_hal_ble = system_part1_module_table + 60 );
+PROVIDE ( dynalib_location_hal_apptimer = system_part1_module_table + 64 );
 

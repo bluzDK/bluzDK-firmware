@@ -29,33 +29,7 @@ extern "C" {
 
 #include "nrf_error.h"
 #include "app_error.h"
-
-//#include "app_timer.h"
-// [Grrr!!]
-//    app_timer.h is not re-entrant in mixed C and C++ terms, due to their of checks 
-//    for macro definitions (I think?) So, rather than changing Nordic's code and 
-//    hopefully only for now, I've copied the required bits here :-/  ...
-// [/Grrr!!]
-
-  typedef uint32_t app_timer_id_t;
-  typedef void (*app_timer_timeout_handler_t)(void * p_context);
-  typedef uint32_t (*app_timer_evt_schedule_func_t) (app_timer_timeout_handler_t timeout_handler, void *p_context);
-  typedef enum
-  {
-    APP_TIMER_MODE_SINGLE_SHOT,                 /**< The timer will expire only once. */
-    APP_TIMER_MODE_REPEATED                     /**< The timer will restart each time it expires. */
-  } app_timer_mode_t;
-
-  extern uint32_t app_timer_create(
-      app_timer_id_t *            p_timer_id,
-      app_timer_mode_t            mode,
-      app_timer_timeout_handler_t timeout_handler);
-  extern uint32_t app_timer_start(app_timer_id_t timer_id, uint32_t timeout_ticks, void * p_context);
-  extern uint32_t app_timer_stop(app_timer_id_t timer_id);
-// [/Grrr!!]
-  
-  extern uint32_t global_debug_err_code;
-  
+#include "apptimer_hal.h"
 
 #ifdef __cplusplus
 }
@@ -81,6 +55,7 @@ private:
     bool oneShot;
     void *callbackContextPointer;
 };
+
 
 
 #endif	/* __RTC_TIMER_H_ */

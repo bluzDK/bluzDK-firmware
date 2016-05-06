@@ -18,6 +18,7 @@
 
 /* Includes -----------------------------------------------------------------*/
 #include "rtc_timer.h"
+#include "apptimer_hal.h"
 
 /* Private typedef ----------------------------------------------------------*/
 
@@ -60,13 +61,13 @@ void RTCTimer::start()
   uint32_t err_code;
   if (!this->timerID)  // don't repeat this call if we already have a valid timerID
   {
-    err_code = app_timer_create( &this->timerID, APP_TIMER_MODE_REPEATED, this->callbackFunc);
+    err_code = HAL_app_timer_create( &this->timerID, APP_TIMER_MODE_REPEATED, this->callbackFunc);
     APP_ERROR_CHECK(err_code);    
   }
 
   if (this->timerID) 
   {
-    err_code = app_timer_start(this->timerID, this->timerInterval, this->callbackContextPointer);
+    err_code = HAL_app_timer_start(this->timerID, this->timerInterval, this->callbackContextPointer);
     APP_ERROR_CHECK(err_code);    
   }
 };
