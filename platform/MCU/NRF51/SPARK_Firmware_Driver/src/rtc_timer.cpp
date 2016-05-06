@@ -18,7 +18,6 @@
 
 /* Includes -----------------------------------------------------------------*/
 #include "rtc_timer.h"
-#include "apptimer_hal.h"
 
 /* Private typedef ----------------------------------------------------------*/
 
@@ -33,30 +32,31 @@
 
 /* Private function prototypes ----------------------------------------------*/
 
-RTCTimer::RTCTimer(uint32_t interval, app_timer_timeout_handler_t callback)
+RTCTimer::RTCTimer(uint32_t interval, app_timer_timeout_handler_t handler_fn)
 {
   this->_init();
-  callbackFunc = callback;
-  this->timerInterval = interval;
-  this->timerMode = APP_TIMER_MODE_REPEATED;
-};
-
-RTCTimer::RTCTimer(uint32_t interval, app_timer_timeout_handler_t callback, bool oneshot = true)
-{
-  this->_init();
-  callbackFunc = callback;
+  this->handlerFunc = handler_fn;
   this->timerInterval = interval;
   this->timerMode = APP_TIMER_MODE_SINGLE_SHOT;
 };
 
-RTCTimer::~RTCTimer() {
+RTCTimer::RTCTimer(uint32_t interval, app_timer_timeout_handler_t handler_fn, bool one_shot = true)
+{
+  this->_init();
+  this->handlerFunc = handler_fn;
+  this->timerInterval = interval;
+  this->timerMode = (one_shot) ? APP_TIMER_MODE_SINGLE_SHOT : APP_TIMER_MODE_REPEATED;
+};
+
+RTCTimer::~RTCTimer()
+{
   if (this->timerID) app_timer_stop(this->timerID);
 }
 
 void RTCTimer::_init() 
 { 
-  this->callbackFunc = (app_timer_timeout_handler_t)0x00; 
-  this->callbackContextPointer = (void *)0x00;
+  this->handlerFunc = (app_timer_timeout_handler_t)0x00; 
+  this->handlerContext = (void *)0x00;
   this->timerMode = APP_TIMER_MODE_REPEATED;
   this->timerID = 0;
 };
@@ -64,15 +64,15 @@ void RTCTimer::_init()
 void RTCTimer::start()
 {
   uint32_t err_code;
-  if (!this->timerID)  // don't repeat if we already have a valid timerID
+  if (!this->timerID)  // don't repeat this call if we already have a valid timerID
   {
-    err_code = HAL_app_timer_create( &this->timerID, this->timerMode, this->callbackFunc);
+    err_code = app_timer_create( &this->timerID, this->timerMode, this->handlerFunc);
     APP_ERROR_CHECK(err_code);    
   }
 
   if (this->timerID) 
   {
-    err_code = HAL_app_timer_start(this->timerID, this->timerInterval, this->callbackContextPointer);
+    err_code = app_timer_start(this->timerID, this->timerInterval, this->handlerContext);
     APP_ERROR_CHECK(err_code);    
   }
 };

@@ -41,8 +41,8 @@ extern "C" {
 class RTCTimer
 {
 public:
-    RTCTimer(uint32_t interval, app_timer_timeout_handler_t callback);
-    RTCTimer(uint32_t interval, app_timer_timeout_handler_t callback, bool oneshot);
+    RTCTimer(uint32_t interval, app_timer_timeout_handler_t handler_fn);
+    RTCTimer(uint32_t interval, app_timer_timeout_handler_t handler_fn, bool one_shot);
     ~RTCTimer();
     void start();
     void stop();
@@ -55,9 +55,9 @@ private:
     void _init();
     app_timer_id_t timerID;
     uint32_t timerInterval;
-    app_timer_timeout_handler_t callbackFunc;
+    app_timer_timeout_handler_t handlerFunc;
     app_timer_mode_t timerMode;
-    void *callbackContextPointer;
+    void *handlerContext;
 };
 
 
