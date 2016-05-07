@@ -100,7 +100,9 @@ void RTCTimer::timeout_handler()
 {
   if (handlerFunc)
   {
-    handlerFunc();
+    handlerFunc(); // <--- this doesn't work, I believe becasue the linker doesn't know 
+                   //      that user-part is offset relative to system-part1 and therefore
+                   //      ends up jumping (calling) into larlar land.
   }
 };
 
