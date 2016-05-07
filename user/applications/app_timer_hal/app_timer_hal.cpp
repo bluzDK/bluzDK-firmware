@@ -15,8 +15,8 @@ void tmcallback2()
     Particle.publish("Yiiiup! Me too! :-)");
 }
 
-RTCTimer *testTimer = new RTCTimer(200000L, tmcallback, false);
-RTCTimer *testTimer2 = new RTCTimer(1000000L, tmcallback2, false);
+RTCTimer *testTimer = new RTCTimer(5000, tmcallback, false);
+RTCTimer *testTimer2 = new RTCTimer(20000, tmcallback2, false);
 
 void setup()
 {
