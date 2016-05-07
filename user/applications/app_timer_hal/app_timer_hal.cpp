@@ -9,7 +9,14 @@ void tmcallback()
     Particle.publish("HOLY CRAP BATMAN!!! IT WORKS!!!");
 }
 
+void tmcallback2()
+{
+  if (Particle.connected())
+    Particle.publish("Yiiiup! Me too! :-)");
+}
+
 RTCTimer *testTimer = new RTCTimer(200000L, tmcallback, false);
+RTCTimer *testTimer2 = new RTCTimer(1000000L, tmcallback2, false);
 
 void setup()
 {
@@ -22,6 +29,7 @@ void loop()
     once = false;
     Particle.publish("I'm back!");
     testTimer->start();
+    testTimer2->start();
   }
 }
 
