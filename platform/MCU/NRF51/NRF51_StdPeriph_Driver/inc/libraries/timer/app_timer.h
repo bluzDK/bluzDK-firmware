@@ -129,7 +129,7 @@ typedef uint32_t (*app_timer_evt_schedule_func_t) (app_timer_timeout_handler_t t
 
 
 /**@brief Integer for keepping track of the RTC overflow events. */
-volatile uint32_t RTC_OVERFLOW_COUNT;
+extern volatile uint32_t RTC_OVERFLOW_COUNT;
 
 
 /**@brief Timer modes. */
