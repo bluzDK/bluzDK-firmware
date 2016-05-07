@@ -27,6 +27,7 @@
 
 #ifdef DYNALIB_EXPORT
 #include "apptimer_hal.h"
+#include "rtc_timer.h"
 #endif
 
 // WARNING
@@ -40,6 +41,7 @@ DYNALIB_BEGIN(hal_apptimer)
 DYNALIB_FN(hal_apptimer, HAL_app_timer_create)
 DYNALIB_FN(hal_apptimer, HAL_app_timer_start)
 DYNALIB_FN(hal_apptimer, HAL_app_timer_stop)
+DYNALIB_FN(hal_apptimer, HAL_staticHandler)
 DYNALIB_END(hal_apptimer)
 
 

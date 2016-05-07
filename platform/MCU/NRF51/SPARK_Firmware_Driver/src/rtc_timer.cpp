@@ -67,7 +67,7 @@ void RTCTimer::start()
   uint32_t err_code;
   if (!timerID)  // don't repeat this call if we already have a valid timerID
   {
-    err_code = HAL_app_timer_create( &timerID, timerMode, &RTCTimer::staticHandler );
+    err_code = HAL_app_timer_create( &timerID, timerMode, HAL_staticHandler );
     APP_ERROR_CHECK(err_code);    
   }
 
@@ -98,12 +98,14 @@ bool RTCTimer::isActive()
 
 void RTCTimer::timeout_handler()
 {
-  if (handlerFunc)
-  {
-    handlerFunc(); // <--- this doesn't work, I believe becasue the linker doesn't know 
-                   //      that user-part is offset relative to system-part1 and therefore
-                   //      ends up jumping (calling) into larlar land.
-  }
+  if (handlerFunc) { handlerFunc(); }
 };
 
-
+void HAL_staticHandler(void *context)
+{
+    if (!context) return;
+    RTCTimer *instance = static_cast<RTCTimer *>(context);
+    instance->active = true;
+    instance->timeout_handler();
+    instance->active = false;
+}

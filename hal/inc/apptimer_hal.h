@@ -24,6 +24,9 @@
 #include <stddef.h> // NULL
 
 #ifdef __cplusplus
+
+extern void HAL_staticHandler(void *context);
+
 extern "C" {
 #endif
 

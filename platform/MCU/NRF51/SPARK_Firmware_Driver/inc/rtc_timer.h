@@ -29,18 +29,20 @@ extern "C" {
 
 #include "nrf_error.h"
 #include "app_error.h"
-#include "apptimer_hal.h"
 
 #ifdef __cplusplus
 }
 #endif
 
+#include "apptimer_hal.h"
+
 #include "stddef.h"
-#include <functional>
 
 class RTCTimer
 {
 public:
+    bool active;
+
     RTCTimer(uint32_t interval, void (*handler_fn)(void));
     RTCTimer(uint32_t interval, void (*handler_fn)(void), bool one_shot);
     ~RTCTimer();
@@ -59,20 +61,8 @@ private:
     void (*handlerFunc)(void);
     app_timer_mode_t timerMode;
     void *handlerContext;
-    bool active;
-
-    static void staticHandler(void *who)
-    {
-        if (!who) return;
-        RTCTimer *instance = static_cast<RTCTimer *>(who);
-        instance->active = true;
-        instance->timeout_handler();
-        instance->active = false;
-    };
 
 };
-
-
 
 #endif	/* __RTC_TIMER_H_ */
 
