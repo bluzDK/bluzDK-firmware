@@ -41,8 +41,8 @@ extern "C" {
 class RTCTimer
 {
 public:
-    RTCTimer(uint32_t interval, app_timer_timeout_handler_t handler_fn);
-    RTCTimer(uint32_t interval, app_timer_timeout_handler_t handler_fn, bool one_shot);
+    RTCTimer(uint32_t interval, void (*handler_fn)(void));
+    RTCTimer(uint32_t interval, void (*handler_fn)(void), bool one_shot);
     ~RTCTimer();
     void start();
     void stop();
@@ -50,14 +50,26 @@ public:
     void dispose();
     bool isActive();
     uint32_t getError();
+    virtual void timeout_handler();
 
 private:
     void _init();
     app_timer_id_t timerID;
     uint32_t timerInterval;
-    app_timer_timeout_handler_t handlerFunc;
+    void (*handlerFunc)(void);
     app_timer_mode_t timerMode;
     void *handlerContext;
+    bool active;
+
+    static void staticHandler(void *who)
+    {
+        if (!who) return;
+        RTCTimer *instance = static_cast<RTCTimer *>(who);
+        instance->active = true;
+        instance->timeout_handler();
+        instance->active = false;
+    };
+
 };
 
 

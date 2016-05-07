@@ -32,54 +32,55 @@
 
 /* Private function prototypes ----------------------------------------------*/
 
-RTCTimer::RTCTimer(uint32_t interval, app_timer_timeout_handler_t handler_fn)
+RTCTimer::RTCTimer(uint32_t interval, void (*handler_fn)(void))
 {
-  this->_init();
-  this->handlerFunc = handler_fn;
-  this->timerInterval = interval;
-  this->timerMode = APP_TIMER_MODE_SINGLE_SHOT;
+  _init();
+  handlerFunc = handler_fn;
+  timerInterval = interval;
+  timerMode = APP_TIMER_MODE_SINGLE_SHOT;
 };
 
-RTCTimer::RTCTimer(uint32_t interval, app_timer_timeout_handler_t handler_fn, bool one_shot = true)
+RTCTimer::RTCTimer(uint32_t interval, void (*handler_fn)(void), bool one_shot = true)
 {
-  this->_init();
-  this->handlerFunc = handler_fn;
-  this->timerInterval = interval;
-  this->timerMode = (one_shot) ? APP_TIMER_MODE_SINGLE_SHOT : APP_TIMER_MODE_REPEATED;
+  _init();
+  handlerFunc = handler_fn;
+  timerInterval = interval;
+  timerMode = (one_shot) ? APP_TIMER_MODE_SINGLE_SHOT : APP_TIMER_MODE_REPEATED;
 };
 
 RTCTimer::~RTCTimer()
 {
-  if (this->timerID) app_timer_stop(this->timerID);
+  if (timerID) app_timer_stop(timerID);
 }
 
 void RTCTimer::_init() 
 { 
-  this->handlerFunc = (app_timer_timeout_handler_t)0x00; 
-  this->handlerContext = (void *)0x00;
-  this->timerMode = APP_TIMER_MODE_REPEATED;
-  this->timerID = 0;
+  handlerFunc = NULL; 
+  handlerContext = NULL;
+  timerMode = APP_TIMER_MODE_REPEATED;
+  timerID = 0;
+  active = false;
 };
 
 void RTCTimer::start()
 {
   uint32_t err_code;
-  if (!this->timerID)  // don't repeat this call if we already have a valid timerID
+  if (!timerID)  // don't repeat this call if we already have a valid timerID
   {
-    err_code = app_timer_create( &this->timerID, this->timerMode, this->handlerFunc);
+    err_code = HAL_app_timer_create( &timerID, timerMode, &RTCTimer::staticHandler );
     APP_ERROR_CHECK(err_code);    
   }
 
-  if (this->timerID) 
+  if (timerID) 
   {
-    err_code = app_timer_start(this->timerID, this->timerInterval, this->handlerContext);
+    err_code = HAL_app_timer_start(timerID, timerInterval, this);
     APP_ERROR_CHECK(err_code);    
   }
 };
 
 void RTCTimer::stop()
 {
-  app_timer_stop(this->timerID);
+  app_timer_stop(timerID);
 };
 
 void RTCTimer::changePeriod()
@@ -92,6 +93,15 @@ void RTCTimer::dispose()
 
 bool RTCTimer::isActive()
 {
-  return false;
+  return active;
 };
+
+void RTCTimer::timeout_handler()
+{
+  if (handlerFunc)
+  {
+    handlerFunc();
+  }
+};
+
 

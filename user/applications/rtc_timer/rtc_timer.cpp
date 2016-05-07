@@ -20,14 +20,14 @@
 #include "application.h"
 #include "rtc_timer.h"
 
-void timerCallback(void *context)
+void timerCallback()
 {
   digitalWrite(D7, 1);
   if (BLE.getState() == BLE_CONNECTED && Particle.connected())
     Particle.publish("OMG IT WORKED!!");
 }
 
-RTCTimer testTimer(2000000L, timerCallback);
+RTCTimer *testTimer = new RTCTimer(2000000L, timerCallback);
 
 /* executes once at startup */
 void setup() {
@@ -40,7 +40,7 @@ void loop() {
   if (once && Particle.connected()) {
     once = false;
     Particle.publish("I'm back!");
-    testTimer.start();
+    testTimer->start();
   }
 
 }
