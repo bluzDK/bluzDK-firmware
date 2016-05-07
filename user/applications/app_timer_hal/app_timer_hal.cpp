@@ -1,27 +1,27 @@
 
 
 #include "application.h"
-#include "apptimer_hal.h"
+#include "rtc_timer.h"
 
-void tmcallback(void *p_context)
+void tmcallback()
 {
   if (Particle.connected())
     Particle.publish("HOLY CRAP BATMAN!!! IT WORKS!!!");
 }
 
-uint32_t id;
-uint32_t err_code;
-/* executes once at startup */
-void setup() {
-  err_code = HAL_app_timer_create(&id, APP_TIMER_MODE_REPEATED, tmcallback);
-  HAL_app_timer_start(id, 200000L, NULL);
+RTCTimer *testTimer = new RTCTimer(200000L, tmcallback, false);
+
+void setup()
+{
 }
 
-/* executes continuously after setup() runs */
-void loop() {
+void loop()
+{
   static bool once = true;
   if (once && Particle.connected() && BLE.getState() == BLE_CONNECTED) {
     once = false;
-    Particle.publish("err_code=", String(err_code));
+    Particle.publish("I'm back!");
+    testTimer->start();
   }
 }
+
