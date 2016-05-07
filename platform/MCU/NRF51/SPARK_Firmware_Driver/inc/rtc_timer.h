@@ -24,12 +24,17 @@ class RTCTimer
     ~RTCTimer();
     void start();
     void stop();
+    bool isActive();
+// TODO   void reset();
+// TODO   void changePeriod();
+    void dispose();
 
   private:
     int timerID;
     uint32_t timerInterval;
     app_timer_mode_t timerMode;
     void (*clientHandler)(void);
+    volatile bool timerActive;
     
     static void staticHandler(void *context)
     {

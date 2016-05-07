@@ -40,6 +40,7 @@
 DYNALIB_BEGIN(hal_apptimer)
 DYNALIB_FN(hal_apptimer, HAL_app_timer_create)
 DYNALIB_FN(hal_apptimer, HAL_app_timer_start)
+DYNALIB_FN(hal_apptimer, HAL_app_timer_stop)
 DYNALIB_END(hal_apptimer)
 
 #endif	/* HAL_DYNALIB_WLAN_H */

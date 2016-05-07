@@ -24,12 +24,19 @@ void setup()
     testTimer2->start();
 }
 
+uint32_t startTime = -1;
 void loop()
 {
   static bool once = true;
-  if (once && Particle.connected() == BLE_CONNECTED) {
+  if (once && Particle.connected()) {
     once = false;
     Particle.publish("I'm back!");
+    startTime = millis();
+  }
+
+  if (testTimer->isActive() && millis() > (startTime + 15000) )
+  {
+    testTimer->stop();
   }
 }
 

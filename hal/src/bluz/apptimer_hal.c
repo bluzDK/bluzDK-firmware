@@ -12,3 +12,7 @@ uint32_t HAL_app_timer_start(app_timer_id_t timer_id, uint32_t milliseconds, voi
     return app_timer_start(timer_id, ticks, p_context);
 }
 
+uint32_t HAL_app_timer_stop(app_timer_id_t timer_id)
+{
+    return app_timer_stop(timer_id);
+}
