@@ -1,8 +1,14 @@
 /**
  ******************************************************************************
+<<<<<<< HEAD
  * @file    hal_dynalib_apptimer.h
  * @authors Matthew McGowan, Bryan J. Rentoul (aka Gruvin)
  * @date    04 May 2016
+=======
+ * @file    hal_dynalib_wlan.h
+ * @authors Matthew McGowan
+ * @date    04 March 2015
+>>>>>>> dynalib-learning
  ******************************************************************************
   Copyright (c) 2015 Particle Industries, Inc.  All rights reserved.
 
@@ -22,12 +28,20 @@
  */
 
 #ifndef HAL_DYNALIB_APPTIMER_H
+<<<<<<< HEAD
 #define HAL_DYNALIB_APPTIMER_H
+=======
+#define	HAL_DYNALIB_APPTIMER_H
+
+>>>>>>> dynalib-learning
 #include "dynalib.h"
 
 #ifdef DYNALIB_EXPORT
 #include "apptimer_hal.h"
+<<<<<<< HEAD
 #include "rtc_timer.h"
+=======
+>>>>>>> dynalib-learning
 #endif
 
 // WARNING
@@ -41,9 +55,16 @@ DYNALIB_BEGIN(hal_apptimer)
 DYNALIB_FN(hal_apptimer, HAL_app_timer_create)
 DYNALIB_FN(hal_apptimer, HAL_app_timer_start)
 DYNALIB_FN(hal_apptimer, HAL_app_timer_stop)
+<<<<<<< HEAD
 DYNALIB_FN(hal_apptimer, HAL_staticHandler)
 DYNALIB_END(hal_apptimer)
 
 
 #endif /* HAL_DYNALIB_APPTIMER_H */
   
+=======
+DYNALIB_END(hal_apptimer)
+
+#endif	/* HAL_DYNALIB_WLAN_H */
+
+>>>>>>> dynalib-learning
