@@ -14,7 +14,7 @@ extern "C" {
 }
 #endif
 
-class RTCTimer
+class Timer
 {
 
   public:
@@ -22,7 +22,7 @@ class RTCTimer
     typedef std::function<void(void)> timer_callback_fn;
 
     // for when standard C function provided as the callback
-    RTCTimer(uint32_t interval, timer_callback_fn callback_, bool one_shot=false) :
+    Timer(uint32_t interval, timer_callback_fn callback_, bool one_shot=false) :
       timerID(0), 
       timerInterval(interval),
       timerActive(false), 
@@ -33,12 +33,12 @@ class RTCTimer
 
     // for when class method provided as the callback
     template <typename T>
-    RTCTimer(uint32_t interval, void (T::*handler)(), T& instance, bool one_shot=false) :
-      RTCTimer(interval, std::bind(handler, &instance), one_shot)
+    Timer(uint32_t interval, void (T::*handler)(), T& instance, bool one_shot=false) :
+      Timer(interval, std::bind(handler, &instance), one_shot)
     {
     }
 
-    ~RTCTimer() { dispose(); }
+    ~Timer() { dispose(); }
 
     void start() 
     {
@@ -107,7 +107,7 @@ class RTCTimer
     
     static void staticCallback(void *context)
     {
-        RTCTimer *instance = static_cast<RTCTimer *>(context);
+        Timer *instance = static_cast<Timer *>(context);
         instance->timeout();
     };
 

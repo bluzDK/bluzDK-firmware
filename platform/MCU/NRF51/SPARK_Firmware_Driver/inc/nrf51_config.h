@@ -32,7 +32,8 @@
 #define __NRF51_CONFIG_H
 
 #define APP_TIMER_PRESCALER             0                                           /**< Value of the RTC1 PRESCALER register. */
-#define APP_TIMER_MAX_TIMERS            6						                    /**< Maximum number of simultaneously created timers. */
+#define APP_TIMER_MAX_TIMERS            11                                          /**< Maximum number of simultaneously created timers. */
+                                                                                    /* one in use by system. 10 for user, to match Particle Photon */
 #define APP_TIMER_OP_QUEUE_SIZE         12                                          /**< Size of timer operation queues. */
 
 #define TIME_KEPPER_MILLISECONDS     	100                                         /**< Keep track of time in roughly 100 mSecond intervals. */

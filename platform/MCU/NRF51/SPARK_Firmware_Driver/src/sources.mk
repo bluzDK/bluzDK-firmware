@@ -7,7 +7,6 @@
 TARGET_SPARK_SRC_PATH = $(TARGET_SPARK_PATH)/src
 
 INCLUDE_DIRS += SPARK_Services/inc
-CPPFLAGS += -std=gnu++11
 
 # C source files included in this build.
 CSRC += $(TARGET_SPARK_SRC_PATH)/hw_config.c
@@ -33,7 +32,6 @@ CPPSRC += $(TARGET_SPARK_SRC_PATH)/data_service.cpp
 CPPSRC += $(TARGET_SPARK_SRC_PATH)/custom_data_service.cpp
 CPPSRC += $(TARGET_SPARK_SRC_PATH)/data_services.cpp
 CPPSRC += $(TARGET_SPARK_SRC_PATH)/rgbled_hal.cpp
-CPPSRC += $(TARGET_SPARK_SRC_PATH)/rtc_timer.cpp
 # ASM source files included in this build.
 ASRC +=
 
