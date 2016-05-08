@@ -76,10 +76,16 @@ class Timer
 
     void reset()
     {
+      stop();
+      changePeriod(timerInterval);
+      start();
     };
     
-    void changePeriod()
+    void changePeriod(uint32_t interval)
     {
+      stop();
+      timerInterval = interval;
+      start();
     }
 
     /*
@@ -94,8 +100,14 @@ class Timer
 
     void dispose()
     {
-      stop();
-      // TODO: Not sure if there even is a way to delete an app_timer. Refer to Nordic's docs.
+      stop(); // for compatibility
+      /** XXX
+       * Nordic's Application Timer does not include a means of completely deleting/de-allocating 
+       * a timer_id, once it has been created using app_timer_create. If one day needed (unlikely)
+       * then it should suffice to add a new _DELETE enum value for timer_user_op_type_t and have
+       * list_deletions_handler() do a  [mp_nodes[timer_id].state=FREE], after processing _STOP.
+       **/
+
     }
 
   private:
