@@ -3,40 +3,60 @@
 #include "application.h"
 #include "rtc_timer.h"
 
-void tmcallback()
+
+class TimerTest : public RTCTimer
+{
+  uint16_t counter;
+
+  public:
+  TimerTest(uint32_t interval) 
+    : RTCTimer(interval, nullptr) // no callback, as we'll be simply overriding RTCTimer::timeout 
+  {
+  };
+  
+  virtual void timeout()
+  {
+    if (Particle.connected())
+    {
+      if (millis() < 60000) 
+        Particle.publish("Yiiiup! Me too! :-)", String(millis()));
+      else
+      {
+        stop(); 
+        Particle.publish("Yiiiup! I'm otta here!", String(millis()));
+      }
+    }
+  };
+};
+TimerTest classMethodOverrider(20000);
+
+///////////////////////////////////////////////////////////
+// standard function as the timeout handler callback ...
+void timer1_Callback();
+RTCTimer timer1(6300, timer1_Callback, /*one_shot=*/true ); 
+
+void timer1_Callback()
 {
   if (Particle.connected())
-    Particle.publish("HOLY CRAP BATMAN!!! IT WORKS!!!");
+  {
+    Particle.publish("IT WORKS!!! :-D C'ya!", String(millis()));
+  } 
 }
 
-void tmcallback2()
-{
-  if (Particle.connected())
-    Particle.publish("Yiiiup! Me too! :-)");
-}
-
-RTCTimer *testTimer = new RTCTimer(6300, tmcallback, false);
-RTCTimer *testTimer2 = new RTCTimer(20000, tmcallback2, false);
 
 void setup()
 {
-    testTimer->start();
-    testTimer2->start();
+    classMethodOverrider.start();
 }
 
-uint32_t startTime = -1;
 void loop()
 {
   static bool once = true;
   if (once && Particle.connected()) {
     once = false;
-    Particle.publish("I'm back!");
-    startTime = millis();
+    Particle.publish("I'm back!", String(millis()));
+    timer1.start();
   }
 
-  if (testTimer->isActive() && millis() > (startTime + 15000) )
-  {
-    testTimer->stop();
-  }
 }
 

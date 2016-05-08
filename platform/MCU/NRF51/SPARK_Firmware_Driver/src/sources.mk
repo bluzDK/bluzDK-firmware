@@ -7,6 +7,7 @@
 TARGET_SPARK_SRC_PATH = $(TARGET_SPARK_PATH)/src
 
 INCLUDE_DIRS += SPARK_Services/inc
+CPPFLAGS += -std=gnu++11
 
 # C source files included in this build.
 CSRC += $(TARGET_SPARK_SRC_PATH)/hw_config.c
