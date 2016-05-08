@@ -74,13 +74,6 @@ class Timer
       return (timerActive);
     }
 
-    void reset()
-    {
-      stop();
-      changePeriod(timerInterval);
-      start();
-    };
-    
     void changePeriod(uint32_t interval)
     {
       stop();
@@ -88,6 +81,12 @@ class Timer
       start();
     }
 
+    void reset()
+    {
+      stop();
+      start();
+    };
+    
     /*
      * Subclasses can either provide a callback function, or override
      * this timeout method.
