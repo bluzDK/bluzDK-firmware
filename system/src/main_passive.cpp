@@ -102,7 +102,6 @@ extern "C" void HAL_SysTick_Handler(void) {
         }
     }
 
-
 }
 
 //stubs
@@ -133,7 +132,6 @@ void app_setup_and_loop_passive(void)
     //Set some Particle flags to bypass functionality we don't need
     SPARK_CLOUD_SOCKETED = 0;
     SPARK_CLOUD_CONNECTED = 0;
-    HAL_Set_Cloud_Connection(false);
     
     //setup all peripherals
     HAL_Core_Init();
@@ -157,7 +155,7 @@ void app_setup_and_loop_passive(void)
     while (1)
     {
         DECLARE_SYS_HEALTH(ENTERED_WLAN_Loop);
-
+        
         //Execute user application loop
         DECLARE_SYS_HEALTH(ENTERED_Loop);
         if (system_mode()!=SAFE_MODE && !SPARK_FLASH_UPDATE) {
@@ -166,10 +164,6 @@ void app_setup_and_loop_passive(void)
             DECLARE_SYS_HEALTH(RAN_Loop);
 //            DEBUG("Exited User Loop");
         }
-
-        if (!SPARK_FLASH_UPDATE) {
-            HAL_Loop_Iteration();
-        }
         
         //we may not be connected. if not, don't try to manage anything cloud related
         if (system_mode()!=MANUAL) {
@@ -177,62 +171,60 @@ void app_setup_and_loop_passive(void)
                 if (CLOUD_CONNECTED) {
 //                DEBUG("Calling Spark Comm Loop");
 //                Spark_Process_Events();
-                if (!Spark_Communication_Loop()) {
-                    cloudErrors++;
-                    ERROR("Error when calling Spark Comm Loop");
-                    if (cloudErrors > 2) {
-                      cloudErrors = 0;
-                      HAL_Handle_Cloud_Disconnect();
+                    if (!Spark_Communication_Loop()) {
+                        cloudErrors++;
+                        ERROR("Error when calling Spark Comm Loop");
+                        if (cloudErrors > 2) {
+                            cloudErrors = 0;
+                            HAL_Handle_Cloud_Disconnect();
+                        }
+                    }
+                } else {
+                    ledOffTime = 250;
+                    HAL_Delay_Milliseconds(2000);
+                    DEBUG("Calling Spark Connect");
+                    int err_code = Spark_Connect();
+                    if (err_code) {
+                        ERROR("Error when calling Spark Connect");
+                    }
+                    SPARK_CLOUD_SOCKETED = 1;
+
+                    HAL_Delay_Milliseconds(2000);
+                    Spark_Protocol_Init();
+                    DEBUG("Calling Spark Handshake");
+                    err_code = Spark_Handshake();
+                    if (err_code) {
+                        LED_SetRGBColor(RGB_COLOR_MAGENTA);
+                        ERROR("Error when calling Spark Handshake");
+                        SPARK_CLOUD_SOCKETED = 0;
+                        HAL_Handle_Cloud_Disconnect();
+                    } else {
+                        LED_SetRGBColor(system_mode() == SAFE_MODE ? RGB_COLOR_MAGENTA : RGB_COLOR_CYAN);
+                        DEBUG("Handshake Complete");
+
+                        CLOUD_CONNECTED = true;
+                        SPARK_CLOUD_CONNECTED = 1;
+                        ledOffTime = 2000;
                     }
                 }
             } else {
-                ledOffTime = 250;
-                HAL_Delay_Milliseconds(2000);
-                DEBUG("Calling Spark Connect");
-                int err_code = Spark_Connect();
-                if (err_code) {
-                    ERROR("Error when calling Spark Connect");
-                }
-                SPARK_CLOUD_SOCKETED = 1;
+                if (CLOUD_CONNECTED) {
+                    DEBUG("Connection Lost");
+                    //we disconnected
+                    CLOUD_CONNECTED = false;
 
-                HAL_Delay_Milliseconds(2000);
-                Spark_Protocol_Init();
-                DEBUG("Calling Spark Handshake");
-                err_code = Spark_Handshake();
-                if (err_code) {
-                    LED_SetRGBColor(RGB_COLOR_MAGENTA);
-                    ERROR("Error when calling Spark Handshake");
                     SPARK_CLOUD_SOCKETED = 0;
-                    HAL_Handle_Cloud_Disconnect();
-                } else {
-                    LED_SetRGBColor(system_mode()==SAFE_MODE ? RGB_COLOR_MAGENTA : RGB_COLOR_CYAN);
-                    DEBUG("Handshake Complete");
+                    SPARK_CLOUD_CONNECTED = 0;
 
-                    CLOUD_CONNECTED = true;
-                    SPARK_CLOUD_CONNECTED = 1;
                     ledOffTime = 2000;
-                    HAL_Set_Cloud_Connection(true);
+                    LED_SetRGBColor(system_mode() == SAFE_MODE ? RGB_COLOR_MAGENTA : RGB_COLOR_GREEN);
+
                 }
-            }
-        } else {
-            if (CLOUD_CONNECTED) {
-                DEBUG("Connection Lost");
-                //we disconnected
-                CLOUD_CONNECTED = false;
-
-                SPARK_CLOUD_SOCKETED = 0;
-                SPARK_CLOUD_CONNECTED = 0;
-                HAL_Set_Cloud_Connection(false);
-
-                ledOffTime = 2000;
-                LED_SetRGBColor(system_mode()==SAFE_MODE ? RGB_COLOR_MAGENTA : RGB_COLOR_GREEN);
-
-            }
-            if (!HAL_Is_Advertising()) {
-                ledOffTime = 2000;
-                LED_SetRGBColor(RGB_COLOR_BLUE);
-            } else {
-                ledOffTime = 2000;
+                if (!HAL_Is_Advertising()) {
+                    ledOffTime = 2000;
+                    LED_SetRGBColor(RGB_COLOR_BLUE);
+                } else {
+                    ledOffTime = 2000;
 //                LED_SetRGBColor(RGB_COLOR_GREEN);
                 }
             }

@@ -217,6 +217,7 @@ typedef struct {
  */
 int HAL_FLASH_Read_CorePrivateKey(uint8_t *keyBuffer, private_key_generation_t* generation);
 
+#define ARRAY_SIZE(foo) (sizeof(foo)/sizeof(foo[0]))
 
 #ifdef	__cplusplus
 }

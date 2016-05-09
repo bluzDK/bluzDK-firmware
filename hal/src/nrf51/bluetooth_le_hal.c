@@ -49,3 +49,13 @@ int HAL_BLE_Register_Radio_Notification(void (*radio_callback)(bool radio_active
 {
     return register_radio_callback(radio_callback);
 }
+
+void HAL_BLE_Register_Data_Callback(void (*data_callback)(uint8_t *data, uint16_t length))
+{
+    register_data_callback(data_callback);
+}
+
+void HAL_BLE_Send_Data(uint8_t *data, uint16_t length)
+{
+    send_data(data, length);
+}

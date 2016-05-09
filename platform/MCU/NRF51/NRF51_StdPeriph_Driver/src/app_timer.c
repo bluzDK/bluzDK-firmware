@@ -158,7 +158,8 @@ static uint8_t                       m_ticks_elapsed_q_write_ind;               
 static app_timer_evt_schedule_func_t m_evt_schedule_func;                       /**< Pointer to function for propagating timeout events to the scheduler. */
 static bool                          m_rtc1_running;                            /**< Boolean indicating if RTC1 is running. */
 static bool                          m_rtc1_reset;                              /**< Boolean indicating if RTC1 counter has been reset due to last timer removed from timer list during the timer list handling. */
- 
+
+volatile uint32_t RTC_OVERFLOW_COUNT; 
 
 /**@brief Function for initializing the RTC1 counter.
  *

@@ -49,6 +49,12 @@ public:
     
     //notification handler
     static int registerNotifications(void (*radio_callback)(bool radio_active));
+
+    //data callback handler
+    static void registerDataCallback(void (*data_callback)(uint8_t *data, uint16_t length));
+
+    //function to send data
+    static void sendData(uint8_t *data, uint16_t length);
     
     
 };

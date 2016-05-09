@@ -38,6 +38,8 @@ DYNALIB_FN(hal_ble,HAL_BLE_Start_Advertising)
 DYNALIB_FN(hal_ble,HAL_BLE_Stop_Advertising)
 DYNALIB_FN(hal_ble,HAL_BLE_Disconnect)
 DYNALIB_FN(hal_ble,HAL_BLE_Register_Radio_Notification)
+DYNALIB_FN(hal_ble,HAL_BLE_Register_Data_Callback)
+DYNALIB_FN(hal_ble,HAL_BLE_Send_Data)
 DYNALIB_END(hal_ble)
 
 #endif	/* HAL_DYNALIB_BLE_H */

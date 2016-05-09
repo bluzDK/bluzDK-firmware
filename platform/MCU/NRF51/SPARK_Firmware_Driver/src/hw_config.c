@@ -30,8 +30,9 @@
 #include "ble_radio_notification.h"
 #include "ble_conn_params.h"
 #include "ble_hci.h"
-#include "nrf_drv_wdt.h"
 #include "client_handling.h"
+#include "custom_data_service.h"
+#include "nrf_drv_wdt.h"
 
 uint32_t NbrOfPage = 0;
 uint16_t Flash_Update_Index = 0;
@@ -258,7 +259,7 @@ void leds_init(void)
 void timers_init(void)
 {
       uint32_t err_code;
-    // Initialize timer module, making it use the scheduler
+    // Initialize timer module, making it NOT use the scheduler
     APP_TIMER_INIT(APP_TIMER_PRESCALER, APP_TIMER_MAX_TIMERS, APP_TIMER_OP_QUEUE_SIZE, false);
     err_code = app_timer_create(&millis_timer, APP_TIMER_MODE_REPEATED, millis_timer_timeout);
     APP_ERROR_CHECK(err_code);
@@ -441,6 +442,16 @@ uint32_t timers_stop(void)
 int register_radio_callback(void (*radio_callback)(bool radio_active))
 {
     return ble_radio_notification_init(NRF_APP_PRIORITY_LOW,NRF_RADIO_NOTIFICATION_DISTANCE_800US,radio_callback);
+}
+
+void register_data_callback(void (*data_callback)(uint8_t *data, uint16_t length))
+{
+    customDataServiceRegisterCallback(data_callback);
+}
+
+void send_data(uint8_t *data, uint16_t length)
+{
+    customDataServiceSendData(data, length);
 }
 
 /**@brief Function for initializing the BLE stack.
