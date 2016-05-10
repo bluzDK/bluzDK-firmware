@@ -1,7 +1,8 @@
 /**
  ******************************************************************************
- * @file    hal_dynalib_export.c
- * @author  Matthew McGowan
+ * @file    hal_dynalib_apptimer.h
+ * @authors Matthew McGowan, Bryan J. Rentoul (aka Gruvin)
+ * @date    04 May 2016
  ******************************************************************************
   Copyright (c) 2015 Particle Industries, Inc.  All rights reserved.
 
@@ -20,30 +21,27 @@
  ******************************************************************************
  */
 
-#define DYNALIB_EXPORT
-#undef SCK
-#undef MOSI
-#undef MISO
-#undef SS
+#ifndef HAL_DYNALIB_APPTIMER_H
+#define HAL_DYNALIB_APPTIMER_H
 
-#include "hal_dynalib.h"
-#undef SCK
-#undef MOSI
-#undef MISO
-#undef SS
-#undef STATIC_ASSERT
-#include "hal_dynalib_core.h"
-#include "hal_dynalib_gpio.h"
-#include "hal_dynalib_i2c.h"
-#undef STATIC_ASSERT
-#include "hal_dynalib_ota.h"
-#undef STATIC_ASSERT
-#include "hal_dynalib_peripherals.h"
-#undef STATIC_ASSERT
-#include "hal_dynalib_socket.h"
-#include "hal_dynalib_spi.h"
-#include "hal_dynalib_usart.h"
-#include "hal_dynalib_concurrent.h"
-#include "hal_dynalib_ble.h"
-#include "hal_dynalib_apptimer.h"
+#include "dynalib.h"
+
+#ifdef DYNALIB_EXPORT
+#include "apptimer_hal.h"
+#endif
+
+// WARNING
+// The order of functions must not be changed or older applications will break
+// when used with newer system firmware.
+// Function signatures shouldn't be changed other than changing pointer types.
+// New HAL functions must be added to the end of this list.
+// GNINRAW
+
+DYNALIB_BEGIN(hal_apptimer)
+DYNALIB_FN(hal_apptimer, HAL_app_timer_create)
+DYNALIB_FN(hal_apptimer, HAL_app_timer_start)
+DYNALIB_FN(hal_apptimer, HAL_app_timer_stop)
+DYNALIB_END(hal_apptimer)
+
+#endif	/* HAL_DYNALIB_APPTIMER_H */
 

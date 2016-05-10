@@ -47,3 +47,14 @@ int BLEClass::registerNotifications(void (*radio_callback)(bool radio_active))
 {
     return HAL_BLE_Register_Radio_Notification(radio_callback);
 }
+
+void BLEClass::registerDataCallback(void (*data_callback)(uint8_t *data, uint16_t length))
+{
+    HAL_BLE_Register_Data_Callback(data_callback);
+}
+
+void BLEClass::sendData(uint8_t *data, uint16_t length)
+{
+    HAL_BLE_Send_Data(data, length);
+}
+

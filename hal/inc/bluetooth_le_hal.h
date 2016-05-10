@@ -42,6 +42,9 @@ extern "C" {
     
     int HAL_BLE_Register_Radio_Notification(void (*radio_callback)(bool radio_active));
 
+    void HAL_BLE_Register_Data_Callback(void (*data_callback)(uint8_t *data, uint16_t length));
+    void HAL_BLE_Send_Data(uint8_t *data, uint16_t length);
+
 #ifdef __cplusplus
 }
 #endif
