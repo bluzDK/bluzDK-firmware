@@ -45,11 +45,15 @@ endif
 endif
 
 MAKE_DEPENDENCIES = modules/$(PLATFORM_DYNALIB_MODULES)/user-part
+ifeq ("$(MAKECMDGOALS)","")
+MAKECMDGOALS := all
+endif
+
+$(MAKECMDGOALS): make_deps
 
 SUBDIR_GOALS := $(MAKECMDGOALS)
 MAKECMDGOALS := all
 
-all program-dfu st-flash: make_deps
 
 include $(COMMON_BUILD)/common-tools.mk
 include $(COMMON_BUILD)/recurse.mk
@@ -69,7 +73,7 @@ USE_PRINTF_FLOAT ?= y
 
 # It's critical that user comes before wiring so that the setup()/loop() functions are linked in preference
 # to the weak functions from wiring
-MAKE_DEPENDENCIES = user wiring hal system services communication platform wiring_globals
+MAKE_DEPENDENCIES = newlib_nano user wiring hal system services communication platform wiring_globals
 DEPENDENCIES = $(MAKE_DEPENDENCIES) dynalib
 
 LIBS += $(MAKE_DEPENDENCIES)

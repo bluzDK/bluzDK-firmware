@@ -32,12 +32,14 @@
 // GNINRAW
 
 DYNALIB_BEGIN(hal_ble)
-DYNALIB_FN(hal_ble,HAL_BLE_GET_STATE)
-DYNALIB_FN(hal_ble,HAL_BLE_GET_CONNECTION_INTERVAL)
-DYNALIB_FN(hal_ble,HAL_BLE_Start_Advertising)
-DYNALIB_FN(hal_ble,HAL_BLE_Stop_Advertising)
-DYNALIB_FN(hal_ble,HAL_BLE_Disconnect)
-DYNALIB_FN(hal_ble,HAL_BLE_Register_Radio_Notification)
+
+DYNALIB_FN(0, hal_ble,HAL_BLE_GET_STATE, BLUETOOTH_LE_STATE(void))
+DYNALIB_FN(1, hal_ble,HAL_BLE_GET_CONNECTION_INTERVAL, uint32_t(void))
+DYNALIB_FN(2, hal_ble,HAL_BLE_Start_Advertising, void(void))
+DYNALIB_FN(3, hal_ble,HAL_BLE_Stop_Advertising, void(void))
+DYNALIB_FN(4, hal_ble,HAL_BLE_Disconnect, void(void))
+DYNALIB_FN(5, hal_ble,HAL_BLE_Register_Radio_Notification, int(void (*radio_callback)(bool radio_active)))
+
 DYNALIB_END(hal_ble)
 
 #endif	/* HAL_DYNALIB_BLE_H */

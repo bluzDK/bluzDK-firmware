@@ -32,6 +32,7 @@ extern "C" {
 
 #if PLATFORM_ID==10
 #define HAL_PLATFORM_CELLULAR 1
+#define PANIC_BUT_KEEP_CALM 1
 #endif
     
 #if PLATFORM_ID==103 || PLATFORM_ID==269
@@ -39,6 +40,12 @@ extern "C" {
 #endif
 
 
+#if PLATFORM_ID==10 || PLATFORM_ID==3
+	#define HAL_PLATFORM_CLOUD_UDP 1
+		#define HAL_PLATFORM_CLOUD_TCP 1
+#else
+	#define HAL_PLATFORM_CLOUD_TCP 1
+#endif
 
 #ifndef HAL_PLATFORM_WIFI
 #define HAL_PLATFORM_WIFI 0
@@ -52,6 +59,13 @@ extern "C" {
 #define HAL_PLATFORM_BLUETOOTH_LE 0
 #endif
 
+#ifndef HAL_PLATFORM_CLOUD_UDP
+#define HAL_PLATFORM_CLOUD_UDP 0
+#endif
+
+#ifndef HAL_PLATFORM_CLOUD_TCP
+#define HAL_PLATFORM_CLOUD_TCP 0
+#endif
 
 
 #ifdef	__cplusplus

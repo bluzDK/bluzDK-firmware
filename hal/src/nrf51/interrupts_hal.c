@@ -76,7 +76,7 @@ static void gpiote_event_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t
     }
 }
 
-void HAL_Interrupts_Attach(uint16_t pin, HAL_InterruptHandler handler, void* data, InterruptMode mode, void* reserved)
+void HAL_Interrupts_Attach(uint16_t pin, HAL_InterruptHandler handler, void* data, InterruptMode mode, HAL_InterruptExtraConfiguration* extraConfig)
 {
     if (!nrf_drv_gpiote_is_init())
     {
@@ -160,6 +160,14 @@ void HAL_Interrupts_Disable_All(void)
             interrupts[i].is_enabled = false;
         }
     }
+}
+
+void HAL_Interrupts_Suspend(void)
+{
+}
+
+void HAL_Interrupts_Restore(void)
+{
 }
 
 /*******************************************************************************

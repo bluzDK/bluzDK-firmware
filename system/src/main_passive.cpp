@@ -189,7 +189,7 @@ void app_setup_and_loop_passive(void)
                 ledOffTime = 250;
                 HAL_Delay_Milliseconds(2000);
                 DEBUG("Calling Spark Connect");
-                int err_code = Spark_Connect();
+                int err_code = spark_cloud_socket_connect();
                 if (err_code) {
                     ERROR("Error when calling Spark Connect");
                 }
@@ -198,7 +198,7 @@ void app_setup_and_loop_passive(void)
                 HAL_Delay_Milliseconds(2000);
                 Spark_Protocol_Init();
                 DEBUG("Calling Spark Handshake");
-                err_code = Spark_Handshake();
+                err_code = Spark_Handshake(false);
                 if (err_code) {
                     LED_SetRGBColor(RGB_COLOR_MAGENTA);
                     ERROR("Error when calling Spark Handshake");

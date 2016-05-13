@@ -134,3 +134,18 @@ bool HAL_USART_Is_Enabled(HAL_USART_Serial serial)
 void HAL_USART_Half_Duplex(HAL_USART_Serial serial, bool Enable)
 {
 }
+
+int32_t HAL_USART_Available_Data_For_Write(HAL_USART_Serial serial)
+{
+    return 0;
+}
+
+void HAL_USART_BeginConfig(HAL_USART_Serial serial, uint32_t baud, uint32_t config, void *ptr)
+{
+
+}
+
+uint32_t HAL_USART_Write_NineBitData(HAL_USART_Serial serial, uint16_t data)
+{
+    return 0;
+}

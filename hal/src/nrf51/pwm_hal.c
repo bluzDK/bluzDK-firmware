@@ -62,6 +62,10 @@ void HAL_PWM_Write(uint16_t pin, uint8_t value)
     enabled = true;
 }
 
+void HAL_PWM_Write_With_Frequency(uint16_t pin, uint8_t value, uint16_t pwm_frequency)
+{
+}
+
 uint16_t HAL_PWM_Get_Frequency(uint16_t pin)
 {
     return PWM_FREQUENCY_HZ;

@@ -41,3 +41,13 @@
 void HAL_DAC_Write(pin_t pin, uint16_t value)
 {
 }
+
+uint8_t HAL_DAC_Is_Enabled(pin_t pin)
+{
+    return 0;
+}
+
+uint8_t HAL_DAC_Enable(pin_t pin, uint8_t state)
+{
+    return 0;
+}

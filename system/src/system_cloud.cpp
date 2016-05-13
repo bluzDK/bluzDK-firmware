@@ -34,7 +34,6 @@
 #include "system_cloud_internal.h"
 #include "string_convert.h"
 #include "spark_protocol_functions.h"
-#include "spark_protocol.h"
 #include "events.h"
 #include "deviceid_hal.h"
 #include "system_mode.h"
@@ -63,23 +62,29 @@ bool spark_subscribe(const char *eventName, EventHandler handler, void* handler_
     SYSTEM_THREAD_CONTEXT_SYNC(spark_subscribe(eventName, handler, handler_data, scope, deviceID, reserved));
     auto event_scope = convert(scope);
     bool success = spark_protocol_add_event_handler(sp, eventName, handler, event_scope, deviceID, handler_data);
-    if (success && spark_connected())
+    if (success && spark_cloud_flag_connected())
     {
         register_event(eventName, event_scope, deviceID);
     }
     return success;
 }
 
-
-inline EventType::Enum convert(Spark_Event_TypeDef eventType) {
-    return eventType==PUBLIC ? EventType::PUBLIC : EventType::PRIVATE;
+/**
+ * Convert from the API flags to the communications lib flags
+ * The event visibility flag (public/private) is encoded differently. The other flags map directly.
+ */
+inline uint32_t convert(uint32_t flags) {
+	bool priv = flags & PUBLISH_EVENT_FLAG_PRIVATE;
+	flags &= ~PUBLISH_EVENT_FLAG_PRIVATE;
+	flags |= !priv ? EventType::PUBLIC : EventType::PRIVATE;
+	return flags;
 }
 
-bool spark_send_event(const char* name, const char* data, int ttl, Spark_Event_TypeDef eventType, void* reserved)
+bool spark_send_event(const char* name, const char* data, int ttl, uint32_t flags, void* reserved)
 {
-    SYSTEM_THREAD_CONTEXT_SYNC(spark_send_event(name, data, ttl, eventType, reserved));
+    SYSTEM_THREAD_CONTEXT_SYNC(spark_send_event(name, data, ttl, flags, reserved));
 
-    return spark_protocol_send_event(sp, name, data, ttl, convert(eventType), NULL);
+    return spark_protocol_send_event(sp, name, data, ttl, convert(flags), NULL);
 }
 
 bool spark_variable(const char *varKey, const void *userVar, Spark_Data_TypeDef userVarType, spark_variable_t* extra)
@@ -125,7 +130,9 @@ bool spark_function(const char *funcKey, p_user_function_int_str_t pFunc, void* 
     return result;
 }
 
-bool spark_connected(void)
+#endif
+
+bool spark_cloud_flag_connected(void)
 {
     if (SPARK_CLOUD_SOCKETED && SPARK_CLOUD_CONNECTED)
         return true;
@@ -133,22 +140,9 @@ bool spark_connected(void)
         return false;
 }
 
-void spark_connect(void)
-{
-    //Schedule cloud connection and handshake
-    SPARK_CLOUD_CONNECT = 1;
-    SPARK_WLAN_SLEEP = 0;
-}
-
-void spark_disconnect(void)
-{
-    SPARK_CLOUD_CONNECT = 0;
-}
-
-#endif
-
 void spark_process(void)
 {
+	// application thread will pump application messages
 #if PLATFORM_THREADING
     if (system_thread_get_state(NULL) && APPLICATION_THREAD_CURRENT())
     {
@@ -156,7 +150,6 @@ void spark_process(void)
         return;
     }
 #endif
-
 
     // run the background processing loop, and specifically also pump cloud events
     Spark_Idle_Events(true);

@@ -1,12 +1,120 @@
-## v0.4.8
+## v0.5.0-rc.2
+
+### FEATURES
+
+- Added SYSTEM_FLAG_WIFITEST_OVER_SERIAL1 which is disabled by default. Tinker enables this by default so that the Wi-Fi Tester is available during manufacturing.  Also ensures TX/RX pins are not used for Serial1 by default, in case you want to use these as GPIO. [945](https://github.com/spark/firmware/pull/945)
+
+### ENHANCEMENTS
+
+- Timer::isActive() function added [#950](https://github.com/spark/firmware/pull/950)
+- mbedtls headers are private to the communications module now, so user applications can include their own version of mbedtls [](https://github.com/spark/firmware/pull/940)
+
+### BUGFIXES
+
+- Soft AP Claim code fix [#956](https://github.com/spark/firmware/pull/956)
+- Variable template fix [#952](https://github.com/spark/firmware/pull/952)
+
+## v0.5.0-rc.1
+
+### FEATURES
+
+- [Electron] [SYSTEM_THREAD()](https://docs.particle.io/reference/firmware/electron/#system-thread) is supported (in Beta) [#884](https://github.com/spark/firmware/pull/884)
+- [Electron] Cellular [Data Usage API](https://docs.particle.io/reference/firmware/electron/#getdatausage-) [#866](https://github.com/spark/firmware/pull/866)
+- [Electron] Configurable keep-alive ping [#913](https://github.com/spark/firmware/pull/913) 
+- [Electron] Cellular [Band Select API](https://docs.particle.io/reference/firmware/electron/#getbandavailable-) [#891](https://github.com/spark/firmware/pull/891)
+- [Electron] Cellular [Local IP API](https://docs.particle.io/reference/firmware/electron/#localip-) [#850](https://github.com/spark/firmware/pull/850)
+- [Photon/Electron] Stack overflow detection with SOS code [13-blinks](https://docs.particle.io/guide/getting-started/modes/photon/#red-flash-sos)
+- [Photon/Electron] [SPI Slave support](https://docs.particle.io/reference/firmware/photon/#begin-spi_mode-uint16_t-) [#882](https://github.com/spark/firmware/pull/882) 
+- Atomic writes in [EEPROM emulation](https://docs.particle.io/reference/firmware/electron/#eeprom) [#871](https://github.com/spark/firmware/pull/871)
+- Software Watchdog [#860](https://github.com/spark/firmware/pull/860)
+- [Serial.availableForWrite()](https://docs.particle.io/reference/firmware/photon/#availableforwrite-) and [Serial.blockOnOverrun()](https://docs.particle.io/reference/firmware/photon/#blockonoverrun-) [#798](https://github.com/spark/firmware/issues/798)
+- [Photon] SoftAP HTTP server can serve application pages. [#906](https://github.com/spark/firmware/pull/906)
+
+### ENHANCEMENTS
+
+- Compiler error with variable/function names that are too long. [#883](https://github.com/spark/firmware/pull/883) 
+- DFU writes are verified [#870](https://github.com/spark/firmware/pull/870) 
+- [Electron] [NO_ACK flag](https://docs.particle.io/reference/firmware/electron/#particle-publish-) on `Particle.publish()` disables acknoweldgements reducing data use [#862](https://github.com/spark/firmware/pull/862)
+- [Electron] Allow session to resume when IP changes. [#848](https://github.com/spark/firmware/pull/848)
+- [Electron] Ensure published events are received by the cloud before sleeping. [#909](https://github.com/spark/firmware/pull/909)
+- [Electron] [SLEEP_NETWORK_STANDBY on System.sleep()](https://docs.particle.io/reference/firmware/electron/#sleep-sleep-) [#845](https://github.com/spark/firmware/pull/845)
+- Serial baudrate to select ymodem mode includes listening mode [#912](https://github.com/spark/firmware/pull/912) 
+- Wi-Fi connection process forced to timeout after 60 seconds if unsuccessful [#898](https://github.com/spark/firmware/pull/898)
+- Added write-verify-retry-fail logic to DFU writes [#870](https://github.com/spark/firmware/pull/870)
+- Support for USART (Serial1/2/4/5) [data bits, parity and stop bits](https://docs.particle.io/reference/firmware/electron/#begin-) [#757](https://github.com/spark/firmware/pull/757)
+
+### BUGFIXES
+
+- targets `program-cloud`, `program-dfu` can be used without requiring `all` and will built the firmware correctly. [#899](https://github.com/spark/firmware/issues/899)
+- TCPClient on Electron not receiving all of the data for small files [#896](https://github.com/spark/firmware/issues/896) 
+- [Electron] Free socket when the socket is closed remotely [#885](https://github.com/spark/firmware/pull/885)
+- Extended CAN filters [#857](https://github.com/spark/firmware/pull/857)
+- I2C does not ensure a stop condition completes correctly in endTransmission [#856](https://github.com/spark/firmware/pull/856)
+- DAC1/2 possible problem with `digitalWrite()` after `analogWrite()` [#855](https://github.com/spark/firmware/pull/855) 
+- Servo HAL: Do not disable timer if some of its channels are still in use [#839](https://github.com/spark/firmware/pull/839)
+- USB driver fixes and Serial.available() not returning values greater than 1 [#812](https://github.com/spark/firmware/pull/812) [#669](https://github.com/spark/firmware/issues/669) [#846](https://github.com/spark/firmware/issues/846) [#923](https://github.com/spark/firmware/issues/923)
+- SOS During `WiFi.scan()` [#651](https://github.com/spark/firmware/issues/651)
+
+
+### INTERNALS
+
+- dynalib: compile-time check for certain types of ABI breaking changes [#895](https://github.com/spark/firmware/pull/895)
+
+
+## v0.4.9
+
+### FEATURES
+
+- Support for CAN Bus [#790](https://github.com/spark/firmware/pull/790)
+- [blockOnOverrun()]((https://docs.particle.io/reference/firmware/photon/#blockonoverrun-)) on hardware serial to allow applications to disable the default flow control. 
+- [availableForWrite()]((https://docs.particle.io/reference/firmware/photon/#availableforwrite-)) on hardware serial to allow applications to implement flow control. [#798](https://github.com/spark/firmware/issues/798)
+- [WiFi.BSSID()](https://docs.particle.io/reference/firmware/photon/#wifi-bssid-) to retrieve the 6-byte MAC address of the connected AP. [#816](https://github.com/spark/firmware/pull/816)
+- [attachInterrupt()](https://docs.particle.io/reference/firmware/photon/#attachinterrupt-) configurable interrupt priority [#806](https://github.com/spark/firmware/issues/806)
+- [Time.local()](https://docs.particle.io/reference/firmware/photon/#local-) retrieves the current time in the configured timezone. [#783](https://github.com/spark/firmware/issues/783)
+- [photon] [WiFi.getCredentials()](https://docs.particle.io/reference/firmware/photon/#wifi-getcredentials-) lists configured credentials.  [#759](https://github.com/spark/firmware/issues/759)
+- variable frequency PWM via [analogWrite(pin,value,hz)](https://docs.particle.io/reference/firmware/photon/#analogwrite-) [#756](https://github.com/spark/firmware/pull/756)
+- [ATOMIC_BLOCK()](https://docs.particle.io/reference/firmware/photon/#atomic_block-) and [SINGLE_THREADED_BLOCK()](https://docs.particle.io/reference/firmware/photon/#single_threaded_block-) declarations for atomicity and thread scheduling control. [#758](https://github.com/spark/firmware/issues/758)
+- [API](https://docs.particle.io/reference/firmware/photon/#synchronizing-access-to-shared-system-resources) for Guarding resources for use between threads. 
+- System events for individual button clicks and a run of button clicks. [#818](https://github.com/spark/firmware/issues/818)
+
+### ENHANCEMENTS
+
+- [System.freeMemory()](https://docs.particle.io/reference/firmware/photon/#system-freememory-) shows an accurate value for free memory rather than the highwater mark for the heap. 
+- [threading] Entering listening mode does not block the system thread. [#788](https://github.com/spark/firmware/issues/788)
+- [threading] System times out waiting for unresponsive application when attempting to reset. [#763](https://github.com/spark/firmware/issues/763)
+- [threading] `Particle.publish()` doesn't block when in listening mode.  [#761](https://github.com/spark/firmware/issues/761)  
+- [threading]. `delay()`/`Particle.process()` pumps application events.
+- Serial, Serial1, SPI and EEPROM global objects guaranteed to be initialized before use. (Prevents White breathing LED if Serial used in a global instance constructor.)
+- [Software Timers]((https://docs.particle.io/reference/firmware/photon/#software-timers) have an option for one-shot timers, and support class member function callbacks. 
+
+### BUGFIXES
+
+- RSA key generation would sometimes produce invalid keys. [#779](https://github.com/spark/firmware/pull/779)
+- Static IP configuration was not being used. 
+- Interrupt on WKP with class method as an ISR [#819](https://github.com/spark/firmware/issues/819)
+- Memory leak configuring WiFi credentials via SoftAP (TCP/HTTP)
+- SPI DMA transfer callback invoked too early [#791](https://github.com/spark/firmware/issues/791)
+- Unset `wiced_result_t` for tcp clients in `socket_send`.  [#773](https://github.com/spark/firmware/issues/773)
+- Update bootloader to support `System.enterSafeMode()`. [#751](https://github.com/spark/firmware/issues/751)
+- [threading] `WiFi.listen(false)` remains in listen mode. [#743](https://github.com/spark/firmware/issues/743)
+- Factory Reset doesn't clear WiFi credentials until `network.connect()`. [#736](https://github.com/spark/firmware/issues/736)
+- Comparison between `IPAddress` objects does not always work.  [#715](https://github.com/spark/firmware/issues/715)
+- P1 dfu-util 0.8 does not read/write from External Flash. [#706](https://github.com/spark/firmware/issues/706)
+- DFU errors writing to flash silently ignored. [#813](https://github.com/spark/firmware/pull/813) 
+- [threading] heap allocation not thread-safe. [#826](https://github.com/spark/firmware/issues/826)
+- System crash when button interrupt occurs during i2c transmission. [#709](https://github.com/spark/firmware/issues/709)
+- [photon] 'analogWrite()` to DAC pins.  [#671](https://github.com/spark/firmware/issues/671)  
+- [photon] `analogWrite()` to DAC pins requires `pinMode()` each time. [#662](https://github.com/spark/firmware/issues/662)  
+- [photon] `System.sleep(pin,edge)` doesn't wake.  [#655](https://github.com/spark/firmware/issues/655)
+  
+
+## v0.4.8-rc.1
 
 ### FEATURE
 
 - factory firmware uses full modular firmware [#749](https://github.com/spark/firmware/pull/749). No need for UpdateZero.
 
 - `Timer.changePeriod()` [#720](https://github.com/spark/firmware/pull/720)
-
-- 
 
 ### BUGFIXES
 

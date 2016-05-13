@@ -36,6 +36,7 @@
 #include "hal_dynalib_gpio.h"
 #include "hal_dynalib_i2c.h"
 #undef STATIC_ASSERT
+#undef STATIC_ASSERT_H
 #include "hal_dynalib_ota.h"
 #undef STATIC_ASSERT
 #include "hal_dynalib_peripherals.h"

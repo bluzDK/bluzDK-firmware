@@ -20,11 +20,10 @@
 
 #include "static_assert.h"
 #include "spark_wiring_string.h"
+#include "spark_protocol_functions.h"
 #include <string.h>
 #include <time.h>
 #include <stdint.h>
-
-typedef class SparkProtocol SparkProtocol;
 
 
 typedef enum
@@ -64,12 +63,17 @@ const CloudVariableTypeInt INT;
 const CloudVariableTypeString STRING;
 const CloudVariableTypeDouble DOUBLE;
 
+#if PLATFORM_ID==3
+// avoid a c-linkage incompatible with C error on newer versions of gcc
+String spark_deviceID(void);
+#endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
+#if PLATFORM_ID!=3
 String spark_deviceID(void);
+#endif
 
 void cloud_disconnect(bool closeSocket=true);
 
@@ -85,11 +89,11 @@ STATIC_ASSERT(spark_data_typedef_is_1_byte, sizeof(Spark_Data_TypeDef)==1);
 
 #endif
 
+const uint32_t PUBLISH_EVENT_FLAG_PUBLIC = 0;
+const uint32_t PUBLISH_EVENT_FLAG_PRIVATE = 1;
+const uint32_t PUBLISH_EVENT_FLAG_NO_ACK = 2;
 
-typedef enum
-{
-	PUBLIC = 0, PRIVATE = 1
-} Spark_Event_TypeDef;
+STATIC_ASSERT(publish_no_ack_flag_matches, PUBLISH_EVENT_FLAG_NO_ACK==EventType::NO_ACK);
 
 typedef void (*EventHandler)(const char* name, const char* data);
 
@@ -134,27 +138,47 @@ bool spark_variable(const char *varKey, const void *userVar, Spark_Data_TypeDef 
  * @param reserved  For future expansion, set to NULL.
  */
 bool spark_function(const char *funcKey, p_user_function_int_str_t pFunc, void* reserved);
-bool spark_send_event(const char* name, const char* data, int ttl, Spark_Event_TypeDef eventType, void* reserved);
+bool spark_send_event(const char* name, const char* data, int ttl, uint32_t flags, void* reserved);
 bool spark_subscribe(const char *eventName, EventHandler handler, void* handler_data,
         Spark_Subscription_Scope_TypeDef scope, const char* deviceID, void* reserved);
 
 
 void spark_process(void);
-void spark_connect(void);
-void spark_disconnect(void);    // should be set connected since it manages the connection state)
-bool spark_connected(void);
-SparkProtocol* system_cloud_protocol_instance(void);
+bool spark_cloud_flag_connected(void);
+
+/**
+ * Sets the auto-connect state to true. The cloud will be connected by the system.
+ */
+void spark_cloud_flag_connect(void);
+
+/**
+ * Sets the auto-connect state to false. The cloud will be disconnected by the system.
+ */
+void spark_cloud_flag_disconnect(void);    // should be set connected since it manages the connection state)
+
+/**
+ * Determines if the system will attempt to connect or disconnect from the cloud.
+ */
+bool spark_cloud_flag_auto_connect(void);
+
+ProtocolFacade* system_cloud_protocol_instance(void);
 
 
 #define SPARK_BUF_LEN			        600
 
 //#define SPARK_SERVER_IP			        "54.235.79.249"
 #define SPARK_SERVER_PORT		        5683
-
+#define PORT_COAPS						(5684)
 #define SPARK_LOOP_DELAY_MILLIS		        1000    //1sec
 #define SPARK_RECEIVE_DELAY_MILLIS              10      //10ms
 
+#if PLATFORM_ID==103
 #define TIMING_FLASH_UPDATE_TIMEOUT             600000   //10 minutes
+#elif PLATFORM_ID==10
+#define TIMING_FLASH_UPDATE_TIMEOUT             90000   //90 seconds
+#else
+#define TIMING_FLASH_UPDATE_TIMEOUT             30000   //30sec
+#endif
 
 #define USER_VAR_MAX_COUNT		        10
 #define USER_VAR_KEY_LENGTH		        12

@@ -20,7 +20,7 @@
 #include "system_network_internal.h"
 
 
-class BLENetworkInterface : public ManagedNetworkInterface
+class BLENetworkInterface : public ManagedIPNetworkInterface<WLanConfig, BLENetworkInterface>
 {
 
 protected:
@@ -39,10 +39,6 @@ protected:
         
     }
 
-    void fetch_ipconfig(WLanConfig* target) override {
-        
-    }
-
     void on_now() override {
         
     }
@@ -56,6 +52,10 @@ protected:
     }
 
 public:
+
+    void fetch_ipconfig(WLanConfig* target) {
+
+    }
 
     void start_listening() override
     {
@@ -79,7 +79,7 @@ public:
         return true;
     }
     int set_credentials(NetworkCredentials* creds) override { return -1; }
-    void connect_cancel(bool cancel, bool calledFromISR) override { /* n/a */ }
+    void connect_cancel(bool cancel) override { /* n/a */ }
 
     void set_error_count(unsigned count) override
     {

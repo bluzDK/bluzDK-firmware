@@ -14,12 +14,10 @@ endif
 
 # redefine these for your environment
 TOOLCHAIN_PREFIX=arm-none-eabi-
-CORE?=../../../..
-WICED_SDK?=$(CORE)/WICED/WICED-SDK-3.1.1/WICED-SDK
-FIRMWARE=$(CORE)/firmware
+BASE?=../../../..
+WICED_SDK?=$(BASE)/WICED/WICED-SDK-3.1.1/WICED-SDK
+FIRMWARE?=$(BASE)/firmware
 COMMON_BUILD=$(FIRMWARE)/build
-#WICED_SDK?=$(CORE)/photon-wiced
-#FIRMWARE=$(CORE)/firmware-private
 
 include $(COMMON_BUILD)/macros.mk
 include $(COMMON_BUILD)/os.mk
@@ -28,12 +26,13 @@ include $(COMMON_BUILD)/version.mk
 ifeq (6,$(PLATFORM_ID))
 CMD=test.mfg_test-BCM9WCDUSI09-FreeRTOS-LwIP-SDIO
 BUILD_NAME=test_mfg_test-BCM9WCDUSI09-FreeRTOS-LwIP-SDIO
-SUFFIX=_BM-09
+SUFFIX=_BM-09_$(VERSION_STRING)
 else
 CMD=test.mfg_test-BCM9WCDUSI14-FreeRTOS-LwIP-SDIO
 BUILD_NAME=test_mfg_test-BCM9WCDUSI14-FreeRTOS-LwIP-SDIO
-SUFFIX=_BM-14
+SUFFIX=_BM-14_$(VERSION_STRING)
 endif
+
 
 SERVER_PUB_KEY=cloud_public.der
 FIRMWARE_BUILD=$(FIRMWARE)/build
@@ -83,7 +82,7 @@ all: combined-full
 setup:
 	-mkdir $(TARGET_PARENT)
 	-mkdir $(TARGET)
-
+	-mkdir $(OUT)
 clean:
 	-rm -rf $(TARGET_PARENT)
 	-rm $(MFG_TEST_BIN)
@@ -184,7 +183,7 @@ combined-minimal: setup bootloader dct mfg_test user system-minimal $(WL_DEP) ch
 	# Generate combined.elf from combined.bin
 	${TOOLCHAIN_PREFIX}ld -b binary -r -o $(OUT)/temp.elf $(COMBINED_MEM)
 	${TOOLCHAIN_PREFIX}objcopy --rename-section .data=.text --set-section-flags .data=alloc,code,load $(OUT)/temp.elf
-	${TOOLCHAIN_PREFIX}ld $(OUT)/temp.elf -T combined_bin_to_elf.ld -o $(COMBINED_ELF)
+	${TOOLCHAIN_PREFIX}ld $(OUT)/temp.elf -T ../stm32/combined_bin_to_elf.ld -o $(COMBINED_ELF)
 	${TOOLCHAIN_PREFIX}strip -s $(COMBINED_ELF)
 	-rm -rf $(OUT)/temp.elf
 
@@ -201,7 +200,7 @@ combined-full: setup bootloader dct mfg_test user-full system-full $(WL_DEP) use
 	# Generate combined.elf from combined.bin
 	${TOOLCHAIN_PREFIX}ld -b binary -r -o $(OUT)/temp.elf $(COMBINED_MEM)
 	${TOOLCHAIN_PREFIX}objcopy --rename-section .data=.text --set-section-flags .data=alloc,code,load $(OUT)/temp.elf
-	${TOOLCHAIN_PREFIX}ld $(OUT)/temp.elf -T combined_bin_to_elf.ld -o $(COMBINED_ELF)
+	${TOOLCHAIN_PREFIX}ld $(OUT)/temp.elf -T ../stm32/combined_bin_to_elf.ld -o $(COMBINED_ELF)
 	${TOOLCHAIN_PREFIX}strip -s $(COMBINED_ELF)
 	-rm -rf $(OUT)/temp.elf
 
