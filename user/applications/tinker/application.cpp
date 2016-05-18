@@ -50,10 +50,10 @@ void setup()
     //Register all the Tinker functions
     Particle.function("digitalread", tinkerDigitalRead);
     Particle.function("digitalwrite", tinkerDigitalWrite);
-
-	Particle.variable("version", version);
     Particle.function("analogread", tinkerAnalogRead);
     Particle.function("analogwrite", tinkerAnalogWrite);
+
+	Particle.variable("version", version);
 }
 
 /* This function loops forever --------------------------------------------*/

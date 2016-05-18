@@ -39,7 +39,6 @@ int32_t Socket::init(uint8_t family, uint8_t type, uint8_t protocol, uint16_t po
 
 int32_t Socket::connect(uint32_t sockid, const sockaddr_b *addr, long addrlen)
 {
-
     int offset = 0;
 #if PLATFORM_ID==269
     offset = 3;
@@ -128,7 +127,7 @@ int32_t Socket::close()
 //    data[1] = (SOCKET_DISCONNECT & 0xF0) | (id & 0x0F);
 //    
 //    DataManagementLayer::sendData(2, data);
-    return 1;
+    return 0;
 }
 
 int32_t Socket::bytes_available()

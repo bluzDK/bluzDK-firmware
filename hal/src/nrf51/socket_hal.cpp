@@ -92,7 +92,7 @@ sock_handle_t socket_handle_invalid()
 
 uint8_t socket_handle_valid(sock_handle_t handle)
 {
-    return 1;
+    return handle != SOCKET_INVALID;
 }
 
 sock_result_t socket_create_tcp_server(uint16_t port, network_interface_t nif)
