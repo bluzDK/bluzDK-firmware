@@ -18,29 +18,26 @@
  */
 
 #include "application.h"
-#include "rtc_timer.h"
 
 void timerCallback()
 {
   digitalWrite(D7, 1);
-  if (BLE.getState() == BLE_CONNECTED && Particle.connected())
-    Particle.publish("OMG IT WORKED!!");
+  Particle.publish("\"I'm alive!\" -- Timer (class of 2016)");
+  delay(200);
+  digitalWrite(D7, 0);
 }
 
-RTCTimer *testTimer = new RTCTimer(2000000L, timerCallback);
+Timer testTimer(5000, timerCallback);
 
 /* executes once at startup */
 void setup() {
   pinMode(D7, OUTPUT);  
+
+  Particle.publish("I'm back!");
+  testTimer.start();
 }
 
 /* executes continuously after setup() runs */
 void loop() {
-  static bool once = true;
-  if (once && Particle.connected()) {
-    once = false;
-    Particle.publish("I'm back!");
-    testTimer->start();
-  }
 
 }

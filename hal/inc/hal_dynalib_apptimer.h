@@ -38,9 +38,9 @@
 // GNINRAW
 
 DYNALIB_BEGIN(hal_apptimer)
-DYNALIB_FN(hal_apptimer, HAL_app_timer_create)
-DYNALIB_FN(hal_apptimer, HAL_app_timer_start)
-DYNALIB_FN(hal_apptimer, HAL_app_timer_stop)
+DYNALIB_FN(0, hal_apptimer, HAL_app_timer_create, uint32_t(app_timer_id_t *p_timer_id, app_timer_mode_t mode, app_timer_timeout_handler_t timeout_handler))
+DYNALIB_FN(1, hal_apptimer, HAL_app_timer_start, uint32_t(app_timer_id_t timer_id, uint32_t milliseconds, void *p_context))
+DYNALIB_FN(2, hal_apptimer, HAL_app_timer_stop, uint32_t(app_timer_id_t timer_id))
 DYNALIB_END(hal_apptimer)
 
 #endif	/* HAL_DYNALIB_APPTIMER_H */
