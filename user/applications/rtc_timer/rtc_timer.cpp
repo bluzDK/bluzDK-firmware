@@ -21,6 +21,7 @@
 
 void timerCallback()
 {
+  if (!Particle.connected()) return;
   digitalWrite(D7, 1);
   Particle.publish("\"I'm alive!\" -- Timer (class of 2016)");
   delay(200);
@@ -33,11 +34,16 @@ Timer testTimer(5000, timerCallback);
 void setup() {
   pinMode(D7, OUTPUT);  
 
-  Particle.publish("I'm back!");
-  testTimer.start();
 }
 
 /* executes continuously after setup() runs */
 void loop() {
+  static bool one_shot = true;
+  if (one_shot && Particle.connected()) {
+    one_shot = false;
+
+    Particle.publish("I'm back!");
+    testTimer.start();
+  }
 
 }
