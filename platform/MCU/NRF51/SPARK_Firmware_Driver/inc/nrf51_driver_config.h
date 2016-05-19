@@ -19,12 +19,12 @@
 #define __NRF51_DRIVER_CONFIG_H
 
 typedef enum {
-    HW0_NONE,
-    HW0_SPI,
-    HW0_TWI
-} HardwarePeripheralZero;
+    HW1_NONE,
+    HW1_SPI,
+    HW1_TWI
+} HardwarePeripheralOne;
 
-HardwarePeripheralZero HW_ZERO_CONFIG;
+HardwarePeripheralOne HW_ONE_CONFIG;
 
 
 #endif

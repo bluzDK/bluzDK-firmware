@@ -28,6 +28,7 @@ extern "C" {
 void setup();
 void loop();
 
+void _post_loop();
 void serialEventRun();
 
 /**
@@ -40,6 +41,9 @@ void module_user_init_hook(void);
  * @return true if the backup ram was valid and didn't need initializing. False if the ram was invalid and was initialized.
  */
 bool __backup_ram_was_valid();
+
+void random_seed_from_cloud(unsigned int value) __attribute__((weak));
+
 
 #ifdef __cplusplus
 }

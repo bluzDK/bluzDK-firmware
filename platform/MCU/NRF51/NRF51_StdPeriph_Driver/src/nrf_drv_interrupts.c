@@ -34,14 +34,16 @@
 #include "spi_master.h"
 #include "nrf51_driver_config.h"
 
-void nrf_drv_spi0_int_handler(void);
-void nrf_drv_twi0_int_handler(void);
+void nrf_drv_spi1_int_handler(void);
+void nrf_drv_twi1_int_handler(void);
 
-void SPI0_TWI0_IRQHandler(void)
+#if (TWI1_ENABLED == 1) || defined(SPI_MASTER_1_ENABLE)
+void SPI1_TWI1_IRQHandler(void)
 {
-    if (HW_ZERO_CONFIG == HW0_TWI) {
-        nrf_drv_twi0_int_handler();
-    } else if (HW_ZERO_CONFIG == HW0_SPI) {
-//        nrf_drv_spi0_int_handler();
+    if (HW_ONE_CONFIG == HW1_TWI) {
+        nrf_drv_twi1_int_handler();
+    } else if (HW_ONE_CONFIG == HW1_SPI) {
+        nrf_drv_spi1_int_handler();
     }
 }
+#endif

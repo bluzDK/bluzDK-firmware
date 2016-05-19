@@ -39,6 +39,7 @@
 */
 class MDMParser
 {
+
 public:
     //! Constructor
     MDMParser(void);
@@ -62,6 +63,11 @@ public:
     bool connect(const char* simpin = NULL,
             const char* apn = "spark.telefonica.com", const char* username = NULL,
             const char* password = NULL, Auth auth = AUTH_DETECT);
+
+    /**
+     * Used to issue a hardware reset of the modem
+     */
+    void reset(void);
 
     /**
      * powerOn Initialize the modem and SIM card
@@ -98,10 +104,37 @@ public:
 
     /** checks the signal strength
         \param status an optional structure that will have current network information
-               and updated RSSI and BER values.
+               and updated RSSI and QUAL values.
         \return true if successful, false otherwise
     */
     bool getSignalStrength(NetStatus &status);
+
+    /** fetches the current data usage byte counts
+        \param data a required structure that will be populated with
+               current data usage values.
+        \return true if successful, false otherwise
+    */
+    bool getDataUsage(MDM_DataUsage &data);
+
+    /** sets the cellular frequency bands used
+        \param bands a comma delimited constant char string of bands.
+        \return true if successful, false otherwise
+    */
+    bool setBandSelect(MDM_BandSelect &data);
+
+    /** gets the cellular frequency bands curently used
+        \param data a required structure that will be populated with
+               current bands set for use.
+        \return true if successful, false otherwise
+    */
+    bool getBandSelect(MDM_BandSelect &data);
+
+    /** gets the cellular frequency bands available to select
+        \param data a required structure that will be populated with
+               current bands available.
+        \return true if successful, false otherwise
+    */
+    bool getBandAvailable(MDM_BandSelect &data);
 
     /** Power off the MT, This function has to be called prior to
         switching off the supply.
@@ -452,6 +485,9 @@ protected:
     static int _cbCPIN(int type, const char* buf, int len, Sim* sim);
     static int _cbCCID(int type, const char* buf, int len, char* ccid);
     // network
+    static int _cbUGCNTRD(int type, const char* buf, int len, MDM_DataUsage* data);
+    static int _cbBANDAVAIL(int type, const char* buf, int len, MDM_BandSelect* data);
+    static int _cbBANDSEL(int type, const char* buf, int len, MDM_BandSelect* data);
     static int _cbCSQ(int type, const char* buf, int len, NetStatus* status);
     static int _cbCOPS(int type, const char* buf, int len, NetStatus* status);
     static int _cbCNUM(int type, const char* buf, int len, char* num);
@@ -464,8 +500,9 @@ protected:
     static int _cbUDNSRN(int type, const char* buf, int len, MDM_IP* ip);
     static int _cbUSOCR(int type, const char* buf, int len, int* handle);
     static int _cbUSOCTL(int type, const char* buf, int len, int* handle);
-    static int _cbUSORD(int type, const char* buf, int len, char* out);
-    typedef struct { char* buf; MDM_IP ip; int port; } USORFparam;
+    typedef struct { char* buf; int len; } USORDparam;
+    static int _cbUSORD(int type, const char* buf, int len, USORDparam* param);
+    typedef struct { char* buf; MDM_IP ip; int port; int len; } USORFparam;
     static int _cbUSORF(int type, const char* buf, int len, USORFparam* param);
     typedef struct { char* buf; char* num; } CMGRparam;
     static int _cbCUSD(int type, const char* buf, int len, char* resp);
@@ -481,6 +518,7 @@ protected:
     DevStatus   _dev; //!< collected device information
     NetStatus   _net; //!< collected network information
     MDM_IP       _ip;  //!< assigned ip address
+    MDM_DataUsage _data_usage; //!< collected data usage information
     // management struture for sockets
     typedef struct {
         int handle;
@@ -497,11 +535,14 @@ protected:
     int _socketCloseUnusedHandles(void);
     int _socketSocket(int socket, IpProtocol ipproto, int port);
     bool _socketFree(int socket);
+    bool _powerOn(void);
+    void _setBandSelectString(MDM_BandSelect &data, char* bands, int index=0); // private helper to create bands strings
     static MDMParser* inst;
     bool _init;
     bool _pwr;
     bool _activated;
     bool _attached;
+    bool _attached_urc;
     volatile bool _cancel_all_operations;
 #ifdef MDM_DEBUG
     int _debugLevel;

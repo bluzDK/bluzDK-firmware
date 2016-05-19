@@ -11,16 +11,21 @@ INCLUDE_DIRS += SPARK_Services/inc
 # C source files included in this build.
 CSRC += $(TARGET_SPARK_SRC_PATH)/hw_config.c
 CSRC += $(TARGET_SPARK_SRC_PATH)/flash.c
-CSRC += $(TARGET_SPARK_SRC_PATH)/ble_scs.c
 CSRC += $(TARGET_SPARK_SRC_PATH)/sst25vf_spi.c
 CSRC += $(TARGET_SPARK_SRC_PATH)/system_nrf51.c
 CSRC += $(TARGET_SPARK_SRC_PATH)/nrf51_callbacks.c
-CSRC += $(TARGET_SPARK_SRC_PATH)/particle_data_service.c
 CSRC += $(TARGET_SPARK_SRC_PATH)/spi_master_fast.c
 
-#ifdef BLUZ
+ifeq ("$(PLATFORM_ID)","103")
+CSRC += $(TARGET_SPARK_SRC_PATH)/ble_scs.c
+CSRC += $(TARGET_SPARK_SRC_PATH)/particle_data_service.c
+endif
 
-#endif
+ifeq ("$(PLATFORM_ID)","269")
+CSRC += $(TARGET_SPARK_SRC_PATH)/hw_gateway_config.c
+CSRC += $(TARGET_SPARK_SRC_PATH)/spi_slave_stream.c
+CSRC += $(TARGET_SPARK_SRC_PATH)/client_handling.c
+endif
 
 
 # C++ source files included in this build.

@@ -29,6 +29,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stddef.h>
 
 /* Exported types ------------------------------------------------------------*/
 typedef enum
@@ -107,7 +108,7 @@ void HAL_Notify_Button_State(uint8_t button, uint8_t state);
 
 void HAL_Core_Enter_Safe_Mode(void* reserved);
 void HAL_Core_Enter_Bootloader(bool persist);
-void HAL_Core_Enter_Stop_Mode(uint16_t wakeUpPin, uint16_t edgeTriggerMode);
+void HAL_Core_Enter_Stop_Mode(uint16_t wakeUpPin, uint16_t edgeTriggerMode, long seconds);
 void HAL_Core_Execute_Stop_Mode(void);
 void HAL_Core_Enter_Standby_Mode(void);
 void HAL_Core_Execute_Standby_Mode(void);
@@ -120,6 +121,8 @@ void HAL_Events_Manage(void);
 bool HAL_Network_Connection(void);
 bool HAL_Is_Advertising(void);
 void HAL_Handle_Cloud_Disconnect(void);
+void HAL_Loop_Iteration(void);
+void HAL_Set_Cloud_Connection(bool connected);
 uint32_t HAL_Get_Sys_Tick_Interval(void);
 
 typedef enum _BootloaderFlag_t {
@@ -202,7 +205,8 @@ int HAL_Set_System_Config(hal_system_config_t config_item, const void* data, uns
 
 typedef enum HAL_Feature {
     FEATURE_RETAINED_MEMORY=1,       // [write only] retained memory on backup power
-    FEATURE_WARM_START               // [read only] set to true if previous retained memory contents are available]
+    FEATURE_WARM_START,              // [read only] set to true if previous retained memory contents are available]
+	FEATURE_CLOUD_UDP,				// [read only] true if the UDP implementation should be used.
 } HAL_Feature;
 
 int HAL_Feature_Set(HAL_Feature feature, bool enabled);
@@ -212,6 +216,10 @@ bool HAL_Feature_Get(HAL_Feature feature);
  * Externally defined function that is called before user constructors.
  */
 extern void module_user_init_hook(void);
+
+int HAL_System_Backup_Save(size_t offset, const void* buffer, size_t length, void* reserved);
+int HAL_System_Backup_Restore(size_t offset, void* buffer, size_t max_length, size_t* length, void* reserved);
+
 
 #ifdef __cplusplus
 }

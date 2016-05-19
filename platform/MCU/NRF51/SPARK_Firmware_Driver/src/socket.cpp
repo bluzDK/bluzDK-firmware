@@ -39,44 +39,55 @@ int32_t Socket::init(uint8_t family, uint8_t type, uint8_t protocol, uint16_t po
 
 int32_t Socket::connect(uint32_t sockid, const sockaddr_b *addr, long addrlen)
 {
+    int offset = 0;
+#if PLATFORM_ID==269
+    offset = 3;
+#endif
+
     id = sockid;
+
     //format to tell the gateway to open a socket is: <sockid><family><type><protocol><port><address>
-    uint8_t data[9+addrlen];
+    uint8_t data[9+addrlen+offset];
     //first, the service ID
-    data[0] = SOCKET_DATA_SERVICE & 0xFF;
+    data[0+offset] = SOCKET_DATA_SERVICE & 0xFF;
     
     //next, the socket ID
-    data[1] = ((SOCKET_CONNECT << 4) & 0xF0) | (id & 0x0F);
+    data[1+offset] = ((SOCKET_CONNECT << 4) & 0xF0) | (id & 0x0F);
     
     //then the connection code
-    data[2] = (SOCKET_CONNECT & 0xFF00) >> 8;
-    data[3] = SOCKET_CONNECT & 0xFF;
+    data[2+offset] = (SOCKET_CONNECT & 0xFF00) >> 8;
+    data[3+offset] = SOCKET_CONNECT & 0xFF;
     
-    data[4] = family;
-    data[5] = type;
-    data[6] = protocol;
+    data[4+offset] = family;
+    data[5+offset] = type;
+    data[6+offset] = protocol;
 
-    data[7] = (port & 0xFF00) >> 8;
-    data[8] = port & 0xFF;
+    data[7+offset] = (port & 0xFF00) >> 8;
+    data[8+offset] = port & 0xFF;
     
-    memcpy(data+9, addr, addrlen);
+    memcpy(data+9+offset, addr, addrlen);
     
-    DataManagementLayer::sendData(9+addrlen, data);
+    DataManagementLayer::sendData(9+addrlen+offset, data);
     return 0;
 }
 int32_t Socket::send(const void* data, uint32_t len)
 {
+    int offset = 0;
+#if PLATFORM_ID==269
+    offset = 3;
+#endif
+
     DEBUG("Sending on socket %d data of size %d!", id, len);
-    uint8_t dataPlusID[len+2];
-    dataPlusID[0] = SOCKET_DATA_SERVICE & 0xFF;
-    dataPlusID[1] = ((SOCKET_DATA << 4) & 0xF0) | (id & 0x0F);
+    uint8_t dataPlusID[len+2+offset];
+    dataPlusID[0+offset] = SOCKET_DATA_SERVICE & 0xFF;
+    dataPlusID[1+offset] = ((SOCKET_DATA << 4) & 0xF0) | (id & 0x0F);
     
-    memcpy(dataPlusID+2, data, len);
+    memcpy(dataPlusID+2+offset, data, len);
     
 //    uint8_t dataPlusID[len];
 //    memcpy(dataPlusID, data, len);
     
-    DataManagementLayer::sendData(len+2, dataPlusID);
+    DataManagementLayer::sendData(len+2+offset, dataPlusID);
     return len;
 }
 int32_t Socket::receive(void* data, uint32_t len, unsigned long _timeout)
@@ -116,7 +127,7 @@ int32_t Socket::close()
 //    data[1] = (SOCKET_DISCONNECT & 0xF0) | (id & 0x0F);
 //    
 //    DataManagementLayer::sendData(2, data);
-    return 1;
+    return 0;
 }
 
 int32_t Socket::bytes_available()

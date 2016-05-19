@@ -43,9 +43,12 @@ ALLDEPS += $(addprefix $(BUILD_PATH)/, $(CSRC:.c=.o.d))
 ALLDEPS += $(addprefix $(BUILD_PATH)/, $(CPPSRC:.cpp=.o.d))
 ALLDEPS += $(addprefix $(BUILD_PATH)/, $(patsubst $(COMMON_BUILD)/arm/%,%,$(ASRC:.S=.o.d)))
 
+CLOUD_FLASH_URL ?= https://api.spark.io/v1/devices/$(SPARK_CORE_ID)\?access_token=$(SPARK_ACCESS_TOKEN)
 
 # All Target
-all: $(MAKE_DEPENDENCIES) $(TARGET)
+all: $(TARGET) postbuild
+
+build_dependencies: $(MAKE_DEPENDENCIES)
 
 elf: $(TARGET_BASE).elf
 bin: $(TARGET_BASE).bin
@@ -60,6 +63,14 @@ st-flash: $(TARGET_BASE).bin
 	@echo Flashing $< using st-flash to address $(PLATFORM_DFU)
 	st-flash write $< $(PLATFORM_DFU)
 
+ifneq ("$(OPENOCD_HOME)","")
+
+program-openocd: $(TARGET_BASE).bin
+	@echo Flashing $< using openocd to address $(PLATFORM_DFU)
+	$(OPENOCD_HOME)/openocd -f $(OPENOCD_HOME)/tcl/interface/ftdi/particle-ftdi.cfg -f $(OPENOCD_HOME)/tcl/target/stm32f2x.cfg  -c "init; reset halt" -c "flash protect 0 0 11 off" -c "program $< $(PLATFORM_DFU) reset exit"
+
+endif
+
 # Program the core using dfu-util. The core should have been placed
 # in bootloader mode before invoking 'make program-dfu'
 program-dfu: $(TARGET_BASE).dfu
@@ -70,7 +81,7 @@ ifeq ("$(wildcard $(PARTICLE_SERIAL_DEV))","")
 	@echo Serial device PARTICLE_SERIAL_DEV : $(PARTICLE_SERIAL_DEV) not available
 else
 	@echo Entering dfu bootloader mode:
-	stty -f $(PARTICLE_SERIAL_DEV) $(START_DFU_FLASHER_SERIAL_SPEED)
+	$(SERIAL_SWITCHER) $(START_DFU_FLASHER_SERIAL_SPEED) $(PARTICLE_SERIAL_DEV)
 	sleep 1
 endif
 endif
@@ -92,7 +103,7 @@ ifeq ("$(wildcard $(PARTICLE_SERIAL_DEV))","")
 	@echo Serial device PARTICLE_SERIAL_DEV : $(PARTICLE_SERIAL_DEV) not available
 else
 	@echo Entering serial programmer mode:
-	stty -f $(PARTICLE_SERIAL_DEV) $(START_YMODEM_FLASHER_SERIAL_SPEED)
+	$(SERIAL_SWITCHER) $(START_YMODEM_FLASHER_SERIAL_SPEED) $(PARTICLE_SERIAL_DEV)
 	sleep 1
 	@echo Flashing using serial ymodem protocol:
 # Got some issue currently in getting 'sz' working
@@ -171,14 +182,14 @@ endif
 	$(call echo,)
 
 
-$(TARGET_BASE).elf : $(ALLOBJ) $(LIB_DEPS) $(LINKER_DEPS)
+$(TARGET_BASE).elf : build_dependencies $(ALLOBJ) $(LIB_DEPS) $(LINKER_DEPS)
 	$(call echo,'Building target: $@')
 	$(call echo,'Invoking: ARM GCC C++ Linker')
 	$(VERBOSE)$(MKDIR) $(dir $@)
 	$(VERBOSE)$(CPP) $(CFLAGS) $(ALLOBJ) --output $@ $(LDFLAGS)
 	$(call echo,)
 
-$(TARGET_BASE)$(EXECUTABLE_EXTENSION) : $(ALLOBJ) $(LIB_DEPS) $(LINKER_DEPS)
+$(TARGET_BASE)$(EXECUTABLE_EXTENSION) : build_dependencies $(ALLOBJ) $(LIB_DEPS) $(LINKER_DEPS)
 	$(call echo,'Building target: $@')
 	$(call echo,'Invoking: GCC C++ Linker')
 	$(VERBOSE)$(MKDIR) $(dir $@)
@@ -226,7 +237,7 @@ clean: clean_deps
 	$(VERBOSE)$(RMDIR) $(BUILD_PATH)
 	$(call,echo,)
 
-.PHONY: all none elf bin hex size program-dfu program-cloud st-flash program-serial
+.PHONY: all postbuild none elf bin hex size program-dfu program-cloud st-flash program-serial
 .SECONDARY:
 
 include $(COMMON_BUILD)/recurse.mk

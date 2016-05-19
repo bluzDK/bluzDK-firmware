@@ -38,16 +38,21 @@ int32_t InfoDataService::getServiceID()
 }
 int32_t InfoDataService::DataCallback(uint8_t *data, int16_t length)
 {
+    int offset = 0;
+#if PLATFORM_ID==269
+    offset = 3;
+#endif
+
     switch (data[0]) {
         case GET_ID:
             uint8_t id[12];
             HAL_device_ID(id, 12);
             
-            uint8_t rsp[13];
-            rsp[0] = INFO_DATA_SERVICE & 0xFF;
-            memcpy(rsp+1, id, 12);
+            uint8_t rsp[13+offset];
+            rsp[0+offset] = INFO_DATA_SERVICE & 0xFF;
+            memcpy(rsp+1+offset, id, 12);
             
-            DataManagementLayer::sendData(13, rsp);
+            DataManagementLayer::sendData(13+offset, rsp);
             break;
     }
     return 1;

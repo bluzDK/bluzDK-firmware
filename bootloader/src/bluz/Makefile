@@ -86,7 +86,14 @@ INC_PATHS += -I$(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/inc/
 INC_PATHS += -I$(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/inc/toolchain)
 INC_PATHS += -I$(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/inc/libraries/bootloader_dfu)
 INC_PATHS += -I$(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/inc/libraries/scheduler)
+
+ifeq ("$(PLATFORM_ID)","103")
 INC_PATHS += -I$(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/inc/softdevice/s110/headers)
+else ifeq ("$(PLATFORM_ID)","269")
+INC_PATHS += -I$(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/inc/softdevice/s120/headers)
+endif
+
+
 INC_PATHS += -I$(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/inc/bsp)
 INC_PATHS += -I$(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/inc/drivers_nrf/pstorage)
 INC_PATHS += -I$(abspath ../../../platform/MCU/NRF51/NRF51_StdPeriph_Driver/inc/drivers_nrf/common)
@@ -123,11 +130,16 @@ CPPFLAGS  = -DSWI_DISABLE0
 CPPFLAGS += -DBOARD_PCA10028
 CPPFLAGS += -DSOFTDEVICE_PRESENT
 CPPFLAGS += -DNRF51
+
+ifeq ("$(PLATFORM_ID)","103")
 CPPFLAGS += -DS110
+else ifeq ("$(PLATFORM_ID)","269")
+CPPFLAGS += -DS120
+endif
+
 CPPFLAGS += -D__HEAP_SIZE=0
 CPPFLAGS += -DBLE_STACK_SUPPORT_REQD
 CPPFLAGS += -DBSP_DEFINES_ONLY
-CPPFLAGS += -DPLATFORM_ID=103
 CPPFLAGS += -mcpu=cortex-m0
 CPPFLAGS += -mthumb -mabi=aapcs
 CPPFLAGS += -Wall -Werror -Os
@@ -154,7 +166,13 @@ ASMFLAGS += -DSWI_DISABLE0
 ASMFLAGS += -DBOARD_PCA10028
 ASMFLAGS += -DSOFTDEVICE_PRESENT
 ASMFLAGS += -DNRF51
+
+ifeq ("$(PLATFORM_ID)","103")
 ASMFLAGS += -DS110
+else ifeq ("$(PLATFORM_ID)","269")
+ASMFLAGS += -DS120
+endif
+
 ASMFLAGS += -D__HEAP_SIZE=0
 ASMFLAGS += -DBLE_STACK_SUPPORT_REQD
 ASMFLAGS += -DBSP_DEFINES_ONLY

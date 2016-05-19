@@ -28,7 +28,7 @@ extern "C" {
 
 
 typedef uint64_t system_event_t;
-typedef void (system_event_handler_t)(system_event_t event, uint32_t param, void* pointer);
+typedef void (system_event_handler_t)(system_event_t event, int param, void* pointer);
 
 
 enum SystemEvents {
@@ -53,9 +53,13 @@ enum SystemEvents {
     firmware_update_pending = 1<<9,
     reset_pending = 1<<10,          // notifies that the system would like to shutdown (System.resetPending() return true)
     reset = 1<<11,                  // notifies that the system will now reset on return from this event.
+    button_click = 1<<12,           // generated for every click in series - data is number of clicks in the lower 4 bits.
+    button_final_click = 1<<13,     // generated for last click in series - data is the number of clicks in the lower 4 bits.
 
-    all_events = 0x7FFFFFFF
+    all_events = 0xFFFFFFFFFFFFFFFF
 };
+
+inline uint8_t system_button_clicks(int param) { return param&0xF; }
 
 enum SystemEventsParam {
     //
@@ -109,4 +113,4 @@ void system_unsubscribe_event(system_event_t events, system_event_handler_t* han
  * @param data
  * @param pointer
  */
-void system_notify_event(system_event_t event, uint32_t data=0, void* pointer=nullptr, void (*fn)()=nullptr);
+void system_notify_event(system_event_t event, uint32_t data=0, void* pointer=nullptr, void (*fn)(void* data)=nullptr, void* fndata=nullptr);

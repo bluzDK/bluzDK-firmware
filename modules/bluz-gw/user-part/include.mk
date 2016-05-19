@@ -1,0 +1,3 @@
+
+INCLUDE_DIRS += $(USER_PART_MODULE_PATH)/inc
+

@@ -21,10 +21,12 @@
 
 #include "system_network_internal.h"
 #include "wlan_hal.h"
+#include "interrupts_hal.h"
 
 
-class WiFiNetworkInterface : public ManagedNetworkInterface
+class WiFiNetworkInterface : public ManagedIPNetworkInterface<WLanConfig, WiFiNetworkInterface>
 {
+    WLanConfig ip_config;
 
     static int wifi_add_profile_callback(void* data, const char *ssid, const char *password,
         unsigned long security_type, unsigned long cipher, bool dry_run)
@@ -94,11 +96,6 @@ protected:
     {
         wlan_connect_init();
 
-        if (wlan_reset_credentials_store_required())
-        {
-            wlan_reset_credentials_store();
-        }
-
         Set_NetApp_Timeout();
     }
 
@@ -133,10 +130,10 @@ public:
     }
 
 
-    void connect_cancel(bool cancel, bool calledFromISR) override
+    void connect_cancel(bool cancel) override
     {
         if (cancel)
-            wlan_connect_cancel(calledFromISR);
+            wlan_connect_cancel(HAL_IsISR());
     }
 
     bool has_credentials() override
@@ -174,9 +171,14 @@ public:
     void setup() override
     {
         wlan_setup();
+
+        if (wlan_reset_credentials_store_required())
+        {
+            wlan_reset_credentials_store();
+        }
     }
 
-    void fetch_ipconfig(WLanConfig* target) override
+    void fetch_ipconfig(WLanConfig* target)
     {
         wlan_fetch_ipconfig(target);
     }

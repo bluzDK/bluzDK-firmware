@@ -7,12 +7,25 @@
 
 
 #if PLATFORM_THREADING
+
+#if HAL_PLATFORM_CLOUD_UDP
+// Electron uses larger stack size to workaround stack overflow problem that occurs during
+// handshake in multithreaded configuration
+#define THREAD_STACK_SIZE 4*1024
+#else
+#define THREAD_STACK_SIZE 3*1024
+#endif
+
 void system_thread_idle()
 {
     Spark_Idle_Events(true);
 }
 
-ActiveObjectThreadQueue SystemThread(ActiveObjectConfiguration(system_thread_idle, 100, 1024*3));
+ActiveObjectThreadQueue SystemThread(ActiveObjectConfiguration(system_thread_idle,
+			100, /* take timeout */
+			0x7FFFFFFF, /* put timeout - wait forever */
+			50, /* queue size */
+			THREAD_STACK_SIZE /* stack size */)); // TODO: Use this value for threads spawned by ActiveObjectBase
 
 /**
  * Implementation to support gthread's concurrency primitives.
@@ -90,10 +103,7 @@ namespace std {
         thread_startup startup;
         startup.call = base.get();
         startup.started = false;
-        // FIXME: if the priority of the new thread is low enough not to cause `os_thread_create` to
-        // preempt the current thread to run the thread start function, by the time `invoke_thread`
-        // executes `call->_M_run()` will cause a pure virtual error
-        if (os_thread_create(&_M_id._M_thread, "std::thread", OS_THREAD_PRIORITY_DEFAULT, invoke_thread, &startup, 1024*3)) {
+        if (os_thread_create(&_M_id._M_thread, "std::thread", OS_THREAD_PRIORITY_DEFAULT, invoke_thread, &startup, THREAD_STACK_SIZE)) {
             PANIC(AssertionFailure, "%s %s", __FILE__, __LINE__);
         }
         else {  // C++ ensure the thread has started execution, as required by the standard
@@ -113,7 +123,18 @@ namespace std {
     }
 }
 
+static os_mutex_recursive_t usb_serial_mutex;
+
+os_mutex_recursive_t mutex_usb_serial()
+{
+	if (nullptr==usb_serial_mutex) {
+		os_mutex_recursive_create(&usb_serial_mutex);
+	}
+	return usb_serial_mutex;
+}
+
 #endif
+
 
 
 void* system_internal(int item, void* reserved)
@@ -122,6 +143,7 @@ void* system_internal(int item, void* reserved)
 #if PLATFORM_THREADING
     case 0: return &ApplicationThread;
     case 1: return &SystemThread;
+    case 2: return mutex_usb_serial();
 #endif
     }
     return nullptr;

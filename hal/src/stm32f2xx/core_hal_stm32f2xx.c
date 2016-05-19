@@ -45,6 +45,14 @@
 #include "core_hal_stm32f2xx.h"
 #include "stm32f2xx.h"
 #include "timer_hal.h"
+#include "dct.h"
+#include "hal_platform.h"
+#include "malloc.h"
+#include "usb_hal.h"
+#include "usart_hal.h"
+
+#define STOP_MODE_EXIT_CONDITION_PIN 0x01
+#define STOP_MODE_EXIT_CONDITION_RTC 0x02
 
 void HardFault_Handler( void ) __attribute__( ( naked ) );
 
@@ -174,6 +182,16 @@ void (*HAL_TIM4_Handler)(void);
 void (*HAL_TIM5_Handler)(void);
 void (*HAL_TIM8_Handler)(void);
 
+//HAL Interrupt Handlers defined in xxx_hal.c files
+void HAL_CAN1_TX_Handler(void) __attribute__ ((weak));
+void HAL_CAN1_RX0_Handler(void) __attribute__ ((weak));
+void HAL_CAN1_RX1_Handler(void) __attribute__ ((weak));
+void HAL_CAN1_SCE_Handler(void) __attribute__ ((weak));
+void HAL_CAN2_TX_Handler(void) __attribute__ ((weak));
+void HAL_CAN2_RX0_Handler(void) __attribute__ ((weak));
+void HAL_CAN2_RX1_Handler(void) __attribute__ ((weak));
+void HAL_CAN2_SCE_Handler(void) __attribute__ ((weak));
+
 /* Extern variables ----------------------------------------------------------*/
 extern __IO uint16_t BUTTON_DEBOUNCED_TIME[];
 
@@ -231,7 +249,7 @@ void HAL_Core_Config(void)
     // where WICED isn't ready for a SysTick until after main() has been called to
     // fully intialize the RTOS.
     HAL_Core_Setup_override_interrupts();
-
+    
 #if MODULAR_FIRMWARE
     // write protect system module parts if not already protected
     FLASH_WriteProtectMemory(FLASH_INTERNAL, CORE_FW_ADDRESS, USER_FIRMWARE_IMAGE_LOCATION - CORE_FW_ADDRESS, true);
@@ -263,7 +281,7 @@ void HAL_Core_Setup(void) {
     bootloader_update_if_needed();
     HAL_Bootloader_Lock(true);
 
-#if !MODULAR_FIRMWARE
+#if !defined(MODULAR_FIRMWARE)
     module_user_init_hook();
 #endif
 }
@@ -362,37 +380,102 @@ void HAL_Core_Enter_Safe_Mode(void* reserved)
     HAL_Core_System_Reset();
 }
 
-void HAL_Core_Enter_Stop_Mode(uint16_t wakeUpPin, uint16_t edgeTriggerMode)
+void HAL_Core_Enter_Stop_Mode(uint16_t wakeUpPin, uint16_t edgeTriggerMode, long seconds)
 {
+    if (!((wakeUpPin < TOTAL_PINS) && (wakeUpPin >= 0) && (edgeTriggerMode <= FALLING)) && seconds <= 0)
+        return;
+
+    SysTick->CTRL &= ~SysTick_CTRL_ENABLE_Msk;
+
+    // Disable USB Serial (detach)
+    USB_USART_Init(0);
+
+    // Flush all USARTs
+    for (int usart = 0; usart < TOTAL_USARTS; usart++)
+    {
+        if (HAL_USART_Is_Enabled(usart))
+        {
+            HAL_USART_Flush_Data(usart);
+        }
+    }
+
+    int32_t state = HAL_disable_irq();
+
+    uint32_t exit_conditions = 0x00;
+
+    // Suspend all EXTI interrupts
+    HAL_Interrupts_Suspend();
+
+    /* Configure EXTI Interrupt : wake-up from stop mode using pin interrupt */
     if ((wakeUpPin < TOTAL_PINS) && (edgeTriggerMode <= FALLING))
     {
         PinMode wakeUpPinMode = INPUT;
-
         /* Set required pinMode based on edgeTriggerMode */
         switch(edgeTriggerMode)
         {
-        case CHANGE:
-            wakeUpPinMode = INPUT;
-            break;
-
         case RISING:
             wakeUpPinMode = INPUT_PULLDOWN;
             break;
-
         case FALLING:
             wakeUpPinMode = INPUT_PULLUP;
             break;
+        case CHANGE:
+        default:
+            wakeUpPinMode = INPUT;
+            break;
         }
-        HAL_Pin_Mode(wakeUpPin, wakeUpPinMode);
 
-        /* Configure EXTI Interrupt : wake-up from stop mode using pin interrupt */
+        HAL_Pin_Mode(wakeUpPin, wakeUpPinMode);
         HAL_Interrupts_Attach(wakeUpPin, NULL, NULL, edgeTriggerMode, NULL);
 
-        HAL_Core_Execute_Stop_Mode();
+        exit_conditions |= STOP_MODE_EXIT_CONDITION_PIN;
+    }
 
+    // Configure RTC wake-up
+    if (seconds > 0) {
+        /*
+         * - To wake up from the Stop mode with an RTC alarm event, it is necessary to:
+         * - Configure the EXTI Line 17 to be sensitive to rising edges (Interrupt
+         * or Event modes) using the EXTI_Init() function.
+         * 
+         */
+        HAL_RTC_Cancel_UnixAlarm();
+        HAL_RTC_Set_UnixAlarm((time_t) seconds);
+
+        // Connect RTC to EXTI line
+        EXTI_InitTypeDef EXTI_InitStructure = {0};
+        EXTI_InitStructure.EXTI_Line = EXTI_Line17;
+        EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+        EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;
+        EXTI_InitStructure.EXTI_LineCmd = ENABLE;
+        EXTI_Init(&EXTI_InitStructure);
+
+        exit_conditions |= STOP_MODE_EXIT_CONDITION_RTC;
+    }
+
+    HAL_Core_Execute_Stop_Mode();
+
+    if (exit_conditions & STOP_MODE_EXIT_CONDITION_PIN) {
         /* Detach the Interrupt pin */
         HAL_Interrupts_Detach(wakeUpPin);
     }
+
+    if (exit_conditions & STOP_MODE_EXIT_CONDITION_RTC) {
+        // No need to detach RTC Alarm from EXTI, since it will be detached in HAL_Interrupts_Restore()
+
+        // RTC Alarm should be canceled to avoid entering HAL_RTCAlarm_Handler or if we were woken up by pin
+        HAL_RTC_Cancel_UnixAlarm();
+    }
+
+    // Restore
+    HAL_Interrupts_Restore();
+
+    // Successfully exited STOP mode
+    HAL_enable_irq(state);
+
+    SysTick->CTRL |= SysTick_CTRL_ENABLE_Msk;
+
+    USB_USART_Init(9600);
 }
 
 void HAL_Core_Execute_Stop_Mode(void)
@@ -794,23 +877,75 @@ void TIM1_TRG_COM_TIM11_irq(void)
     UNUSED(result);
 }
 
+void CAN1_TX_irq()
+{
+    if(NULL != HAL_CAN1_TX_Handler)
+    {
+        HAL_CAN1_TX_Handler();
+    }
+    HAL_System_Interrupt_Trigger(SysInterrupt_CAN1_TX_IRQ, NULL);
+}
+
+void CAN1_RX0_irq()
+{
+    if(NULL != HAL_CAN1_RX0_Handler)
+    {
+        HAL_CAN1_RX0_Handler();
+    }
+    HAL_System_Interrupt_Trigger(SysInterrupt_CAN1_RX0_IRQ, NULL);
+}
+
+void CAN1_RX1_irq()
+{
+    if(NULL != HAL_CAN1_RX1_Handler)
+    {
+        HAL_CAN1_RX1_Handler();
+    }
+    HAL_System_Interrupt_Trigger(SysInterrupt_CAN1_RX1_IRQ, NULL);
+}
+
+void CAN1_SCE_irq()
+{
+    if(NULL != HAL_CAN1_SCE_Handler)
+    {
+        HAL_CAN1_SCE_Handler();
+    }
+    HAL_System_Interrupt_Trigger(SysInterrupt_CAN1_SCE_IRQ, NULL);
+}
+
 void CAN2_TX_irq()
 {
+    if(NULL != HAL_CAN2_TX_Handler)
+    {
+        HAL_CAN2_TX_Handler();
+    }
     HAL_System_Interrupt_Trigger(SysInterrupt_CAN2_TX_IRQ, NULL);
 }
 
 void CAN2_RX0_irq()
 {
+    if(NULL != HAL_CAN2_RX0_Handler)
+    {
+        HAL_CAN2_RX0_Handler();
+    }
     HAL_System_Interrupt_Trigger(SysInterrupt_CAN2_RX0_IRQ, NULL);
 }
 
 void CAN2_RX1_irq()
 {
+    if(NULL != HAL_CAN2_RX1_Handler)
+    {
+        HAL_CAN2_RX1_Handler();
+    }
     HAL_System_Interrupt_Trigger(SysInterrupt_CAN2_RX1_IRQ, NULL);
 }
 
 void CAN2_SCE_irq()
 {
+    if(NULL != HAL_CAN2_SCE_Handler)
+    {
+        HAL_CAN2_SCE_Handler();
+    }
     HAL_System_Interrupt_Trigger(SysInterrupt_CAN2_SCE_IRQ, NULL);
 }
 
@@ -864,7 +999,9 @@ uint32_t HAL_Core_Runtime_Info(runtime_info_t* info, void* reserved)
     extern unsigned char _eheap[];
     extern unsigned char *sbrk_heap_top;
 
-    info->freeheap = _eheap-sbrk_heap_top;
+    struct mallinfo heapinfo = mallinfo();
+    info->freeheap = _eheap-sbrk_heap_top + heapinfo.fordblks;
+
     return 0;
 }
 
@@ -909,6 +1046,60 @@ bool HAL_Feature_Get(HAL_Feature feature)
         {
             return (PWR_GetFlagStatus(PWR_FLAG_BRR) != RESET);
         }
+
+        case FEATURE_CLOUD_UDP:
+        {
+        		uint8_t value = false;
+#if HAL_PLATFORM_CLOUD_UDP
+        		const uint8_t* data = dct_read_app_data(DCT_CLOUD_TRANSPORT_OFFSET);
+        		value = *data==0xFF;		// default is to use UDP
+#endif
+        		return value;
+        }
     }
     return false;
 }
+
+#if HAL_PLATFORM_CLOUD_UDP
+
+#include "dtls_session_persist.h"
+#include "deepsleep_hal_impl.h"
+#include <string.h>
+
+retained_system SessionPersistDataOpaque session;
+
+int HAL_System_Backup_Save(size_t offset, const void* buffer, size_t length, void* reserved)
+{
+	if (offset==0 && length==sizeof(SessionPersistDataOpaque))
+	{
+		memcpy(&session, buffer, length);
+		return 0;
+	}
+	return -1;
+}
+
+int HAL_System_Backup_Restore(size_t offset, void* buffer, size_t max_length, size_t* length, void* reserved)
+{
+	if (offset==0 && max_length>=sizeof(SessionPersistDataOpaque) && session.size==sizeof(SessionPersistDataOpaque))
+	{
+		*length = sizeof(SessionPersistDataOpaque);
+		memcpy(buffer, &session, sizeof(session));
+		return 0;
+	}
+	return -1;
+}
+
+
+#else
+
+int HAL_System_Backup_Save(size_t offset, const void* buffer, size_t length, void* reserved)
+{
+	return -1;
+}
+
+int HAL_System_Backup_Restore(size_t offset, void* buffer, size_t max_length, size_t* length, void* reserved)
+{
+	return -1;
+}
+
+#endif

@@ -21,14 +21,14 @@ Debug/*
 # Release folder
 Release/*
 
-# bootloader build
-bootloader/src/bluz/_build/
-
 # build folder
 *.map
 *.lst
 *.d
 *.o
+
+# Unit test build folder
+user/tests/unit/obj/*
 
 # Platform-specific settings
 .settings/*

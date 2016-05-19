@@ -1,4 +1,3 @@
-
 VERSION_STRING = 1.1.47
 
 # PRODUCT_FIRMWARE_VERSION reported by default

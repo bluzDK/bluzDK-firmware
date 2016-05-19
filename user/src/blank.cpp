@@ -65,17 +65,11 @@ bool ledOn = false;
 bool once = false;
 /* executes continuously after setup() runs */
 void loop() {
-  static bool one = true;
-  if (one && BLE.getState() == BLE_CONNECTED) {
-    one = false;
-    Spark.publish("ERROR CODE: ", String(testTimer.getError()) );
-  }
-
-    if (Particle.connected() && once == false && millis() > 30000) {
-//        DEBUG("Connection Interval: %d", BLE.getConnectionInterval());
-        once = true;
-    }
-    System.sleep(SLEEP_MODE_DEEP);
+//    if (Particle.connected() && once == false && millis() > 30000) {
+////        DEBUG("Connection Interval: %d", BLE.getConnectionInterval());
+//        once = true;
+//    }
+//    System.sleep(SLEEP_MODE_DEEP);
 //    m = micros();
 //    if (Particle.connected() && millis() % 1000 == 0) {
 //        if (ledOn) {

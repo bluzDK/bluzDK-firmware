@@ -21,19 +21,23 @@
 
 #include "system_network_internal.h"
 #include "cellular_hal.h"
+#include "interrupts_hal.h"
+#include "spark_wiring_interrupts.h"
 
-
-class CellularNetworkInterface : public ManagedNetworkInterface
+class CellularNetworkInterface : public ManagedIPNetworkInterface<CellularConfig, CellularNetworkInterface>
 {
+	volatile bool connect_cancelled = false;
+	volatile bool connecting = false;
 
 protected:
 
     virtual void on_finalize_listening(bool complete) override { /* n/a */ }
 
-    virtual void on_start_listening() override { /* n/a */ }
+    virtual void on_start_listening() override {
+        cellular_cancel(false, true, NULL);  // resume
+    }
 
     virtual bool on_stop_listening() override {
-        cellular_cancel(false, true, NULL);  // resume
         /* in case we interrupted during connecting(), force system to stop WLAN_CONNECTING */
         if (ManagedNetworkInterface::connecting()) ManagedNetworkInterface::disconnect();
         CLR_WLAN_WD(); // keep system from power cycling modem in manage_network_connection()
@@ -44,7 +48,7 @@ protected:
 
     virtual void connect_init() override { /* n/a */ }
 
-    virtual void connect_finalize() override {
+    void connect_finalize_impl() {
         cellular_result_t result = -1;
         result = cellular_init(NULL);
         if (result) return;
@@ -61,13 +65,29 @@ protected:
         result = cellular_gprs_attach(savedCreds, NULL);
         if (result) return;
 
-        HAL_WLAN_notify_connected();
-        HAL_WLAN_notify_dhcp(true);
+        HAL_NET_notify_connected();
+        HAL_NET_notify_dhcp(true);
     }
 
-    void fetch_ipconfig(WLanConfig* target) override {
-        cellular_fetch_ipconfig(target, NULL);
+    void connect_finalize() override {
+		ATOMIC_BLOCK() { connecting = true; }
+
+		connect_finalize_impl();
+
+		bool require_resume = false;
+
+        ATOMIC_BLOCK() {
+        		// ensure after connection exits the cancel flag is cleared if it was set during connection
+        		if (connect_cancelled) {
+        			require_resume = true;
+        		}
+        		connecting = false;
+        }
+        if (require_resume)
+        		cellular_cancel(false, HAL_IsISR(), NULL);
     }
+
+ 
 
     void on_now() override {
         cellular_on(NULL);
@@ -85,6 +105,10 @@ protected:
     }
 
 public:
+
+    void fetch_ipconfig(CellularConfig* target)  {
+        cellular_fetch_ipconfig(target, NULL);
+    }
 
     void start_listening() override
     {
@@ -107,7 +131,22 @@ public:
         return cellular_sim_ready(NULL);
     }
     int set_credentials(NetworkCredentials* creds) override { /* n/a */ return -1; }
-    void connect_cancel(bool cancel, bool calledFromISR) override { cellular_cancel(cancel, calledFromISR, NULL);  }
+
+    void connect_cancel(bool cancel) override {
+    		// only cancel if presently connecting
+    		bool require_cancel = false;
+    		ATOMIC_BLOCK() {
+    			if (connecting)
+    			{
+    				if (cancel!=connect_cancelled) {
+    					require_cancel = true;
+    					connect_cancelled = cancel;
+    				}
+    			}
+    		}
+    		if (require_cancel)
+    			cellular_cancel(cancel, HAL_IsISR(), NULL);
+    }
 
     void set_error_count(unsigned count) override { /* n/a */ }
 };

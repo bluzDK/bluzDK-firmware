@@ -76,10 +76,16 @@
 
 #define Wiring_Wire1 1
 #define Wiring_Wire3 1 /* System PMIC and Fuel Guage I2C3 */
-#define Wiring_SoftPowerOff 1
+#define Wiring_SetupButtonUX 1
 #endif
 
 #if PLATFORM_ID==103      // bluz
+#define Wiring_BLE 1
+#define Wiring_SPI1 1
+#define Wiring_IPv6 0
+#endif
+
+#if PLATFORM_ID==269      // bluz-gw
 #define Wiring_BLE 1
 #define Wiring_SPI1 1
 #define Wiring_IPv6 0
@@ -125,8 +131,8 @@
 #define Wiring_Serial5 0
 #endif
 
-#ifndef Wiring_SoftPowerOff
-#define Wiring_SoftPowerOff 0
+#ifndef Wiring_SetupButtonUX
+#define Wiring_SetupButtonUX 0
 #endif
 
 #ifndef Wiring_BLE

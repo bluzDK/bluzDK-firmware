@@ -18,9 +18,14 @@
 #include <stdint.h>
 #include <cstdlib>
 #include "data_management_layer.h"
+#include "socket.h"
 extern "C" {
 #include "particle_data_service.h"
+#include "hw_gateway_config.h"
+#include "spi_slave_stream.h"
 }
+
+#include "debug.h"
 
 int16_t DataManagementLayer::dataServicesRegistered = 0;
 DataService* DataManagementLayer::services[MAX_NUMBER_OF_SERVICES] = {NULL};
@@ -32,12 +37,13 @@ void DataManagementLayer::registerService(DataService* service)
     services[dataServicesRegistered++] = service;
 }
 
-void DataManagementLayer::feedData(uint16_t id, int16_t length, uint8_t *data)
+void DataManagementLayer::feedData(int16_t length, uint8_t *data)
 {
+    uint16_t serviceID = 0x00 | data[0];
     for (int i = 0; i < dataServicesRegistered; i++)
     {
-        if (services[i] != NULL && id == services[i]->getServiceID()) {
-            services[i]->DataCallback(data, length);
+        if (services[i] != NULL && serviceID == services[i]->getServiceID()) {
+            services[i]->DataCallback(data+1, length-1);
             break;
         }
     }
@@ -46,14 +52,21 @@ void DataManagementLayer::feedData(uint16_t id, int16_t length, uint8_t *data)
 void DataManagementLayer::sendData(int16_t length, uint8_t *data)
 {
 //a bit of a hack for now, should HAL this out, but it'll work for the time being
-#ifdef BLUZ
+#if PLATFORM_ID==103
     particle_service_send_data(data, length);
+#endif
+#if PLATFORM_ID==269
+    data[0] = (( (length-BLE_HEADER_SIZE-SPI_HEADER_SIZE) & 0xFF00) >> 8);
+    data[1] = ( (length-BLE_HEADER_SIZE-SPI_HEADER_SIZE) & 0xFF);
+    data[2] = GATEWAY_ID;
+
+    spi_slave_send_data(data, length);
 #endif
 }
 
-void dataManagementFeedData(uint16_t id, int16_t length, uint8_t *data)
+void dataManagementFeedData(int16_t length, uint8_t *data)
 {
-    DataManagementLayer::feedData(id, length, data);
+    DataManagementLayer::feedData(length, data);
 }
     
 void dataManagementSendData(int16_t length, uint8_t *data)

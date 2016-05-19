@@ -125,16 +125,12 @@ inline void pinResetFast(pin_t _pin)
 {
     PIN_MAP[_pin].gpio_peripheral->BSRRH = PIN_MAP[_pin].gpio_pin;
 }
-<<<<<<< HEAD
-#elif PLATFORM_ID==3 || PLATFORM_ID == 103
-=======
 
 inline int32_t pinReadFast(pin_t _pin)
 {
 	return ((PIN_MAP[_pin].gpio_peripheral->IDR & PIN_MAP[_pin].gpio_pin) == 0 ? LOW : HIGH);
 }
 #elif PLATFORM_ID==3
->>>>>>> 94baa374e5765d734fe1666c76bb7d2b06cd327a
 
 // make them unresolved symbols so attempted use will result in a linker error
 void pinResetFast(pin_t _pin);

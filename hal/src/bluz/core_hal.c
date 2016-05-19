@@ -31,6 +31,7 @@
 
 void HAL_Core_Init(void)
 {
+    isCloudUpdating =  false;
     system_init();
     leds_init();
     timers_init();
@@ -58,6 +59,16 @@ void HAL_Network_Init(void)
 void HAL_Handle_Cloud_Disconnect(void)
 {
     ble_disconnect();
+}
+
+void HAL_Loop_Iteration(void)
+{
+    
+}
+
+void HAL_Set_Cloud_Connection(bool connected)
+{
+    set_cloud_connection_state(connected);
 }
 
 void HAL_Events_Manage(void)
@@ -109,7 +120,7 @@ void HAL_Core_Enter_Bootloader(bool persist)
 {
 }
 
-void HAL_Core_Enter_Stop_Mode(uint16_t wakeUpPin, uint16_t edgeTriggerMode)
+void HAL_Core_Enter_Stop_Mode(uint16_t wakeUpPin, uint16_t edgeTriggerMode, long seconds)
 {
 }
 
@@ -258,4 +269,12 @@ bool HAL_Core_Validate_User_Module(void)
 //    }
     
     return valid;
+}
+
+void HAL_Core_Write_Backup_Register(uint32_t BKP_DR, uint32_t Data)
+{
+}
+uint32_t HAL_Core_Read_Backup_Register(uint32_t BKP_DR)
+{
+    return 0xFFFFFFFF;
 }

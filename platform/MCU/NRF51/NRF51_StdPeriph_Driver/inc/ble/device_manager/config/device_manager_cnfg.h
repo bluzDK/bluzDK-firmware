@@ -70,7 +70,7 @@
  *          Maximum value : Maximum links supported by SoftDevice.
  *          Dependencies  : None.
  */
-#define DEVICE_MANAGER_MAX_CONNECTIONS   1
+#define DEVICE_MANAGER_MAX_CONNECTIONS   8
 
 
 /**
@@ -85,7 +85,7 @@
  *       be stored. In such cases, application will be notified with DM_DEVICE_CONTEXT_FULL 
  *       as event result at the completion of the security procedure.
  */
-#define DEVICE_MANAGER_MAX_BONDS         7
+#define DEVICE_MANAGER_MAX_BONDS         8
 
 
 /**
@@ -96,7 +96,7 @@
  *          Maximum value : 254.
  *          Dependencies  : None.
  */
-#define DM_GATT_CCCD_COUNT               6
+#define DM_GATT_CCCD_COUNT               1
 
 
 /**

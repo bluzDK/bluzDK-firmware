@@ -80,7 +80,7 @@ static __INLINE void spi_master_send_recv_irq(volatile spi_master_instance_t * c
 /**
  * @brief SPI0 interrupt handler.
  */
-void nrf_drv_spi0_int_handler(void)
+void SPI0_TWI0_IRQHandler(void)
 {
     if ((NRF_SPI0->EVENTS_READY == 1) && (NRF_SPI0->INTENSET & SPI_INTENSET_READY_Msk))
     {
@@ -97,7 +97,7 @@ void nrf_drv_spi0_int_handler(void)
 /**
  * @brief SPI1 interrupt handler. Changed from the default driver to handle TWI1/SPI1 conflicts
  */
-void SPI1_TWI1_IRQHandler(void)
+void nrf_drv_spi1_int_handler(void)
 {
     if ((NRF_SPI1->EVENTS_READY == 1) && (NRF_SPI1->INTENSET & SPI_INTENSET_READY_Msk))
     {

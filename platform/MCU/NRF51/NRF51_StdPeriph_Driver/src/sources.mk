@@ -16,7 +16,6 @@ CSRC += $(TARGET_STDPERIPH_SRC_PATH)/bootloader.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/bootloader_settings.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/bootloader_util.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/crc16.c
-CSRC += $(TARGET_STDPERIPH_SRC_PATH)/device_manager_peripheral.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/app_timer.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/app_trace.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/app_uart.c
@@ -39,6 +38,16 @@ CSRC += $(TARGET_STDPERIPH_SRC_PATH)/pstorage.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/softdevice_handler.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/softdevice_handler_appsh.c
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/spi_master.c
+
+ifeq ("$(PLATFORM_ID)","269")
+CSRC += $(TARGET_STDPERIPH_SRC_PATH)/spi_slave.c
+CSRC += $(TARGET_STDPERIPH_SRC_PATH)/ble_db_discovery.c
+CSRC += $(TARGET_STDPERIPH_SRC_PATH)/device_manager_central.c
+endif
+
+ifeq ("$(PLATFORM_ID)","103")
+CSRC += $(TARGET_STDPERIPH_SRC_PATH)/device_manager_peripheral.c
+endif
 
 # C++ source files included in this build.
 CPPSRC +=

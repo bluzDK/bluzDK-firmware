@@ -89,6 +89,10 @@ uint32_t system_milliseconds;
 uint32_t system_microseconds;
 uint32_t system_connection_interval;
 
+//cloud variables
+bool isCloudConnected;
+bool isCloudUpdating;
+
 //device manager
 dm_application_instance_t         m_app_handle;                                  /**< Application identifier allocated by device manager. */
 dm_handle_t                       m_bonded_peer_handle;                          /**< Device reference handle to the current bonded central. */
