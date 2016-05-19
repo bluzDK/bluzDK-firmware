@@ -159,7 +159,7 @@ void app_setup_and_loop_passive(void)
     while (1)
     {
         DECLARE_SYS_HEALTH(ENTERED_WLAN_Loop);
-
+        
         //Execute user application loop
         DECLARE_SYS_HEALTH(ENTERED_Loop);
         if (system_mode()!=SAFE_MODE && !SPARK_FLASH_UPDATE) {
@@ -167,10 +167,6 @@ void app_setup_and_loop_passive(void)
             loop();
             DECLARE_SYS_HEALTH(RAN_Loop);
 //            DEBUG("Exited User Loop");
-        }
-
-        if (!SPARK_FLASH_UPDATE) {
-            HAL_Loop_Iteration();
         }
         
         //we may not be connected. if not, don't try to manage anything cloud related
