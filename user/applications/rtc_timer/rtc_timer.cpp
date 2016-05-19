@@ -21,9 +21,11 @@
 
 void timerCallback()
 {
+// The following line shoud not strictly be needed. This should be fixed pretty soon though.
   if (!Particle.connected()) return;
+
   digitalWrite(D7, 1);
-  Particle.publish("\"I'm alive!\" -- Timer (class of 2016)");
+  Particle.publish("Timer (class of 2016)", String(millis()) );
   delay(200);
   digitalWrite(D7, 0);
 }
@@ -34,6 +36,10 @@ Timer testTimer(5000, timerCallback);
 void setup() {
   pinMode(D7, OUTPUT);  
 
+// The following doesn't work as it this writing. It should be fixed pretty soon though.
+//  Particle.publish("I'm back!", String(millis()) );
+//  testTimer.start();
+
 }
 
 /* executes continuously after setup() runs */
@@ -42,7 +48,7 @@ void loop() {
   if (one_shot && Particle.connected()) {
     one_shot = false;
 
-    Particle.publish("I'm back!");
+    Particle.publish("I'm back!", String(millis()) );
     testTimer.start();
   }
 
