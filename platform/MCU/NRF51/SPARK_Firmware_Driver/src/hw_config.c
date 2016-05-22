@@ -259,7 +259,7 @@ void leds_init(void)
 void timers_init(void)
 {
       uint32_t err_code;
-    // Initialize timer module, making it use the scheduler
+    // Initialize timer module, making it NOT use the scheduler
     APP_TIMER_INIT(APP_TIMER_PRESCALER, APP_TIMER_MAX_TIMERS, APP_TIMER_OP_QUEUE_SIZE, false);
     err_code = app_timer_create(&millis_timer, APP_TIMER_MODE_REPEATED, millis_timer_timeout);
     APP_ERROR_CHECK(err_code);

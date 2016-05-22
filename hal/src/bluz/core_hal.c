@@ -108,7 +108,7 @@ void HAL_Core_Mode_Button_Reset(void)
 }
 
 void HAL_Core_System_Reset(void)
-{  
+{
 }
 
 void HAL_Core_Factory_Reset(void)

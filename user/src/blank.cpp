@@ -20,7 +20,6 @@ void radioCallbackHandler(bool radio_active) {
     //Do something about it
 }
 
-
 /* executes once at startup */
 void setup() {
 //    Particle.variable("hello", hello, STRING);
