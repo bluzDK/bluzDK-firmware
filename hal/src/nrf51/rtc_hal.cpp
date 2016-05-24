@@ -25,14 +25,23 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "rtc_hal.h"
+#include "core_hal.h"
 
+
+uint32_t base;
 void HAL_RTC_Configuration(void)
 {
+    base = 0;
 }
 
 time_t HAL_RTC_Get_UnixTime(void)
 {
-    return 0;
+    return HAL_Get_System_Seconds() + base;
+}
+
+void HAL_RTC_Set_UnixTime(time_t value)
+{
+    base = value;
 }
 
 void HAL_RTC_Set_Alarm(uint32_t value)
@@ -41,13 +50,8 @@ void HAL_RTC_Set_Alarm(uint32_t value)
 
 void HAL_RTC_Set_UnixAlarm(time_t value)
 {
-
 }
 
 void HAL_RTC_Cancel_UnixAlarm(void)
-{
-}
-
-void HAL_RTC_Set_UnixTime(time_t value)
 {
 }

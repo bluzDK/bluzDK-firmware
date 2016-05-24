@@ -50,6 +50,16 @@ static void blink_led(int count)
     nrf_delay_us(500000);
 }
 
+void tick_system_seconds(void)
+{
+    system_seconds++;
+}
+
+uint32_t get_system_seconds(void)
+{
+    return system_seconds;
+}
+
 uint32_t system_millis(void)
 {
     return (( (((uint64_t)RTC_OVERFLOW_COUNT << 24) | (uint64_t)NRF_RTC1->COUNTER) * 1.0 ) / (APP_TIMER_CLOCK_FREQ * 1.0)) * 1000.0;

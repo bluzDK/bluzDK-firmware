@@ -95,6 +95,7 @@ scs_t m_scs;
 uint16_t m_conn_handle; /**< Handle of the current connection. */
 
 //system variables
+uint32_t system_seconds;
 uint32_t system_milliseconds;
 uint32_t system_microseconds;
 uint32_t system_connection_interval;
