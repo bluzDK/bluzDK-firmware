@@ -33,6 +33,7 @@
 #include "custom_data_service.h"
 #include "nrf_drv_wdt.h"
 #include "client_handling.h"
+#include "app_timer.h"
 
 uint32_t NbrOfPage = 0;
 uint16_t Flash_Update_Index = 0;
@@ -146,6 +147,9 @@ void FLASH_Begin(uint32_t sFLASH_Address, uint32_t fileSize)
 {
     //OTA_FLASHED_Status_SysFlag = 0x0000;
     //Save_SystemFlags();
+#if PLATFORM_ID==103
+  for (int i=0; i<APP_TIMER_MAX_TIMERS; i++) app_timer_stop(i+1);
+#endif
 #if PLATFORM_ID==269
     disconnect_all_peripherals();
 #endif
