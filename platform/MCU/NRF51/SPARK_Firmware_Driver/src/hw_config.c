@@ -147,9 +147,8 @@ void FLASH_Begin(uint32_t sFLASH_Address, uint32_t fileSize)
 {
     //OTA_FLASHED_Status_SysFlag = 0x0000;
     //Save_SystemFlags();
-#if PLATFORM_ID==103
-  for (int i=0; i<APP_TIMER_MAX_TIMERS; i++) app_timer_stop(i+1);
-#endif
+    for (int i=1; i<APP_TIMER_MAX_TIMERS; i++) app_timer_stop(i);
+
 #if PLATFORM_ID==269
     disconnect_all_peripherals();
 #endif
