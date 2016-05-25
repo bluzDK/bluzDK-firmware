@@ -65,9 +65,10 @@ int32_t Socket::connect(uint32_t sockid, const sockaddr_b *addr, long addrlen)
     data[7+offset] = (port & 0xFF00) >> 8;
     data[8+offset] = port & 0xFF;
     
-    memcpy(data+9+offset, addr, addrlen);
+
+    memcpy(data+9+offset, addr, addrlen); // XXX this addr also contains int16_t family, int8_t port[2] and uint8_t IPaddress[4]
     
-    DataManagementLayer::sendData(9+addrlen+offset, data);
+    DataManagementLayer::sendData(9+addrlen+offset, data); // XXX TODO THIS IS CRASHING THE BluzDK on the TCPClient connection
     return 0;
 }
 int32_t Socket::send(const void* data, uint32_t len)

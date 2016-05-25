@@ -29,6 +29,14 @@
 #include "bluetooth_le_hal.h"
 #include "socket_hal.h"
 
+int X_inet_gethostbyname(const char* hostname, uint16_t hostnameLen, HAL_IPAddress* out_ip_addr,
+        network_interface_t nif, void* reserved)
+{
+  HAL_IPAddress rip = { (uint32_t)(10<<24 | 0 <<16 | 1 << 8 | 112) };
+  *out_ip_addr = rip;
+  return 0;
+}
+
 uint16_t TCPClient::_srcport = 1024;
 
 static bool inline isOpen(sock_handle_t sd)
@@ -53,7 +61,7 @@ int TCPClient::connect(const char* host, uint16_t port, network_interface_t nif)
       {
         IPAddress ip_addr;
 
-        if((rv = inet_gethostbyname(host, strlen(host), ip_addr, nif, NULL)) == 0)
+        if((rv = X_inet_gethostbyname(host, strlen(host), ip_addr, nif, NULL)) == 0)
         {
                 return connect(ip_addr, port, nif);
         }
@@ -87,12 +95,11 @@ int TCPClient::connect(IPAddress ip, uint16_t port, network_interface_t nif)
             tSocketAddr.sa_data[4] = ip[2];
             tSocketAddr.sa_data[5] = ip[3];
 
-
-            uint32_t ot = HAL_NET_SetNetWatchDog(S2M(MAX_SEC_WAIT_CONNECT));
+            // uint32_t ot = HAL_NET_SetNetWatchDog(S2M(MAX_SEC_WAIT_CONNECT));
             DEBUG("_sock %d connect",_sock);
-            connected = (socket_connect(_sock, &tSocketAddr, sizeof(tSocketAddr)) == 0 ? 1 : 0);
+            connected = (socket_connect(_sock, &tSocketAddr, sizeof(tSocketAddr))); // XXX
             DEBUG("_sock %d connected=%d",_sock, connected);
-            HAL_NET_SetNetWatchDog(ot);
+            //HAL_NET_SetNetWatchDog(ot);
             _remoteIP = ip;
             if(!connected)
             {

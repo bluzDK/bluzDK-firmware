@@ -40,7 +40,7 @@ public:
     int32_t close(uint32_t sockid);
     int32_t bytes_available(uint32_t sockid);
     
-    static const int32_t MAX_NUMBER_OF_SOCKETS = 1;
+    static const int32_t MAX_NUMBER_OF_SOCKETS = 2;
     
     //DataService functions
     virtual int32_t getServiceID();
