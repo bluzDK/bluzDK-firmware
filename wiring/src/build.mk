@@ -17,7 +17,6 @@ ifeq (,$(filter "PLATFORM_ID","103" "269"))
 else
   CPPSRC += $(SPARK_CPPSRC)
 endif
-$(warning VVVVVVVVVVVVVVVVVVVVVVVVVVVV CPPSRC=$(CPPSRC) )
 
 # ASM source files included in this build.
 ASRC +=
