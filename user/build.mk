@@ -4,11 +4,10 @@
 
 # determine where user sources are, relative to project root
 
-# propagate the APPLIBV1s to module libs only when building this user module
-# (otherwise if we used APPLIBs directly in the module build each recursively
+# propagate the APPLIBs to module libs only when building this user module
+# (otherwise if we used APPLIBs directly in the module build each recursivly
 # built module would build the libs.)
-MODULE_LIBSV1 += $(call remove_slash,$(APPLIBSV1))
-MODULE_LIBSV2 += $(call remove_slash,$(APPLIBSV2))
+MODULE_LIBS += $(APPLIBS)
 
 
 ifdef APP
