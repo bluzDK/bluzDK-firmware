@@ -76,6 +76,7 @@ void app_error_handler(uint32_t error_code, uint32_t line_num, const uint8_t * p
     DEBUG("Error happened on line number %d in file %s", line_num, p_file_name);
     LED_SetRGBColor(RGB_COLOR_RED);
 
+    for (int i=1; i<APP_TIMER_MAX_TIMERS; i++) app_timer_stop(i);
 
     for (int i = 0; i < error_code; i++) {
         nrf_gpio_pin_set(0);
