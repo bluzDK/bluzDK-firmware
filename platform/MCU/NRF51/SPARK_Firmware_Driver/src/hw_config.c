@@ -33,6 +33,7 @@
 #include "custom_data_service.h"
 #include "nrf_drv_wdt.h"
 #include "client_handling.h"
+#include "app_timer.h"
 
 uint32_t NbrOfPage = 0;
 uint16_t Flash_Update_Index = 0;
@@ -48,6 +49,16 @@ static void blink_led(int count)
         nrf_delay_us(250000);
     }
     nrf_delay_us(500000);
+}
+
+void tick_system_seconds(void)
+{
+    system_seconds++;
+}
+
+uint32_t get_system_seconds(void)
+{
+    return system_seconds;
 }
 
 uint32_t system_millis(void)
@@ -75,6 +86,7 @@ void app_error_handler(uint32_t error_code, uint32_t line_num, const uint8_t * p
     DEBUG("Error happened on line number %d in file %s", line_num, p_file_name);
     LED_SetRGBColor(RGB_COLOR_RED);
 
+    for (int i=1; i<APP_TIMER_MAX_TIMERS; i++) app_timer_stop(i);
 
     for (int i = 0; i < error_code; i++) {
         nrf_gpio_pin_set(0);
@@ -146,6 +158,8 @@ void FLASH_Begin(uint32_t sFLASH_Address, uint32_t fileSize)
 {
     //OTA_FLASHED_Status_SysFlag = 0x0000;
     //Save_SystemFlags();
+    for (int i=1; i<APP_TIMER_MAX_TIMERS; i++) app_timer_stop(i);
+
 #if PLATFORM_ID==269
     disconnect_all_peripherals();
 #endif

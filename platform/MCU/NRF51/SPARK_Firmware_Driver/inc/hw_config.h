@@ -85,6 +85,8 @@ void app_sched_execute(void);
 //useful functions
 void blinkLED(int times);
 void heartBeat(void);
+void tick_system_seconds(void);
+uint32_t get_system_seconds(void);
 uint32_t system_millis(void);
 uint32_t system_micros(void);
 void set_cloud_connection_state(bool connected);

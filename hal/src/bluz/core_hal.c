@@ -151,6 +151,16 @@ uint32_t HAL_Get_Sys_Tick_Interval(void)
 {
     return TIME_KEPPER_MILLISECONDS;
 }
+
+void HAL_Tick_System_Seconds(void)
+{
+    return tick_system_seconds();
+}
+
+uint32_t HAL_Get_System_Seconds(void)
+{
+    return get_system_seconds();
+}
 /**
  * @brief  Computes the 32-bit CRC of a given buffer of byte data.
  * @param  pBuffer: pointer to the buffer containing the data to be computed

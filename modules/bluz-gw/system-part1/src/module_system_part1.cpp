@@ -24,6 +24,7 @@ DYNALIB_TABLE_EXTERN(system_net);
 DYNALIB_TABLE_EXTERN(system_cloud);
 DYNALIB_TABLE_EXTERN(hal_concurrent);
 DYNALIB_TABLE_EXTERN(hal_ble);
+DYNALIB_TABLE_EXTERN(hal_apptimer);
 
 extern "C" __attribute__((externally_visible)) const void* const system_part1_module[] = {
     DYNALIB_TABLE_NAME(communication),
@@ -42,6 +43,7 @@ extern "C" __attribute__((externally_visible)) const void* const system_part1_mo
     DYNALIB_TABLE_NAME(system_cloud),
     DYNALIB_TABLE_NAME(hal_concurrent),
     DYNALIB_TABLE_NAME(hal_ble),
+    DYNALIB_TABLE_NAME(hal_apptimer),
 };
 
 #include "system_part1_loader.c"

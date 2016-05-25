@@ -33,18 +33,8 @@
 
 #define APP_TIMER_PRESCALER             0                                           /**< Value of the RTC1 PRESCALER register. */
 
-#if PLATFORM_ID==103
-
 #define APP_TIMER_MAX_TIMERS            11                                          /**< Maximum number of simultaneously created timers. */
-                                                                                    /* ... One for system. 10 for user, to match Photon */
 #define APP_TIMER_OP_QUEUE_SIZE         12                                          /**< Size of timer operation queues. */
-
-#else
-
-#define APP_TIMER_MAX_TIMERS             2                                          /**< Maximum number of simultaneously created timers. */
-#define APP_TIMER_OP_QUEUE_SIZE          6                                          /**< Size of timer operation queues. */
-
-#endif
 
 #define TIME_KEPPER_MILLISECONDS     	100                                         /**< Keep track of time in roughly 100 mSecond intervals. */
 #define TIME_KEPPER_INTERVAL     		APP_TIMER_TICKS(TIME_KEPPER_MILLISECONDS, APP_TIMER_PRESCALER)     /**< Convert to clock ticks. */
@@ -95,6 +85,7 @@ scs_t m_scs;
 uint16_t m_conn_handle; /**< Handle of the current connection. */
 
 //system variables
+uint32_t system_seconds;
 uint32_t system_milliseconds;
 uint32_t system_microseconds;
 uint32_t system_connection_interval;

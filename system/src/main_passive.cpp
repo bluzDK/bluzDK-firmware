@@ -55,6 +55,7 @@
 volatile uint16_t ledOffTime = 2000, ledOnTime = 200;
 static volatile uint32_t TimingLED;
 static volatile uint32_t TimingIWDGReload;
+static volatile uint32_t SystemSecondsTick;
 static bool CLOUD_CONNECTED = false;
 uint32_t on_mseconds = ledOnTime, off_mseconds = ledOnTime+ledOffTime;
 uint16_t cloudErrors = 0;
@@ -86,6 +87,18 @@ extern "C" void HAL_SysTick_Handler(void) {
     else
     {
         TimingIWDGReload+=HAL_Get_Sys_Tick_Interval();
+    }
+
+    //tick the system seconds (separate from millis() so it won't roll over after 49 days)
+    if (SystemSecondsTick >= 1000)
+    {
+        SystemSecondsTick = 0;
+        /* Reload WDG counter */
+        HAL_Tick_System_Seconds();
+    }
+    else
+    {
+        SystemSecondsTick+=HAL_Get_Sys_Tick_Interval();
     }
 
     //check on system updates and reset if necessary
