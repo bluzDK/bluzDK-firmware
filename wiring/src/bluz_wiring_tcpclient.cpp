@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  * @file    spark_wiring_tcpclient.cpp
- * @author  Satish Nair
+ * @author  Bryan J. Rentoul (aka Gruvin)
  * @version V1.0.0
  * @date    10-Nov-2013
  *
@@ -25,15 +25,9 @@
   ******************************************************************************
  */
 
-#include "spark_wiring_tcpclient.h"
-#include "spark_wiring_network.h"
-#include "system_task.h"
+#include "bluz_wiring_tcpclient.h"
+#include "bluetooth_le_hal.h"
 #include "socket_hal.h"
-#include "inet_hal.h"
-#include "spark_macros.h"
-
-
-using namespace spark;
 
 uint16_t TCPClient::_srcport = 1024;
 
@@ -55,7 +49,7 @@ int TCPClient::connect(const char* host, uint16_t port, network_interface_t nif)
 {
     stop();
       int rv = 0;
-      if(Network.ready())
+      if(HAL_BLE_GET_STATE() == BLUETOOTH_LE_CONNECTED)
       {
         IPAddress ip_addr;
 
@@ -73,7 +67,7 @@ int TCPClient::connect(IPAddress ip, uint16_t port, network_interface_t nif)
 {
     stop();
         int connected = 0;
-        if(Network.from(nif).ready())
+        if(HAL_BLE_GET_STATE() == BLUETOOTH_LE_CONNECTED)
         {
           sockaddr_t tSocketAddr;
           _sock = socket_create(AF_INET, SOCK_STREAM, IPPROTO_TCP, port, nif);
@@ -134,7 +128,7 @@ int TCPClient::available()
         flush_buffer();
     }
 
-    if(Network.from(nif).ready() && isOpen(_sock))
+    if(HAL_BLE_GET_STATE() == BLUETOOTH_LE_CONNECTED && isOpen(_sock))
     {
         // Have room
         if ( _total < arraySize(_buffer))
@@ -216,7 +210,7 @@ uint8_t TCPClient::connected()
 
 uint8_t TCPClient::status()
 {
-  return (isOpen(_sock) && Network.from(nif).ready() && (SOCKET_STATUS_ACTIVE == socket_active_status(_sock)));
+  return (isOpen(_sock) && HAL_BLE_GET_STATE() == BLUETOOTH_LE_CONNECTED && (SOCKET_STATUS_ACTIVE == socket_active_status(_sock)));
 }
 
 TCPClient::operator bool()
