@@ -10,7 +10,7 @@ TARGET_SRC_PATH = src
 CSRC +=
 
 ifeq (,$(filter "PLATFORM_ID","103" "269"))
-  SPARK_CPPSRC = $(call target_files,src/,spark_*.cpp)
+  SPARK_CPPSRC = $(call target_files,src/,!(bluz_*.cpp))
   BLUZ_CPPSRC = $(call target_files,src/,bluz_*.cpp)
   CPPSRC += $(filter-out $(subst src/bluz_,src/spark_,$(BLUZ_CPPSRC)),$(SPARK_CPPSRC))
   CPPSRC += $(BLUZ_CPPSRC)
