@@ -20,7 +20,7 @@ Timer::~Timer() { dispose(); }
 
 void Timer::start()
 {
-    if (!timerID) // XXX: app_timer_create crashes if called from the contructor. I think it's because the system isn't ready by then.
+    if (!timerID) // XXX: app_timer_create crashes if called from the constructor. I think it's because the system isn't ready by then.
     {
         app_timer_id_t timer_id;
         uint32_t err_code = HAL_app_timer_create( &timer_id, timerMode, staticCallback );

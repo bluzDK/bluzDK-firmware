@@ -49,7 +49,7 @@ class TimerTest : public Timer
       else
       {
         stop(); 
-        Particle.publish("Yiiiup! I'm otta here!", String(millis()));
+        Particle.publish("Yiiiup! I'm outta here.", String(millis()));
       }
     }
   };
