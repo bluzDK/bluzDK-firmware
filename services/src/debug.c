@@ -44,7 +44,12 @@ void log_print_(int level, int line, const char *func, const char *file, const c
     va_list args;
     va_start(args, msg);
     file = file ? strrchr(file,'/') + 1 : "";
+#ifdef BOOTLOADER_VERSION
+    // OUCH! Needed system_millis() (not HAL_Timer...) but got  "region `APP_FLASH' overflowed by 5836 bytes" from ld with DEBUG_BUILD=y   
+    int trunc = snprintf(_buffer, arraySize(_buffer), "%010u:%s: %s %s(%d):", 0U, levels[level/10], func, file, line);
+#else
     int trunc = snprintf(_buffer, arraySize(_buffer), "%010u:%s: %s %s(%d):", (unsigned)HAL_Timer_Get_Milli_Seconds(), levels[level/10], func, file, line);
+#endif
 	debug_output_(_buffer);
 	if (trunc > arraySize(_buffer))
 	{
