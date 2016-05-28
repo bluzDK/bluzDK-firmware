@@ -97,7 +97,7 @@ int TCPClient::connect(IPAddress ip, uint16_t port, network_interface_t nif)
 
             // uint32_t ot = HAL_NET_SetNetWatchDog(S2M(MAX_SEC_WAIT_CONNECT));
             DEBUG("_sock %d connect",_sock);
-            connected = (socket_connect(_sock, &tSocketAddr, sizeof(tSocketAddr))); // XXX
+            connected = !(socket_connect(_sock, &tSocketAddr, sizeof(tSocketAddr))); // socket_connect() returns 0 on success
             DEBUG("_sock %d connected=%d",_sock, connected);
             //HAL_NET_SetNetWatchDog(ot);
             _remoteIP = ip;
