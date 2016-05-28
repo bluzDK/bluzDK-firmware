@@ -86,15 +86,9 @@ void app_error_handler(uint32_t error_code, uint32_t line_num, const uint8_t * p
     DEBUG("Error happened on line number %d in file %s", line_num, p_file_name);
     LED_SetRGBColor(RGB_COLOR_RED);
 
-    for (int i=1; i<APP_TIMER_MAX_TIMERS; i++) app_timer_stop(i);
-
-    for (int i = 0; i < error_code; i++) {
-        nrf_gpio_pin_set(0);
-        nrf_delay_us(250000);
-        nrf_gpio_pin_clear(0);
-        nrf_delay_us(250000);
-    }
-    nrf_delay_us(500000);
+    nrf_drv_wdt_channel_feed(m_channel_id);
+    //this will stop all timers, so we need to feed the WDT here
+    for (int i=0; i<APP_TIMER_MAX_TIMERS; i++) app_timer_stop(i);
 
     nrf_gpio_pin_set(0);
     for (int count = 0; count < 2; count++) {
@@ -104,6 +98,7 @@ void app_error_handler(uint32_t error_code, uint32_t line_num, const uint8_t * p
             nrf_delay_ms(100);
             LED_Off(LED_RGB);
             nrf_delay_ms(100);
+            nrf_drv_wdt_channel_feed(m_channel_id);
         }
         nrf_delay_ms(250);
         for (int i = 0; i < 3; i++) {
@@ -111,6 +106,7 @@ void app_error_handler(uint32_t error_code, uint32_t line_num, const uint8_t * p
             nrf_delay_ms(250);
             LED_Off(LED_RGB);
             nrf_delay_ms(250);
+            nrf_drv_wdt_channel_feed(m_channel_id);
         }
         nrf_delay_ms(250);
         for (int i = 0; i < 3; i++) {
@@ -118,6 +114,7 @@ void app_error_handler(uint32_t error_code, uint32_t line_num, const uint8_t * p
             nrf_delay_ms(100);
             LED_Off(LED_RGB);
             nrf_delay_ms(100);
+            nrf_drv_wdt_channel_feed(m_channel_id);
         }
         nrf_delay_ms(1000);
         for (int i = 0; i < error_code; i++) {
@@ -125,8 +122,10 @@ void app_error_handler(uint32_t error_code, uint32_t line_num, const uint8_t * p
             nrf_delay_ms(250);
             LED_Off(LED_RGB);
             nrf_delay_ms(250);
+            nrf_drv_wdt_channel_feed(m_channel_id);
         }
-        nrf_delay_ms(3000);
+        nrf_delay_ms(2000);
+        nrf_drv_wdt_channel_feed(m_channel_id);
     }
     
     

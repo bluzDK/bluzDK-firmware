@@ -37,6 +37,7 @@ uint8_t dataInBuffer[32];
 uint8_t dataInBufferSize = 0, dataInBufferStart = 0;
 
 uint8_t dataAddress;
+bool wireConfigured = false;
 
 void twi_event_handler(nrf_drv_twi_evt_t *p_event);
 
@@ -46,12 +47,17 @@ void HAL_I2C_Init(HAL_I2C_Interface i2c, void* reserved)
 
 void HAL_I2C_Begin(HAL_I2C_Interface i2c, I2C_Mode mode, uint8_t address, void* reserved)
 {
-    p_twi_config.scl = TWI1_CONFIG_SCL;
-    p_twi_config.sda = TWI1_CONFIG_SDA;
-    int ret_code = nrf_drv_twi_init(&p_twi_instance, &p_twi_config, NULL); // Initiate twi driver with instance and configuration values
-    APP_ERROR_CHECK(ret_code); // Check for errors in return value
-    HW_ONE_CONFIG = HW1_TWI;
-    nrf_drv_twi_enable(&p_twi_instance); // Enable the TWI instance
+    if (!wireConfigured) {
+        p_twi_config.scl = TWI1_CONFIG_SCL;
+        p_twi_config.sda = TWI1_CONFIG_SDA;
+        int ret_code = nrf_drv_twi_init(&p_twi_instance, &p_twi_config,
+                                        NULL); // Initiate twi driver with instance and configuration values
+        APP_ERROR_CHECK(ret_code); // Check for errors in return value
+        HW_ONE_CONFIG = HW1_TWI;
+        nrf_drv_twi_enable(&p_twi_instance); // Enable the TWI instance
+        wireConfigured = true;
+    }
+
 }
 
 void HAL_I2C_End(HAL_I2C_Interface i2c, void* reserved)
