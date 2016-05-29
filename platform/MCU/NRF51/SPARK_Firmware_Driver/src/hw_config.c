@@ -34,6 +34,7 @@
 #include "nrf_drv_wdt.h"
 #include "client_handling.h"
 #include "app_timer.h"
+#include "interrupts_hal.h"
 
 uint32_t NbrOfPage = 0;
 uint16_t Flash_Update_Index = 0;
@@ -86,8 +87,14 @@ void app_error_handler(uint32_t error_code, uint32_t line_num, const uint8_t * p
     DEBUG("Error happened on line number %d in file %s", line_num, p_file_name);
     LED_SetRGBColor(RGB_COLOR_RED);
 
+// Running out of APP_FLASH with DEBUG_BUILD=y. Lose some stuff we don't need
+#ifdef BOOTLOADER_VERSION
+#define _nrf_delay_ms(a) nrf_delay_ms(a)
+#else
+#define _nrf_delay_ms(a) nrf_delay_us(1000*a)
     for (int i=1; i<APP_TIMER_MAX_TIMERS; i++) app_timer_stop(i);
-
+    HAL_Interrupts_Disable_All();
+#endif
     for (int i = 0; i < error_code; i++) {
         nrf_gpio_pin_set(0);
         nrf_delay_us(250000);
@@ -101,35 +108,37 @@ void app_error_handler(uint32_t error_code, uint32_t line_num, const uint8_t * p
         //SOS Call
         for (int i = 0; i < 3; i++) {
             LED_On(LED_RGB);
-            nrf_delay_ms(100);
+            _nrf_delay_ms(100);
             LED_Off(LED_RGB);
-            nrf_delay_ms(100);
+            _nrf_delay_ms(100);
         }
-        nrf_delay_ms(250);
+        _nrf_delay_ms(250);
         for (int i = 0; i < 3; i++) {
             LED_On(LED_RGB);
-            nrf_delay_ms(250);
+            _nrf_delay_ms(250);
             LED_Off(LED_RGB);
-            nrf_delay_ms(250);
+            _nrf_delay_ms(250);
         }
-        nrf_delay_ms(250);
+        _nrf_delay_ms(250);
         for (int i = 0; i < 3; i++) {
             LED_On(LED_RGB);
-            nrf_delay_ms(100);
+            _nrf_delay_ms(100);
             LED_Off(LED_RGB);
-            nrf_delay_ms(100);
+            _nrf_delay_ms(100);
         }
-        nrf_delay_ms(1000);
+        _nrf_delay_ms(1000);
         for (int i = 0; i < error_code; i++) {
             LED_On(LED_RGB);
-            nrf_delay_ms(250);
+            _nrf_delay_ms(250);
             LED_Off(LED_RGB);
-            nrf_delay_ms(250);
+            _nrf_delay_ms(250);
         }
-        nrf_delay_ms(3000);
+        _nrf_delay_ms(3000);
     }
-    
-    
+#ifndef BOOTLOADER_VERSION
+    HAL_Interrupts_Disable_All();
+#endif
+
     // On assert, the system can only recover with a reset.
     NVIC_SystemReset();
 }
