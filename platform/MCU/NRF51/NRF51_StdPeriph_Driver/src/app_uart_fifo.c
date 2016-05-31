@@ -571,3 +571,7 @@ uint32_t app_uart_close(uint16_t app_uart_uid)
     return NRF_SUCCESS;
 }
 
+uint32_t app_uart_bytes_available()
+{
+    return FIFO_LENGTH(m_rx_fifo);
+}

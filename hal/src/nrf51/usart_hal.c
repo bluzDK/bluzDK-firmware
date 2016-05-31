@@ -34,6 +34,8 @@ void HAL_USART_Init(HAL_USART_Serial serial, Ring_Buffer *rx_buffer, Ring_Buffer
 bool uartConfigured = false;
 void HAL_USART_Begin(HAL_USART_Serial serial, uint32_t baud)
 {
+    if (uartConfigured) {return;}
+
     uint32_t nrfBaudRate = UART_BAUDRATE_BAUDRATE_Baud38400;
     switch (baud) {
         case 1200:
@@ -80,7 +82,9 @@ void HAL_USART_Begin(HAL_USART_Serial serial, uint32_t baud)
           nrfBaudRate
       };
 
-    APP_UART_INIT(&comm_params,
+    APP_UART_FIFO_INIT(&comm_params,
+                       128,
+                       256,
                   uart_error_handle,
                   APP_IRQ_PRIORITY_LOW,
                   err_code);
@@ -98,22 +102,22 @@ void HAL_USART_End(HAL_USART_Serial serial)
 uint32_t HAL_USART_Write_Data(HAL_USART_Serial serial, uint8_t data)
 {
     if (!uartConfigured) {return -1;}
-    while (app_uart_put(data) == NRF_ERROR_NO_MEM) { }
-//    app_uart_put(data);
+//    while (app_uart_put(data) == NRF_ERROR_NO_MEM) { }
+    app_uart_put(data);
     return 1;
 }
 
 int32_t HAL_USART_Available_Data(HAL_USART_Serial serial)
 {
-    return 0;
+    return app_uart_bytes_available();
 }
 
 int32_t HAL_USART_Read_Data(HAL_USART_Serial serial)
 {
     if (!uartConfigured) {return -1;}
-    uint8_t* byte = NULL;
-    app_uart_get(byte);
-    return *byte;
+    uint8_t byte;
+    app_uart_get(&byte);
+    return byte;
 }
 
 int32_t HAL_USART_Peek_Data(HAL_USART_Serial serial)

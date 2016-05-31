@@ -26,14 +26,14 @@
 
 void uart_error_handle(app_uart_evt_t * p_event)
 {
-    if (p_event->evt_type == APP_UART_COMMUNICATION_ERROR)
-    {
-        APP_ERROR_HANDLER(p_event->data.error_communication);
-    }
-    else if (p_event->evt_type == APP_UART_FIFO_ERROR)
-    {
-        APP_ERROR_HANDLER(p_event->data.error_code);
-    }
+//    if (p_event->evt_type == APP_UART_COMMUNICATION_ERROR)
+//    {
+//        APP_ERROR_HANDLER(p_event->data.error_communication);
+//    }
+//    else if (p_event->evt_type == APP_UART_FIFO_ERROR)
+//    {
+//        APP_ERROR_HANDLER(p_event->data.error_code);
+//    }
 }
 
 /**@brief Function for handling a Connection Parameters error.

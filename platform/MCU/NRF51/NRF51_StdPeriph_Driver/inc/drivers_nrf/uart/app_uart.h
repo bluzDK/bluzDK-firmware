@@ -298,6 +298,8 @@ uint32_t app_uart_flush(void);
  */
 uint32_t app_uart_close(uint16_t app_uart_id);
 
+uint32_t app_uart_bytes_available();
+
 
 #endif //APP_UART_H__
 
