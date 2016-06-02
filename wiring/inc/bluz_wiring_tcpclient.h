@@ -51,7 +51,6 @@ public:
 	virtual int read(uint8_t *buffer, size_t size);
 	virtual int peek();
 	virtual void flush();
-        void flush_buffer();
 	virtual void stop();
 	virtual uint8_t connected();
 	virtual operator bool();
@@ -68,11 +67,7 @@ protected:
 private:
 	static uint16_t _srcport;
 	sock_handle_t _sock;
-	uint8_t _buffer[TCPCLIENT_BUF_MAX_SIZE];
-	uint16_t _offset;
-	uint16_t _total;
-        IPAddress _remoteIP;
-	inline int bufferCount();
+    IPAddress _remoteIP;
 
 };
 
