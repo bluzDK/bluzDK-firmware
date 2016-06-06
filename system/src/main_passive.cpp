@@ -214,9 +214,9 @@ void app_setup_and_loop_passive(void)
                     DEBUG("Calling Spark Handshake");
                     err_code = Spark_Handshake(false);
                     if (err_code) {
-                        LED_SetRGBColor(RGB_COLOR_MAGENTA);
                         ERROR("Error when calling Spark Handshake");
                         SPARK_CLOUD_SOCKETED = 0;
+                        ledOffTime = 2000;
                         HAL_Handle_Cloud_Disconnect();
                     } else {
                         LED_SetRGBColor(system_mode()==SAFE_MODE ? RGB_COLOR_YELLOW : RGB_COLOR_CYAN);
