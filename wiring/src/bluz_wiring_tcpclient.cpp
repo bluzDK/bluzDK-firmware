@@ -120,14 +120,14 @@ size_t TCPClient::write(const uint8_t *buffer, size_t size)
 
 int TCPClient::available()
 {
-    return socket_bytes_available(_sock);
+    return connected() ? socket_bytes_available(_sock) : 0;
 }
 
 int TCPClient::read()
 {
     uint8_t buf[1];
     if (read(buf, 1) == 1) {
-        return buf[0];
+        return (int)buf[0];
     } else {
         return -1;
     }

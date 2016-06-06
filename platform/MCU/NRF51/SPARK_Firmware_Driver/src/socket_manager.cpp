@@ -54,8 +54,7 @@ int32_t SocketManager::receive(uint32_t sd, void* buffer, uint32_t len, unsigned
 }
 int32_t SocketManager::close(uint32_t sockid)
 {
-    sockets[sockid].close();
-    return 1;
+    return sockets[sockid].close();
 }
 
 int32_t SocketManager::bytes_available(uint32_t sockid)
