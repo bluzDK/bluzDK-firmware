@@ -23,10 +23,20 @@
 #include <stdint.h>
 #include "data_service.h"
 
+#define BLUZGW_SOCKET_TIMEOUT 30 /* seconds */
+
 enum SOCKET_COMMANDS {
     SOCKET_DATA,
     SOCKET_CONNECT,
-    SOCKET_DISCONNECT
+    SOCKET_DISCONNECT,
+    SOCKET_CONNECTED,
+    SOCKET_FAILED
+};
+
+enum SOCKET_STATE {
+  AVAILABLE,
+  CONNECT_FAILED,
+  CONNECTED
 };
 
 typedef struct
@@ -50,7 +60,7 @@ public:
     int32_t feed(uint8_t* buffer, uint32_t len);
     
     static const int32_t SOCKET_BUFFER_SIZE = 1024;
-    bool inUse;
+    volatile SOCKET_STATE inUse;
     
 private:
     uint32_t id;

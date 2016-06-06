@@ -63,6 +63,8 @@ void loop()
 
     client.write("BOO!\n"); // probably not a valid SSH handshake signal ;)
   }
+
+  System.sleep(SLEEP_MODE_CPU);
 }
 
 

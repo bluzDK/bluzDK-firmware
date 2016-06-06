@@ -153,8 +153,7 @@ void TCPClient::flush()
 
 void TCPClient::stop()
 {
-  DEBUG("_sock %d closesocket", _sock);
-
+  DEBUG("_sock %d close socket", _sock);
   if (isOpen(_sock))
       socket_close(_sock);
   _sock = socket_handle_invalid();

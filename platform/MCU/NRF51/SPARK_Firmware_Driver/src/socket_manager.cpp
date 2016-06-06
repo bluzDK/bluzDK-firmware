@@ -32,7 +32,7 @@ int32_t SocketManager::create(uint8_t family, uint8_t type, uint8_t protocol, ui
 {
     for (int i = 0; i < MAX_NUMBER_OF_SOCKETS; i++)
     {
-        if (!sockets[i].inUse)
+        if (sockets[i].inUse != CONNECTED)
         {
             sockets[i].init(family, type, protocol, port, nif);
             return i;
@@ -63,7 +63,7 @@ int32_t SocketManager::bytes_available(uint32_t sockid)
 }
 int32_t SocketManager::active_status(uint32_t sockid)
 {
-    if (sockets[sockid].inUse)
+    if (sockets[sockid].inUse == CONNECTED)
     {
         return SOCKET_ACTIVE;
     }
@@ -81,11 +81,34 @@ int32_t SocketManager::getServiceID()
 }
 int32_t SocketManager::DataCallback(uint8_t *data, int16_t length)
 {
-    uint16_t socketID = 0x00 | data[0];
-    if (sockets[socketID].inUse)
+    uint8_t type = data[0] >> 4;
+    uint8_t socketID = data[0] & 0xF;
+
     {
-        sockets[socketID].feed(data+1, length-1);
-    }
-    return -1;
+      switch (type)
+      {
+        case SOCKET_CONNECTED:
+          // the gateway is informing us that our previous socket connect request was successful
+          sockets[socketID].inUse = CONNECTED;
+          break;
+
+        case SOCKET_FAILED:
+          sockets[socketID].inUse = CONNECT_FAILED;
+          break;
+
+        case SOCKET_DISCONNECT:
+          if (sockets[socketID].inUse == CONNECTED) sockets[socketID].close();
+          break;
+
+        case SOCKET_DATA:
+          if (sockets[socketID].inUse == CONNECTED) sockets[socketID].feed(data+1, length-1);
+          break;
+
+        default:
+          return -1;
+          break;
+      }
+    } 
+    return 0;
 }
 

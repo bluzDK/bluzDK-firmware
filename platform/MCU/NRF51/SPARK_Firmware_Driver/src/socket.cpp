@@ -19,16 +19,18 @@
 #include "data_management_layer.h"
 #include "debug.h"
 #include "registered_data_services.h"
+#include "timer_hal.h"
+#include "core_hal.h" // HAL_Core_CPU_Sleep()
 #include <cstring>
 #include <stdio.h>
 
-Socket::Socket() { id=-1;inUse=false; bufferLength=0;bufferStart=0; }
+Socket::Socket() { id=-1;inUse=AVAILABLE; bufferLength=0;bufferStart=0; }
 
 int32_t Socket::init(uint8_t family, uint8_t type, uint8_t protocol, uint16_t port, uint32_t nif)
 {
     bufferLength=0;
     bufferStart=0;
-    inUse = true;
+    inUse = AVAILABLE;
     this->family = family;
     this->type = type;
     this->protocol = protocol;
@@ -65,11 +67,18 @@ int32_t Socket::connect(uint32_t sockid, const sockaddr_b *addr, long addrlen)
     data[7+offset] = (port & 0xFF00) >> 8;
     data[8+offset] = port & 0xFF;
     
-
     memcpy(data+9+offset, addr, addrlen); // XXX this addr also contains int16_t family, int8_t port[2] and uint8_t IPaddress[4]
     
-    DataManagementLayer::sendData(9+addrlen+offset, data); // XXX TODO THIS IS CRASHING THE BluzDK on the TCPClient connection
-    return 0;
+    // send the socket connect request to the gateway. We are not connected until the gateway confirms. SocketManager::DataCallback()
+    DataManagementLayer::sendData(9+addrlen+offset, data);
+
+    // block (sleepily to save battery) until GW CONNECTED or FAILED msg arrives -- or timeout
+    uint64_t t = HAL_Timer_Get_Milli_Seconds();
+    while (inUse == AVAILABLE) {
+      if (HAL_Timer_Get_Milli_Seconds() > (t + (1000UL * BLUZGW_SOCKET_TIMEOUT)) ) break;
+      HAL_Core_CPU_Sleep();
+    }
+    return (inUse == CONNECTED) ? 0 : -1; // the only other possibilty is SOCKET_FAILED
 }
 int32_t Socket::send(const void* data, uint32_t len)
 {
@@ -122,12 +131,13 @@ int32_t Socket::close()
 {
     bufferLength=0;
     bufferStart=0;
-    inUse = false;
-//    uint8_t data[2];
-//    data[0] = SOCKET_DATA_SERVICE & 0xFF;
-//    data[1] = (SOCKET_DISCONNECT & 0xF0) | (id & 0x0F);
-//    
-//    DataManagementLayer::sendData(2, data);
+    inUse = AVAILABLE;
+
+    // notify the gateway
+    uint8_t data[2];
+    data[0] = SOCKET_DATA_SERVICE;
+    data[1] = (SOCKET_DISCONNECT << 4 ) | (id & 0x0F);
+    DataManagementLayer::sendData(2, data);
     return 0;
 }
 
@@ -142,10 +152,8 @@ int32_t Socket::feed(uint8_t* data, uint32_t len)
         //can't put all this data in.
         return -1;
     }
-    
     memcpy(buffer+bufferStart+bufferLength, data, len);
     bufferLength+=len;
 //    DEBUG("Fed %d bytes to socket id %d, leaving it with %d bytes", len, id, bufferLength);
-    
     return 0;
 }
