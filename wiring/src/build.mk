@@ -9,8 +9,15 @@ TARGET_SRC_PATH = src
 # C source files included in this build.
 CSRC +=
 
-# enumerate target cpp files
-CPPSRC += $(call target_files,src/,*.cpp)
+ifeq ($(PLATFORM_ID),$(filter $(PLATFORM_ID),103 269))
+  SPARK_CPPSRC = $(call target_files,src/,[!bluz_]*.cpp)
+  BLUZ_CPPSRC = $(call target_files,src/,bluz_*.cpp)
+  CPPSRC += $(filter-out $(subst src/bluz_,src/spark_,$(BLUZ_CPPSRC)),$(SPARK_CPPSRC))
+  CPPSRC += $(BLUZ_CPPSRC)
+else
+  CPPSRC += $(SPARK_CPPSRC)
+endif
+#$(warning XXX_DEBUG_XXX CPPSRC=$(CPPSRC))
 
 # ASM source files included in this build.
 ASRC +=
