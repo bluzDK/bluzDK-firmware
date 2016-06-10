@@ -68,18 +68,18 @@ int32_t Socket::connect(uint32_t sockid, const sockaddr_b *addr, long addrlen)
     data[7+offset] = (port & 0xFF00) >> 8;
     data[8+offset] = port & 0xFF;
     
-    memcpy(data+9+offset, addr, addrlen); // XXX this addr also contains int16_t family, int8_t port[2] and uint8_t IPaddress[4]
+    memcpy(data+9+offset, addr, addrlen);
     
     // send the socket connect request to the gateway. We are not connected until the gateway confirms. SocketManager::DataCallback()
     DataManagementLayer::sendData(9+addrlen+offset, data);
 
-    // block (sleepily to save battery) until GW CONNECTED or FAILED msg arrives -- or timeout
+    // block (sleepily to save battery) until GW sends CONNECTED or FAILED -- or timeout
     uint64_t t = HAL_Timer_Get_Milli_Seconds();
     while (inUse == AVAILABLE) {
       if (HAL_Timer_Get_Milli_Seconds() > (t + (1000UL * BLUZGW_SOCKET_TIMEOUT)) ) break;
       HAL_Core_CPU_Sleep();
     }
-    return (inUse == CONNECTED) ? 0 : -1; // the only other possibilty is SOCKET_FAILED
+    return (inUse == CONNECTED) ? 0 : -1;
 }
 int32_t Socket::send(const void* data, uint32_t len)
 {

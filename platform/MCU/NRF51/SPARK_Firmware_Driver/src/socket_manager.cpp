@@ -87,36 +87,35 @@ int32_t SocketManager::getServiceID()
 }
 int32_t SocketManager::DataCallback(uint8_t *data, int16_t length)
 {
-    if (length < 5) return -1; // insist on enough bytes for type/socketID and at least a 32-bit IPv4 address
     uint8_t type = data[0] >> 4;
     uint8_t socketID = data[0] & 0xF;
-    uint32_t *IPv4 = (uint32_t *)&data[1]; // TODO IPv6
+
+    switch (type)
     {
-      switch (type)
-      {
-        case SOCKET_CONNECTED:
-          // the gateway is informing us that our previous socket connect request was successful
-          sockets[socketID]._remoteIP = *IPv4;  
-          sockets[socketID].inUse = CONNECTED;
-          break;
+      case SOCKET_CONNECTED:
+        if (length < 5) return -1;
+        // the gateway is informing us that our previous socket connect request was successful
+        // sockets[socketID]._remoteIP = *((uint32_t *)&data[1]); <== Gruvin: this crashes. WTF? Weird! So, do it the slow way ... 
+        sockets[socketID]._remoteIP = data[1]<<24 | data[2]<<16 | data[3]<<8 | data[4]; // TODO IPv6
+        sockets[socketID].inUse = CONNECTED;
+        break;
 
-        case SOCKET_FAILED:
-          sockets[socketID].inUse = CONNECT_FAILED;
-          break;
+      case SOCKET_FAILED:
+        sockets[socketID].inUse = CONNECT_FAILED;
+        break;
 
-        case SOCKET_DISCONNECT:
-          if (sockets[socketID].inUse == CONNECTED) sockets[socketID].close();
-          break;
+      case SOCKET_DISCONNECT:
+        if (sockets[socketID].inUse == CONNECTED) sockets[socketID].close();
+        break;
 
-        case SOCKET_DATA:
-          if (sockets[socketID].inUse == CONNECTED) sockets[socketID].feed(data+1, length-1);
-          break;
+      case SOCKET_DATA:
+        if (sockets[socketID].inUse == CONNECTED) sockets[socketID].feed(data+1, length-1);
+        break;
 
-        default:
-          return -1;
-          break;
-      }
-    } 
+      default:
+        return -1;
+        break;
+    }
     return 0;
 }
 

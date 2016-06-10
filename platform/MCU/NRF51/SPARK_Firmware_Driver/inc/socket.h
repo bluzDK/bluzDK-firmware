@@ -25,6 +25,11 @@
 
 #define BLUZGW_SOCKET_TIMEOUT 30 /* seconds */
 
+#ifndef AF_INET
+#define  AF_INET                2
+#define  AF_INET6               23
+#endif
+
 enum SOCKET_COMMANDS {
     SOCKET_DATA,
     SOCKET_CONNECT,
@@ -41,7 +46,7 @@ enum SOCKET_STATE {
 
 typedef struct
 {
-    uint16_t   sa_family;
+    uint16_t   sa_family;   // we support only AF_INET and maybe some day, AF_INET6
     uint8_t    sa_data[14];
 } sockaddr_b;
 
