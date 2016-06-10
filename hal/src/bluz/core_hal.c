@@ -129,8 +129,7 @@ void HAL_Core_Execute_Stop_Mode(void)
 
 void HAL_Core_Enter_Standby_Mode(void)
 {
-    power_manage();
-    app_sched_execute();
+    shutdown();
 }
 
 void HAL_Core_CPU_Sleep(void)

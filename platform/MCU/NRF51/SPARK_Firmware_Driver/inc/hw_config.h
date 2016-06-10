@@ -81,6 +81,7 @@ void data_service_init(void);
 //event handling
 void power_manage(void);
 void app_sched_execute(void);
+void shutdown(void);
 
 //useful functions
 void blinkLED(int times);

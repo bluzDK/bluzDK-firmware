@@ -602,6 +602,14 @@ void power_manage(void)
 //    APP_ERROR_CHECK(err_code);
 }
 
+void shutdown(void)
+{
+    nrf_drv_wdt_channel_feed(m_channel_id);
+    //this will stop all timers, so we need to feed the WDT here
+    for (int i=0; i<APP_TIMER_MAX_TIMERS; i++) app_timer_stop(i);
+    LED_Off(LED_RGB);
+    sd_power_system_off();
+}
 
 void FLASH_WriteProtection_Enable(uint32_t FLASH_Sectors)
 {
