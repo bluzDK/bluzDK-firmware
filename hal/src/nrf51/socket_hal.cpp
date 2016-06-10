@@ -66,7 +66,7 @@ sock_result_t socket_close(sock_handle_t sock)
 
 sock_handle_t socket_create(uint8_t family, uint8_t type, uint8_t protocol, uint16_t port, network_interface_t nif)
 {
-    return SocketManager::instance()->create(family, type, protocol, port, nif);
+ return SocketManager::instance()->create(family, type, protocol, port, nif);
 }
 
 sock_result_t socket_send(sock_handle_t sd, const void* buffer, socklen_t len)
@@ -116,3 +116,8 @@ sock_result_t socket_peer(sock_handle_t sd, sock_peer_t* peer, void* reserved)
 {
     return -1;
 }
+
+uint32_t socket_remoteIP(sock_handle_t sd) {
+  return SocketManager::instance()->remoteIP(sd);
+}
+

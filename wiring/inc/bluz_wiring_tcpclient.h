@@ -67,7 +67,6 @@ protected:
 private:
 	static uint16_t _srcport;
 	sock_handle_t _sock;
-    IPAddress _remoteIP;
 
 };
 

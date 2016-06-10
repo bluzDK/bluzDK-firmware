@@ -39,6 +39,7 @@ public:
     int32_t active_status(uint32_t sockid);
     int32_t close(uint32_t sockid);
     int32_t bytes_available(uint32_t sockid);
+    uint32_t remoteIP(uint32_t sockid);
     
     static const int32_t MAX_NUMBER_OF_SOCKETS = 2;
     

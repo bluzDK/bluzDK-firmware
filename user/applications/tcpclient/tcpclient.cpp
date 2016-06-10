@@ -34,7 +34,7 @@ void loop()
     oneshot=false;
     if (client.connect(ip, 22))
     {
-      Serial1.println("TCP connect - success!");
+      Serial1.println("TCP connect - success! Remote IP:" + String(client.remoteIP()) );
     }
     else
     {

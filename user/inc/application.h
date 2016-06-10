@@ -53,13 +53,14 @@
 #include "spark_wiring_client.h"
 #include "spark_wiring_startup.h"
 
-#if PLATFORM_ID==103 // bluzDK
+#if PLATFORM_ID==103 || PLATFORM==269
 #include "bluz_wiring_timer.h"
+#include "bluz_wiring_tcpclient.h"
 #else
 #include "spark_wiring_timer.h"
+#include "spark_wiring_tcpclient.h"
 #endif
 
-#include "spark_wiring_tcpclient.h"
 #include "spark_wiring_tcpserver.h"
 #include "spark_wiring_udp.h"
 #include "spark_wiring_time.h"

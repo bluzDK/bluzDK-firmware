@@ -74,7 +74,7 @@ int TCPClient::connect(const char* host, uint16_t port, network_interface_t nif)
 int TCPClient::connect(IPAddress ip, uint16_t port, network_interface_t nif)
 {
     stop();
-    int connected = 0;
+    int result = 0;
     if(HAL_BLE_GET_STATE() == BLUETOOTH_LE_CONNECTED)
     {
       sockaddr_t tSocketAddr;
@@ -83,6 +83,7 @@ int TCPClient::connect(IPAddress ip, uint16_t port, network_interface_t nif)
 
       if (socket_handle_valid(_sock))
       {
+
         tSocketAddr.sa_family = AF_INET;
 
         tSocketAddr.sa_data[0] = (port & 0xFF00) >> 8;
@@ -93,19 +94,16 @@ int TCPClient::connect(IPAddress ip, uint16_t port, network_interface_t nif)
         tSocketAddr.sa_data[4] = ip[2];
         tSocketAddr.sa_data[5] = ip[3];
 
-        // uint32_t ot = HAL_NET_SetNetWatchDog(S2M(MAX_SEC_WAIT_CONNECT));
         DEBUG("_sock %d connect",_sock);
-        connected = !(socket_connect(_sock, &tSocketAddr, sizeof(tSocketAddr))); // socket_connect() returns 0 on success
-        DEBUG("_sock %d connected=%d",_sock, connected);
-        //HAL_NET_SetNetWatchDog(ot);
-        _remoteIP = ip;
-        if(!connected)
+        result = !(socket_connect(_sock, &tSocketAddr, sizeof(tSocketAddr))); // socket_connect() returns 0 on success
+        DEBUG("_sock %d connected=%d",_sock, result);
+        if(!result)
         {
             stop();
         }
       }
     }
-    return connected;
+    return result;
 }
 
 size_t TCPClient::write(uint8_t b)
@@ -157,12 +155,11 @@ void TCPClient::stop()
   if (isOpen(_sock))
       socket_close(_sock);
   _sock = socket_handle_invalid();
-  _remoteIP.clear();
 }
 
 uint8_t TCPClient::connected()
 {
-    return socket_active_status(_sock) == SOCKET_STATUS_ACTIVE;
+  return socket_active_status(_sock) == SOCKET_STATUS_ACTIVE;
 }
 
 uint8_t TCPClient::status()
@@ -172,10 +169,11 @@ uint8_t TCPClient::status()
 
 TCPClient::operator bool()
 {
-   return (status()!=0);
+  return (status()!=0);
 }
 
 IPAddress TCPClient::remoteIP()
 {
-    return _remoteIP;
+  IPAddress ip(socket_remoteIP(_sock));
+  return ip;
 }

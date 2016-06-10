@@ -61,6 +61,12 @@ int32_t SocketManager::bytes_available(uint32_t sockid)
 {
     return sockets[sockid].bytes_available();
 }
+
+uint32_t SocketManager::remoteIP(uint32_t sockid)
+{
+    return sockets[sockid]._remoteIP;
+}
+
 int32_t SocketManager::active_status(uint32_t sockid)
 {
     if (sockets[sockid].inUse == CONNECTED)
@@ -81,14 +87,16 @@ int32_t SocketManager::getServiceID()
 }
 int32_t SocketManager::DataCallback(uint8_t *data, int16_t length)
 {
+    if (length < 5) return -1; // insist on enough bytes for type/socketID and at least a 32-bit IPv4 address
     uint8_t type = data[0] >> 4;
     uint8_t socketID = data[0] & 0xF;
-
+    uint32_t *IPv4 = (uint32_t *)&data[1]; // TODO IPv6
     {
       switch (type)
       {
         case SOCKET_CONNECTED:
           // the gateway is informing us that our previous socket connect request was successful
+          sockets[socketID]._remoteIP = *IPv4;  
           sockets[socketID].inUse = CONNECTED;
           break;
 

@@ -36,6 +36,7 @@ int32_t Socket::init(uint8_t family, uint8_t type, uint8_t protocol, uint16_t po
     this->protocol = protocol;
     this->port = port;
     this->nif = nif;
+    this->_remoteIP = 0;
     return 0;
 }
 

@@ -45,9 +45,11 @@ typedef struct
     uint8_t    sa_data[14];
 } sockaddr_b;
 
+
 class Socket
 {
 public:
+
     Socket();
     
     int32_t init(uint8_t family, uint8_t type, uint8_t protocol, uint16_t port, uint32_t nif);
@@ -61,7 +63,9 @@ public:
     
     static const int32_t SOCKET_BUFFER_SIZE = 1024;
     volatile SOCKET_STATE inUse;
-    
+
+    uint32_t _remoteIP;
+
 private:
     uint32_t id;
     
@@ -70,7 +74,7 @@ private:
     uint8_t protocol;
     uint16_t port;
     uint32_t nif;
-    
+
     uint16_t bufferLength, bufferStart;
     uint8_t buffer[SOCKET_BUFFER_SIZE];
 };

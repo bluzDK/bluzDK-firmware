@@ -116,6 +116,7 @@ sock_result_t socket_join_multicast(const HAL_IPAddress *address, network_interf
  */
 sock_result_t socket_leave_multicast(const HAL_IPAddress *address, network_interface_t nif, void *reserved);
 
+uint32_t socket_remoteIP(sock_handle_t sd);
 
 typedef struct sock_peer_t {
     uint16_t size;
@@ -123,6 +124,7 @@ typedef struct sock_peer_t {
     uint16_t port;
 } sock_peer_t;
 sock_result_t socket_peer(sock_handle_t sd, sock_peer_t* peer, void* reserved);
+
 
 //------------ Socket Types ------------
 
