@@ -64,6 +64,7 @@ void HAL_I2C_End(HAL_I2C_Interface i2c, void* reserved)
 {
     nrf_drv_twi_disable(&p_twi_instance); // Disable the TWI instance
     nrf_drv_twi_uninit(&p_twi_instance); // Uninit the TWI instance
+    wireConfigured = false;
 }
 
 void HAL_I2C_Set_Speed(HAL_I2C_Interface i2c, uint32_t speed, void* reserved)
