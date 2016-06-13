@@ -52,7 +52,6 @@ LIBCSRC += $(call target_files_dirs,$(MODULE_LIBSV1),,*.c)
 LIBCPPSRC += $(call target_files_dirs,$(MODULE_LIBSV2)/,src/,*.cpp)
 LIBCSRC += $(call target_files_dirs,$(MODULE_LIBSV2)/,src/,*.c)
 
-
 CPPSRC += $(LIBCPPSRC)
 CSRC += $(LIBCSRC)
 
@@ -257,6 +256,22 @@ $(BUILD_PATH)/%.o : $(COMMON_BUILD)/arm/%.S
 # CPP compiler to build .o from .cpp in $(BUILD_DIR)
 # Note: Calls standard $(CC) - gcc will invoke g++ as appropriate
 $(BUILD_PATH)/%.o : $(SOURCE_PATH)/%.cpp
+	$(build_CPP_file)
+
+define build_LIB_files
+$(BUILD_PATH)/$(notdir $1)/%.o : $1/%.c
+	$$(build_C_file)
+
+$(BUILD_PATH)/$(notdir $1)/%.o : $1/%.cpp
+	$$(build_CPP_file)
+endef
+
+# define rules for each library
+# only the sources added for each library are built (so for v2 libraries only files under "src" are built.)
+$(foreach lib,$(MODULE_LIBSV1) $(MODULE_LIBSV2),$(eval $(call build_LIB_files,$(lib))))
+
+# Assember to build .o from .S in $(BUILD_DIR)
+$(BUILD_PATH)/%.o : $(COMMON_BUILD)/arm/%.S
 	$(call echo,'Building file: $<')
 	$(call echo,'Invoking: ARM GCC CPP Compiler')
 	$(VERBOSE)$(MKDIR) $(dir $@)
