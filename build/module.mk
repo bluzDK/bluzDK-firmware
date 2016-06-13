@@ -33,6 +33,38 @@ CFLAGS += $(addprefix -D,$(GLOBAL_DEFINES))
 export GLOBAL_DEFINES
 endif
 
+# fixes build errors on ubuntu with arm gcc 5.3.1
+# GNU_SOURCE is needed for isascii/toascii
+# WINSOCK_H stops select.h from being used which conflicts with CC3000 headers
+CFLAGS += -D_GNU_SOURCE -D_WINSOCK_H
+
+# Global category name for logging
+ifneq (,$(LOG_MODULE_CATEGORY))
+CFLAGS += -DLOG_MODULE_CATEGORY="\"$(LOG_MODULE_CATEGORY)\""
+endif
+
+# Adds the sources from the specified library directories
+# v1 libraries include all sources
+LIBCPPSRC += $(call target_files_dirs,$(MODULE_LIBSV1),,*.cpp)
+LIBCSRC += $(call target_files_dirs,$(MODULE_LIBSV1),,*.c)
+
+# v2 libraries only include sources in the "src" dir
+LIBCPPSRC += $(call target_files_dirs,$(MODULE_LIBSV2)/,src/,*.cpp)
+LIBCSRC += $(call target_files_dirs,$(MODULE_LIBSV2)/,src/,*.c)
+
+
+CPPSRC += $(LIBCPPSRC)
+CSRC += $(LIBCSRC)
+
+# add all module libraries as include directories
+INCLUDE_DIRS += $(MODULE_LIBSV1)
+
+# v2 libraries contain their sources under a "src" folder
+INCLUDE_DIRS += $(addsuffix /src,$(MODULE_LIBSV2))
+
+# $(info cppsrc $(CPPSRC))
+# $(info csrc $(CSRC))
+
 
 # Collect all object and dep files
 ALLOBJ += $(addprefix $(BUILD_PATH)/, $(CSRC:.c=.o))
