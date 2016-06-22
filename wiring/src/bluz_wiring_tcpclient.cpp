@@ -55,20 +55,45 @@ TCPClient::TCPClient(sock_handle_t sock) : _sock(sock)
 int TCPClient::connect(const char* host, uint16_t port, network_interface_t nif)
 {
     stop();
-    int rv = 0;
+    int result = 0;
     if(HAL_BLE_GET_STATE() == BLUETOOTH_LE_CONNECTED)
     {
-        IPAddress ip_addr;
+      // stack the domain name over top of sockaddr_t's IP address data
+      union {
+        sockaddr_t tSocketAddr;
+        struct {
+          uint8_t filler[sizeof(tSocketAddr.sa_family) + sizeof(uint16_t/* tcp_port*/)];
+          char domain[256];
+        } host;
+      } destAddr;
 
-        if((rv = X_inet_gethostbyname(host, strlen(host), ip_addr, nif, NULL)) == 0)
+      _sock = socket_create(AF_INET, SOCK_STREAM, IPPROTO_TCP, port, nif);
+      DEBUG("socket=%d",_sock);
+
+      if (socket_handle_valid(_sock))
+      {
+
+        destAddr.tSocketAddr.sa_family = AF_INET;
+
+        destAddr.tSocketAddr.sa_data[0] = (port & 0xFF00) >> 8;
+        destAddr.tSocketAddr.sa_data[1] = (port & 0x00FF);
+
+        strcpy(destAddr.host.domain, host); // includes null terminator
+
+        DEBUG("_sock %d connect",_sock);
+
+        // socket_connect() returns 0 on success
+        result = !(socket_connect(_sock, (sockaddr_t *)&destAddr, sizeof(destAddr.host.filler) + strlen(destAddr.host.domain)+1));
+        
+        DEBUG("_sock %d connected=%d",_sock, result);
+        
+        if(!result)
         {
-            return connect(ip_addr, port, nif);
+            stop();
         }
-        else {
-            DEBUG("unable to get IP for hostname");
-        }
-  }
-  return rv;
+      }
+    }
+    return result;
 }
 
 int TCPClient::connect(IPAddress ip, uint16_t port, network_interface_t nif)

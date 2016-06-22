@@ -32,7 +32,7 @@ void loop()
   {
     Serial1.println("TCPClient Test - ONLINE");
     oneshot=false;
-    if (client.connect(ip, 22))
+    if (client.connect("india.colorado.edu", 13))
     {
       Serial1.println("TCP connect - success! Remote IP:" + String(client.remoteIP()) );
     }
