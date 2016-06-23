@@ -29,14 +29,6 @@
 #include "bluetooth_le_hal.h"
 #include "socket_hal.h"
 
-int X_inet_gethostbyname(const char* hostname, uint16_t hostnameLen, HAL_IPAddress* out_ip_addr,
-        network_interface_t nif, void* reserved)
-{
-  HAL_IPAddress rip = { (uint32_t)(10<<24 | 0 <<16 | 1 << 8 | 112) };
-  *out_ip_addr = rip;
-  return 0;
-}
-
 uint16_t TCPClient::_srcport = 1024;
 
 static bool inline isOpen(sock_handle_t sd)
@@ -83,7 +75,7 @@ int TCPClient::connect(const char* host, uint16_t port, network_interface_t nif)
         DEBUG("_sock %d connect",_sock);
 
         // socket_connect() returns 0 on success
-        result = !(socket_connect(_sock, (sockaddr_t *)&destAddr, sizeof(destAddr.host.filler) + strlen(destAddr.host.domain)+1));
+        result = !(socket_connect(_sock, (/* ugly hack*/sockaddr_t *)&destAddr, sizeof(destAddr.host.filler) + strlen(destAddr.host.domain)+1));
         
         DEBUG("_sock %d connected=%d",_sock, result);
         
@@ -143,7 +135,7 @@ size_t TCPClient::write(const uint8_t *buffer, size_t size)
 
 int TCPClient::available()
 {
-    return connected() ? socket_bytes_available(_sock) : 0;
+    return socket_bytes_available(_sock);
 }
 
 int TCPClient::read()

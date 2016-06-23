@@ -105,7 +105,7 @@ int32_t SocketManager::DataCallback(uint8_t *data, int16_t length)
         break;
 
       case SOCKET_DISCONNECT:
-        if (sockets[socketID].inUse == CONNECTED) sockets[socketID].close();
+        sockets[socketID].inUse = AVAILABLE; // do NOT close(). There may be unprocessed receive data in the buffer!
         break;
 
       case SOCKET_DATA:
