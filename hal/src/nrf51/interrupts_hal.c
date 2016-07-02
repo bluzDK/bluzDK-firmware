@@ -28,7 +28,12 @@
 #include "nrf_drv_gpiote.h"
 #include "debug.h"
 
+#if PLATFORM_ID==103
 #define MAX_PIN_COUNT       19
+#endif
+#if PLATFORM_ID==269
+#define MAX_PIN_COUNT       1
+#endif
 #define PIN_ACTIVE_TOGGLE   2                               /**< Indicates that an interrupt is toggle. */
 #define PIN_ACTIVE_HIGH     1                               /**< Indicates that an interrupt is active high. */
 #define PIN_ACTIVE_LOW      0                               /**< Indicates that an interrupt is active low. */
