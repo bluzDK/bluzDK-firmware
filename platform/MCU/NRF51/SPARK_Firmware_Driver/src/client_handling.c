@@ -198,7 +198,9 @@ void client_send_data(uint8_t *data, uint16_t len)
             err_code = sd_ble_gattc_write(m_client[id].srv_db.conn_handle, &write_params);
             while (err_code == BLE_ERROR_NO_TX_BUFFERS) {
                 uint8_t bufferCount = 0;
-                while (waitForTxComplete) {
+                //8000 chunks of 500 microseconds is 4 seconds, the longest this should possibly take
+                int timeout = 8000;
+                while (timeout-- > 0 && waitForTxComplete) {
                     sd_ble_tx_buffer_count_get(&bufferCount);
                     nrf_delay_us(500);
                 }
@@ -217,7 +219,8 @@ void client_send_data(uint8_t *data, uint16_t len)
 
         err_code = sd_ble_gattc_write(m_client[id].srv_db.conn_handle, &write_params);
         while (err_code == BLE_ERROR_NO_TX_BUFFERS) {
-            while (waitForTxComplete) {
+            int timeout = 8000;
+            while (timeout-- > 0 && waitForTxComplete) {
                 nrf_delay_us(500);
             }
             waitForTxComplete = true;
