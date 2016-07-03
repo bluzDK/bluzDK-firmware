@@ -26,6 +26,7 @@ enum BLEState {
     BLE_OFF,
     BLE_ADVERTISING,
     BLE_SLEEPING,
+    BLE_GAP_CONNECTED,
     BLE_CONNECTED,
 };
 

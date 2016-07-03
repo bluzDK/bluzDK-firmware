@@ -23,6 +23,8 @@
 #include "pstorage.h"
 #include "hw_gateway_config.h"
 #include "client_handling.h"
+#include "ble.h"
+#include "ble_srv_common.h"
 
 void uart_error_handle(app_uart_evt_t * p_event)
 {
@@ -114,7 +116,15 @@ void on_ble_evt(ble_evt_t * p_ble_evt)
             
             system_connection_interval = p_ble_evt->evt.gap_evt.params.conn_param_update.conn_params.max_conn_interval;
 
-            state = BLE_CONNECTED;
+            state = BLE_GAP_CONNECTED;
+            break;
+
+        case BLE_GATTS_EVT_WRITE:
+            if (p_ble_evt->evt.gatts_evt.params.write.len == 2 && p_ble_evt->evt.gatts_evt.params.write.op == BLE_GATT_OP_WRITE_REQ
+            && p_ble_evt->evt.gatts_evt.params.write.data[0] == BLE_GATT_HVX_NOTIFICATION) {
+                //this is the notification we have been waiting for!
+                state = BLE_CONNECTED;
+            }
             break;
             
         case BLE_GAP_EVT_DISCONNECTED:
