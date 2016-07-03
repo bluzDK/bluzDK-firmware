@@ -138,7 +138,7 @@ uint32_t OTA_FlashAddress()
     return FLASH_FW_ADDRESS;
 }
 
-#define FLASH_MAX_SIZE          (int32_t)(FLASH_LENGTH - FLASH_FW_ADDRESS)
+#define FLASH_MAX_SIZE          (int32_t)(FLASH_STORAGE_ADDRESS - FLASH_FW_ADDRESS)
 
 uint32_t OTA_FlashLength()
 {

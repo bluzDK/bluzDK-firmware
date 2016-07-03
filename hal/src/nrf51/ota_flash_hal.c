@@ -193,7 +193,7 @@ uint32_t HAL_OTA_FlashAddress()
 
 uint32_t HAL_OTA_FlashLength()
 {
-    return (int32_t)(FLASH_LENGTH - FLASH_FW_ADDRESS);
+    return (int32_t)(FLASH_STORAGE_ADDRESS - FLASH_FW_ADDRESS);
 }
 
 uint16_t HAL_OTA_ChunkSize()
