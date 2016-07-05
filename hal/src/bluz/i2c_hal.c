@@ -119,12 +119,13 @@ int32_t HAL_I2C_Available_Data(HAL_I2C_Interface i2c,void* reserved)
 
 int32_t HAL_I2C_Read_Data(HAL_I2C_Interface i2c,void* reserved)
 {
+    dataInBufferSize--;
     return dataInBuffer[dataInBufferStart++];
 }
 
 int32_t HAL_I2C_Peek_Data(HAL_I2C_Interface i2c,void* reserved)
 {
-    return dataInBuffer[dataInBufferSize];
+    return dataInBuffer[dataInBufferStart];
 }
 
 void HAL_I2C_Flush_Data(HAL_I2C_Interface i2c,void* reserved)
