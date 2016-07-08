@@ -5,3 +5,19 @@
  * features in user code. Normally user code should access the platform via
  * the HAL. 
  */
+
+#ifndef PLATFORM_HEADERS_H
+#define	PLATFORM_HEADERS_H
+
+#ifdef	__cplusplus
+extern "C" {
+#endif
+
+#include "nrf_gpio.h"
+
+#ifdef	__cplusplus
+}
+#endif
+
+
+#endif	/* PLATFORM_HEADERS_H */
