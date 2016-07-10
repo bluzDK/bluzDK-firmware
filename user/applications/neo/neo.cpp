@@ -1,16 +1,22 @@
 #include "application.h"
-#include "pinmap_impl.h"
 #include "neopixel.h"
-
-#define STRIP_LENGTH 12
+#include "pinmap_impl.h"
 
 #define PEAK_VALUE 60
 #define LOW_VALUE 0
 #define INCREMENT_VALUE 5
 
-int PIXEL_PIN = PIN_MAP[D2].gpio_pin;
+//12 pixels to our ring
+#define STRIP_LENGTH 12
+
+//get the pin you wish to use
+STM32_Pin_Info* pin_map = HAL_Pin_Map();
+int PIXEL_PIN = pin_map[D2].gpio_pin;
+
+//then declare a strip of neopixels
 neopixel_strip_t m_strip;
 
+//start with some initial values, we will rotate these when it runs
 uint8_t values[] = { 0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55 };
 bool trends[] = { true, true, true, true, true, true, true, true, true, true, true, true };
 
@@ -25,21 +31,20 @@ void radioCallbackHandler(bool radio_active) {
 
 /* executes once at startup */
 void setup() {
-//    BLE.stopAdvertising();
+    BLE.registerNotifications(radioCallbackHandler);
     pinMode(D7, OUTPUT);
     digitalWrite(D7, LOW);
-    BLE.registerNotifications(radioCallbackHandler);
-    
+
     neopixel_init(&m_strip, PIXEL_PIN, STRIP_LENGTH);
     for (int i = 0; i < STRIP_LENGTH; i++)
     {
-        neopixel_set_color(&m_strip, i, 0, values[i], values[i]);
+        neopixel_set_color(&m_strip, i, 0, 0, values[i]);
     }
 }
 
 /* executes continuously after setup() runs */
 void loop() {
-    HAL_Delay_Milliseconds(40);
+    delay(40);
     nextValues();
     for (int i = 0; i < STRIP_LENGTH; i++) {
         neopixel_set_color(&m_strip, i, 0, 0, values[i]);
