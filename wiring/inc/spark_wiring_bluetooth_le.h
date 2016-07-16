@@ -56,7 +56,9 @@ public:
 
     //function to send data
     static void sendData(uint8_t *data, uint16_t length);
-    
+
+    //function to send data
+    static void setTxPower(int power);
     
 };
 

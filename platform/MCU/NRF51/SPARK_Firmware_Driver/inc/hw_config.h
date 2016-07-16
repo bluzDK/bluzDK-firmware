@@ -75,6 +75,7 @@ uint32_t timers_stop(void);
 int register_radio_callback(void (*radio_callback)(bool radio_active));
 void register_data_callback(void (*data_callback)(uint8_t *data, uint16_t length));
 void send_data(uint8_t *data, uint16_t length);
+void setTxPower(int power);
 
 //Data Services Functions
 void data_service_init(void);

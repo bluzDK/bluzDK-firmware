@@ -467,6 +467,11 @@ void send_data(uint8_t *data, uint16_t length)
     customDataServiceSendData(data, length);
 }
 
+void setTxPower(int power)
+{
+    sd_ble_gap_tx_power_set(power);
+}
+
 /**@brief Function for initializing the BLE stack.
  *
  * @details Initializes the SoftDevice and the BLE event interrupt.

@@ -59,3 +59,8 @@ void HAL_BLE_Send_Data(uint8_t *data, uint16_t length)
 {
     send_data(data, length);
 }
+
+void HAL_BLE_Set_TX_Power(int power)
+{
+    setTxPower(power);
+}

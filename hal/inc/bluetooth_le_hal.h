@@ -45,6 +45,8 @@ extern "C" {
     void HAL_BLE_Register_Data_Callback(void (*data_callback)(uint8_t *data, uint16_t length));
     void HAL_BLE_Send_Data(uint8_t *data, uint16_t length);
 
+    void HAL_BLE_Set_TX_Power(int power);
+
 #ifdef __cplusplus
 }
 #endif
