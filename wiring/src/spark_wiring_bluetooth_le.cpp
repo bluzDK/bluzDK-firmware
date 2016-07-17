@@ -62,3 +62,8 @@ void BLEClass::setTxPower(int power)
 {
     HAL_BLE_Set_TX_Power(power);
 }
+
+void BLEClass::setConnectionParameters(int minimum, int maximum)
+{
+    HAL_BLE_Set_CONN_PARAMS(minimum, maximum);
+}

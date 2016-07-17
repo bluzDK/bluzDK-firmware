@@ -92,19 +92,15 @@ static const ble_gap_scan_params_t m_scan_param =
 /**
  * @brief Connection parameters requested for connection.
  */
-static const ble_gap_conn_params_t m_connection_param =
-{
-    (uint16_t)MIN_CONNECTION_INTERVAL,   // Minimum connection
-    (uint16_t)MAX_CONNECTION_INTERVAL,   // Maximum connection
-    0,                                   // Slave latency
-    (uint16_t)SUPERVISION_TIMEOUT        // Supervision time-out
-};
+ble_gap_conn_params_t m_connection_param;
 
 //Gateway Init Functions
 void ble_gateway_stack_init(void);
 void gateway_init(void);
 void gateway_scan_start(void);
 void gateway_loop(void);
+
+void setGatewayConnParameters(int minimum, int maximum);
 
 void gateway_cancel_connect_and_start_scanning(void);
 

@@ -47,6 +47,8 @@ extern "C" {
 
     void HAL_BLE_Set_TX_Power(int power);
 
+    void HAL_BLE_Set_CONN_PARAMS(int minimum, int maximum);
+
 #ifdef __cplusplus
 }
 #endif

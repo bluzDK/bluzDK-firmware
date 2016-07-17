@@ -71,6 +71,12 @@ void gateway_notify_disconnect_all(void) {
 //HW Init Functions
 void gateway_init(void)
 {
+    memset(&m_connection_param, 0, sizeof(m_connection_param));
+    m_connection_param.min_conn_interval = (uint16_t)MIN_CONNECTION_INTERVAL;
+    m_connection_param.max_conn_interval = (uint16_t)MAX_CONNECTION_INTERVAL;
+    m_connection_param.slave_latency = 0;
+    m_connection_param.conn_sup_timeout = (uint16_t)SUPERVISION_TIMEOUT;
+
     lastConnectionErrorTime = 0;
     connectionErrors = 0;
     lastConnectionTime = 0;
@@ -227,4 +233,11 @@ uint32_t adv_report_parse(uint8_t type, data_t * p_advdata, data_t * p_typedata)
         index += field_length+1;
     }
     return NRF_ERROR_NOT_FOUND;
+}
+
+void setGatewayConnParameters(int minimum, int maximum)
+{
+    disconnect_all_peripherals();
+    m_connection_param.min_conn_interval = MSEC_TO_UNITS(minimum, UNIT_1_25_MS);
+    m_connection_param.max_conn_interval = MSEC_TO_UNITS(maximum, UNIT_1_25_MS);
 }

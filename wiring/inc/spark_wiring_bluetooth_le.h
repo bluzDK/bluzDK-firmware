@@ -57,8 +57,11 @@ public:
     //function to send data
     static void sendData(uint8_t *data, uint16_t length);
 
-    //function to send data
+    //function to set TX power
     static void setTxPower(int power);
+
+    //function to set the connection paramaters
+    static void setConnectionParameters(int minimum, int maximum);
     
 };
 

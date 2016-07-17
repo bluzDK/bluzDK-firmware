@@ -472,6 +472,22 @@ void setTxPower(int power)
     sd_ble_gap_tx_power_set(power);
 }
 
+void setConnParameters(int minimum, int maximum)
+{
+    ble_disconnect();
+    int err_code;
+    ble_gap_conn_params_t   gap_conn_params;
+    memset(&gap_conn_params, 0, sizeof(gap_conn_params));
+
+    gap_conn_params.min_conn_interval = MSEC_TO_UNITS(minimum, UNIT_1_25_MS);
+    gap_conn_params.max_conn_interval = MSEC_TO_UNITS(maximum, UNIT_1_25_MS);
+    gap_conn_params.slave_latency     = SLAVE_LATENCY;
+    gap_conn_params.conn_sup_timeout  = CONN_SUP_TIMEOUT;
+
+    err_code = sd_ble_gap_ppcp_set(&gap_conn_params);
+    APP_ERROR_CHECK(err_code);
+}
+
 /**@brief Function for initializing the BLE stack.
  *
  * @details Initializes the SoftDevice and the BLE event interrupt.

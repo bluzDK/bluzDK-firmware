@@ -18,6 +18,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "bluetooth_le_hal.h"
 #include "hw_config.h"
+#include "hw_gateway_config.h"
 #include "spi_master.h"
 #include "nrf51_config.h"
 
@@ -63,4 +64,14 @@ void HAL_BLE_Send_Data(uint8_t *data, uint16_t length)
 void HAL_BLE_Set_TX_Power(int power)
 {
     setTxPower(power);
+}
+
+void HAL_BLE_Set_CONN_PARAMS(int minimum, int maximum)
+{
+#if PLATFORM_ID==103
+    setConnParameters(minimum, maximum);
+#endif
+#if PLATFORM_ID==269
+    setGatewayConnParameters(minimum, maximum);
+#endif
 }

@@ -42,6 +42,7 @@ DYNALIB_FN(5, hal_ble,HAL_BLE_Register_Radio_Notification, int(void (*radio_call
 DYNALIB_FN(6, hal_ble,HAL_BLE_Register_Data_Callback, void(void (*data_callback)(uint8_t *data, uint16_t length)))
 DYNALIB_FN(7, hal_ble,HAL_BLE_Send_Data, void(uint8_t *data, uint16_t length))
 DYNALIB_FN(8, hal_ble,HAL_BLE_Set_TX_Power, void(int power))
+DYNALIB_FN(9, hal_ble,HAL_BLE_Set_CONN_PARAMS, void(int minimum, int maximum))
 DYNALIB_END(hal_ble)
 
 #endif	/* HAL_DYNALIB_BLE_H */
