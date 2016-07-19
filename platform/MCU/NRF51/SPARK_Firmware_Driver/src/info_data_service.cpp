@@ -19,6 +19,8 @@
 #include "data_management_layer.h"
 #include "registered_data_services.h"
 #include "deviceid_hal.h"
+#include "bluetooth_le_hal.h"
+//#include "system_mode.h"
 
 InfoDataService* InfoDataService::m_pInstance = NULL;
 
@@ -44,17 +46,40 @@ int32_t InfoDataService::DataCallback(uint8_t *data, int16_t length)
 #endif
 
     switch (data[0]) {
-        case GET_ID:
+        case GET_ID: {
             uint8_t id[12];
             HAL_device_ID(id, 12);
-            
-            uint8_t rsp[13+offset];
-            rsp[0+offset] = INFO_DATA_SERVICE & 0xFF;
-            memcpy(rsp+1+offset, id, 12);
-            
-            DataManagementLayer::sendData(13+offset, rsp);
+
+            uint8_t rsp[13 + offset];
+            rsp[0 + offset] = INFO_DATA_SERVICE & 0xFF;
+            memcpy(rsp + 1 + offset, id, 12);
+
+            DataManagementLayer::sendData(13 + offset, rsp);
+            break;
+        }
+        case SET_MODE:
+            if (data[0] == 1) {
+                //set mode to manual
+                if (event_callback != NULL) {
+                    event_callback(data[0], data+1, length-1);
+                }
+            }
+            break;
+        case SET_CONNECTION_PARAMETERS:
+            uint16_t min = data[0] << 8 | data[1];
+            uint16_t max = data[2] << 8 | data[3];
+            HAL_BLE_Set_CONN_PARAMS(min, max);
             break;
     }
     return 1;
 }
 
+void InfoDataService::registerCallback(void (*ec)(uint8_t event, uint8_t *data, uint16_t length))
+{
+    event_callback = ec;
+}
+
+void infoDataServiceRegisterCallback(void (*event_callback)(uint8_t event, uint8_t *data, uint16_t length))
+{
+    InfoDataService::instance()->registerCallback(event_callback);
+}

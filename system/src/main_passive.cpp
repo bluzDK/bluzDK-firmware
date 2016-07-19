@@ -131,6 +131,17 @@ void system_part1_post_init()
 {
 }
 
+void platform_event_callback(uint8_t event, uint8_t *data, uint16_t length)
+{
+    //set mode function
+    if (event == 1) {
+        if (length == 1 && data[0] == 1) {
+            set_system_mode(MANUAL);
+        } else {
+            set_system_mode(AUTOMATIC);
+        }
+    }
+}
 
 /*******************************************************************************
  * Function Name  : main.
@@ -142,6 +153,9 @@ void system_part1_post_init()
 void app_setup_and_loop_passive(void)
 {
     system_part1_post_init();
+
+    // Register for events that may come from the platform
+    HAL_Register_Platform_Events(platform_event_callback);
     
     //Set some Particle flags to bypass functionality we don't need
     SPARK_CLOUD_SOCKETED = 0;

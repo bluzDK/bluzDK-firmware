@@ -31,6 +31,7 @@
 #include "ble_conn_params.h"
 #include "ble_hci.h"
 #include "custom_data_service.h"
+#include "info_data_service.h"
 #include "nrf_drv_wdt.h"
 #include "client_handling.h"
 #include "app_timer.h"
@@ -460,6 +461,11 @@ int register_radio_callback(void (*radio_callback)(bool radio_active))
 void register_data_callback(void (*data_callback)(uint8_t *data, uint16_t length))
 {
     customDataServiceRegisterCallback(data_callback);
+}
+
+void register_event_callback(void (*event_callback)(uint8_t event, uint8_t *data, uint16_t length))
+{
+    infoDataServiceRegisterCallback(event_callback);
 }
 
 void send_data(uint8_t *data, uint16_t length)

@@ -72,6 +72,11 @@ void HAL_Set_Cloud_Connection(bool connected)
     set_cloud_connection_state(connected);
 }
 
+void HAL_Register_Platform_Events(void (*event_callback)(uint8_t event, uint8_t *data, uint16_t length))
+{
+    register_event_callback(event_callback);
+}
+
 void HAL_Events_Manage(void)
 {
 }

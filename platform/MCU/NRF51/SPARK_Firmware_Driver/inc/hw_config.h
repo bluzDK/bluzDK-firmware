@@ -74,6 +74,7 @@ uint32_t timers_stop(void);
 
 int register_radio_callback(void (*radio_callback)(bool radio_active));
 void register_data_callback(void (*data_callback)(uint8_t *data, uint16_t length));
+void register_event_callback(void (*event_callback)(uint8_t event, uint8_t *data, uint16_t length));
 void send_data(uint8_t *data, uint16_t length);
 void setTxPower(int power);
 void setConnParameters(int minimum, int maximum);

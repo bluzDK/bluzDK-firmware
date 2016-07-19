@@ -190,7 +190,7 @@ void on_ble_evt(ble_evt_t * p_ble_evt)
             // Verify if short or complete name matches target.
             if ((err_code == NRF_SUCCESS) &&
                 (0 == memcmp(TARGET_DEV_NAME,type_data.p_data,type_data.data_len)) &&
-                isCloudConnected &&
+//                isCloudConnected &&
                 !isCloudUpdating &&
                 system_millis() - lastConnectionTime > TIME_BETWEEN_CONNECTIONS)
             {

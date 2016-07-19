@@ -126,6 +126,7 @@ void HAL_Set_Cloud_Connection(bool connected);
 uint32_t HAL_Get_Sys_Tick_Interval(void);
 void HAL_Tick_System_Seconds(void);
 uint32_t HAL_Get_System_Seconds(void);
+void HAL_Register_Platform_Events(void (*event_callback)(uint8_t event, uint8_t *data, uint16_t length));
 
 typedef enum _BootloaderFlag_t {
     BOOTLOADER_FLAG_VERSION,

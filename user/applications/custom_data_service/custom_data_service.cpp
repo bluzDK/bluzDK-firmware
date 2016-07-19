@@ -1,10 +1,13 @@
 #include "application.h"
 SYSTEM_MODE(MANUAL);
-bool sendResponse = false;
+
+int timeLastPublish = 0;
+int timeBetweenPublishes = 300000;
+
 void dataCallbackHandler(uint8_t *data, uint16_t length) {
     digitalWrite(D7, HIGH);
-    sendResponse = true;
-
+    delay(200);
+    digitalWrite(D7, LOW);
 }
 
 void setup() {
@@ -14,11 +17,12 @@ void setup() {
 
 void loop() {
     System.sleep(SLEEP_MODE_CPU);
-    if (sendResponse) {
+    if (millis() - timeLastPublish > timeBetweenPublishes)
+    {
         uint8_t rsp[2];
-        rsp[0] = 0xAA;
-        rsp[1] = 0xBB;
+        rsp[0] = 'H';
+        rsp[1] = 'i';
         BLE.sendData(rsp, 2);
-        sendResponse = false;
+        timeLastPublish = millis();
     }
 }
