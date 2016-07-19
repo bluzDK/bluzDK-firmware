@@ -13,7 +13,6 @@
 extern "C" {
 #endif
 
-#include "nrf_gpio.h"
 
 #ifdef	__cplusplus
 }
