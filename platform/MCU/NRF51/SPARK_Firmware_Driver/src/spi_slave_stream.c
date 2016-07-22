@@ -7,6 +7,16 @@
 
 #include "debug.h"
 
+volatile bool busy;
+uint8_t m_tx_buf[SPI_SLAVE_HW_TX_BUF_SIZE];   /**< SPI TX buffer. */
+uint8_t m_rx_buf[SPI_SLAVE_HW_RX_BUF_SIZE];   /**< SPI RX buffer. */
+
+//uint8_t *buf;
+uint8_t buf[768];
+int currentSPISlaveBufferSize;
+
+void (*rx_callback)(uint8_t *m_tx_buf, uint16_t size);
+
 void ble_radio_ntf_handler(bool radio_state)
 {
 //	if(radio_state==true)

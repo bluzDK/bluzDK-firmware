@@ -534,3 +534,15 @@ void disconnect_all_peripherals(void) {
 
     }
 }
+
+void connected_peripherals(uint8_t *values) {
+    for (int i = 0; i < MAX_CLIENTS; i++) {
+        if (m_client[i].state == STATE_RUNNING) {
+            values[i] = 1;
+        }
+        else {
+            values[i] = 0;
+        }
+
+    }
+}

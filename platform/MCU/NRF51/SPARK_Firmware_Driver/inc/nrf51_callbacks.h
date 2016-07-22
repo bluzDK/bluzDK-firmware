@@ -19,7 +19,6 @@
 #include "hw_config.h"
 #include "app_uart.h"
 
-
 void uart_error_handle(app_uart_evt_t * p_event);
 void conn_params_error_handler(uint32_t nrf_error);
 

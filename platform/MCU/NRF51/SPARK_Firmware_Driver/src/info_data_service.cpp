@@ -22,6 +22,11 @@
 #include "bluetooth_le_hal.h"
 //#include "system_mode.h"
 
+extern "C" {
+#include "hw_gateway_config.h"
+#include "client_handling.h"
+}
+
 InfoDataService* InfoDataService::m_pInstance = NULL;
 
 InfoDataService* InfoDataService::instance()
@@ -57,19 +62,34 @@ int32_t InfoDataService::DataCallback(uint8_t *data, int16_t length)
             DataManagementLayer::sendData(13 + offset, rsp);
             break;
         }
-        case SET_MODE:
+        case SET_MODE: {
             if (data[0] == 1) {
                 //set mode to manual
                 if (event_callback != NULL) {
-                    event_callback(data[0], data+1, length-1);
+                    event_callback(data[0], data + 1, length - 1);
                 }
             }
             break;
-        case SET_CONNECTION_PARAMETERS:
+        }
+        case SET_CONNECTION_PARAMETERS: {
             uint16_t min = data[0] << 8 | data[1];
             uint16_t max = data[2] << 8 | data[3];
             HAL_BLE_Set_CONN_PARAMS(min, max);
             break;
+        }
+        case POLL_CONNECTIONS: {
+            uint8_t connections[MAX_CLIENTS];
+            connected_peripherals(connections);
+
+            uint8_t rsp[MAX_CLIENTS + 2 + offset];
+            rsp[0 + offset] = INFO_DATA_SERVICE & 0xFF;
+            rsp[1 + offset] = CONNECTION_RESULTS & 0xFF;
+            memcpy(rsp + 2 + offset, connections, MAX_CLIENTS);
+
+            DataManagementLayer::sendData(MAX_CLIENTS + 2 + offset, rsp);
+
+            break;
+        }
     }
     return 1;
 }

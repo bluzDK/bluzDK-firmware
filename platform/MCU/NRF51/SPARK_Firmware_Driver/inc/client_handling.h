@@ -82,6 +82,7 @@ ret_code_t client_handling_dm_event_handler(const dm_handle_t    * p_handle,
                                               const ret_code_t     event_result);
 
 void disconnect_all_peripherals(void);
+void connected_peripherals(uint8_t *values);
 
 #endif // CLIENT_HANDLING_H__
 

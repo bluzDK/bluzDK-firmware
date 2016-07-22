@@ -26,6 +26,10 @@
 #include "ble.h"
 #include "ble_srv_common.h"
 
+
+//variables
+uint32_t lastConnectionTime = 0;
+
 void uart_error_handle(app_uart_evt_t * p_event)
 {
 //    if (p_event->evt_type == APP_UART_COMMUNICATION_ERROR)
@@ -200,11 +204,12 @@ void on_ble_evt(ble_evt_t * p_ble_evt)
                 {
                 }
 
+                ble_gap_conn_params_t connection_param = get_gw_conn_params();
                 lastConnectionTime = system_millis();
                 err_code = sd_ble_gap_connect(&p_ble_evt->evt.gap_evt.params.adv_report.\
                                               peer_addr,
                                               &m_scan_param,
-                                              &m_connection_param);
+                                              &connection_param);
                 
                 if (err_code != NRF_SUCCESS)
                 {

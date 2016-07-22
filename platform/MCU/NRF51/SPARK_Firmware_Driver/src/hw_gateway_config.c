@@ -31,6 +31,31 @@
 
 #include "debug.h"
 
+//global variables
+uint8_t m_peer_count = 0;
+bool m_memory_access_in_progress = false;
+
+//connection parameters
+ble_gap_conn_params_t m_connection_param;
+
+//Buffers needed for callbacks from SPI and BLE events, this is where data passes through
+uint8_t spi_slave_tx_buffer[SPI_SLAVE_TX_BUF_SIZE];
+volatile uint16_t spi_slave_tx_buffer_size;
+volatile uint16_t spi_slave_tx_buffer_start;
+
+
+uint8_t spi_slave_rx_buffer[SPI_SLAVE_RX_BUF_SIZE];
+volatile uint16_t spi_slave_rx_buffer_size;
+volatile uint16_t spi_slave_rx_buffer_start;
+
+uint8_t info_data_service_buffer_size;
+uint8_t info_data_service_buffer[INFO_DATA_SERVICE_BUF_SIZE];
+
+//variables for keeping track
+uint32_t lastConnectionErrorTime;
+uint8_t connectionErrors;
+
+
 /**@brief Function for initializing the BLE stack.
  *
  * @details Initializes the SoftDevice and the BLE event interrupt.
@@ -79,7 +104,6 @@ void gateway_init(void)
 
     lastConnectionErrorTime = 0;
     connectionErrors = 0;
-    lastConnectionTime = 0;
     m_peer_count = 0;
     m_memory_access_in_progress = false;
     spi_slave_tx_buffer_size = 0;
@@ -240,4 +264,9 @@ void setGatewayConnParameters(int minimum, int maximum)
     disconnect_all_peripherals();
     m_connection_param.min_conn_interval = MSEC_TO_UNITS(minimum, UNIT_1_25_MS);
     m_connection_param.max_conn_interval = MSEC_TO_UNITS(maximum, UNIT_1_25_MS);
+}
+
+ble_gap_conn_params_t get_gw_conn_params(void)
+{
+    return m_connection_param;
 }

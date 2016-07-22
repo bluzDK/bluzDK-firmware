@@ -28,7 +28,9 @@
 typedef enum {
     GET_ID=0,
     SET_MODE,
-    SET_CONNECTION_PARAMETERS
+    SET_CONNECTION_PARAMETERS,
+    POLL_CONNECTIONS,
+    CONNECTION_RESULTS
 } INFO_COMMAND;
 
 
@@ -51,13 +53,14 @@ private:
     void (*event_callback)(uint8_t event, uint8_t *data, uint16_t length);
 };
 
-#endif
-#endif	/* _INFO_DATA_SERVICE_H */
+#endif  /*  __cplusplus */
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif  /*  __cplusplus */
 void infoDataServiceRegisterCallback(void (*event_callback)(uint8_t event, uint8_t *data, uint16_t length));
 #ifdef __cplusplus
 }
 #endif
+
+#endif	/* _INFO_DATA_SERVICE_H */

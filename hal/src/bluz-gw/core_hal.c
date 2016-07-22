@@ -26,7 +26,8 @@
 #include "rgbled.h"
 #include "ota_flash_hal.h"
 
-/* Extern variables ----------------------------------------------------------*/
+/* variables ----------------------------------------------------------*/
+bool gatewayHardwareConnected;
 
 /* Private function prototypes -----------------------------------------------*/
 
