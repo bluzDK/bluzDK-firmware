@@ -3,9 +3,10 @@ SYSTEM_MODE(MANUAL);
 
 int timeLastPublish = 0;
 int timeBetweenPublishes = 300000;
+bool sendData = false;
 
 void dataCallbackHandler(uint8_t *data, uint16_t length) {
-
+    sendData = true;
 }
 
 void setup() {
@@ -20,12 +21,13 @@ void setup() {
 
 void loop() {
     System.sleep(SLEEP_MODE_CPU);
-    if (millis() - timeLastPublish > timeBetweenPublishes)
+    if (sendData)
     {
         uint8_t rsp[2];
         rsp[0] = 'H';
         rsp[1] = 'i';
         BLE.sendData(rsp, 2);
         timeLastPublish = millis();
+        sendData = false;
     }
 }

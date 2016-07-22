@@ -77,6 +77,7 @@ int32_t InfoDataService::DataCallback(uint8_t *data, int16_t length)
             HAL_BLE_Set_CONN_PARAMS(min, max);
             break;
         }
+#if PLATFORM_ID==269
         case POLL_CONNECTIONS: {
             uint8_t connections[MAX_CLIENTS];
             connected_peripherals(connections);
@@ -90,6 +91,7 @@ int32_t InfoDataService::DataCallback(uint8_t *data, int16_t length)
 
             break;
         }
+#endif
     }
     return 1;
 }
