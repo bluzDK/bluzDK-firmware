@@ -1016,7 +1016,7 @@ bool SparkProtocol::handle_update_begin(msg& message)
             set_chunks_received(flags & 1 ? 0 : 0xFF);
 
             // send update_reaady - use fast OTA if available
-            update_ready(msg_to_send + 2, message.token, (flags & 0x1));
+            update_ready(msg_to_send + 2, message.token, 0);
             if (0 > blocking_send(msg_to_send, 18))
             {
               // error
