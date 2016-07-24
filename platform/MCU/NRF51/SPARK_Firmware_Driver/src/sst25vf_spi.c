@@ -29,6 +29,7 @@
 #include "spi_master.h"
 #include "nrf_gpio.h"
 #include "nrf_error.h"
+#include "nrf_delay.h"
 #include "app_util_platform.h"
 
 /* Local function forward declarations ---------------------------------------*/
@@ -402,7 +403,10 @@ static uint8_t sFLASH_SendByte(uint8_t byte)
 	uint32_t err_code = spi_master_send_recv(SPI_MASTER_0,(uint8_t *)tx_data, 1, rx_data, 1);
 	if (err_code == NRF_SUCCESS)
 	{
-		while(spi_transmission_completed == false) { }
+        long timeout = 100000;
+		while(spi_transmission_completed == false && timeout-- > 0) {
+            nrf_delay_us(1);
+        }
 	}
 	else { }
 	return rx_data[0];
