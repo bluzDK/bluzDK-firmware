@@ -49,6 +49,8 @@ extern "C" {
 
     void HAL_BLE_Set_CONN_PARAMS(int minimum, int maximum);
 
+    void HAL_BLE_Set_Adv_Name(char* name);
+
 #ifdef __cplusplus
 }
 #endif

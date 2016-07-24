@@ -75,3 +75,8 @@ void HAL_BLE_Set_CONN_PARAMS(int minimum, int maximum)
     setGatewayConnParameters(minimum, maximum);
 #endif
 }
+
+void HAL_BLE_Set_Adv_Name(char* name)
+{
+    setAdvertisedName(name);
+}

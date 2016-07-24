@@ -392,6 +392,12 @@ void device_manager_init(void)
     APP_ERROR_CHECK(err_code);
 }
 
+char* DEVICE_NAME = "Bluz DK";
+void setAdvertisedName(char* name)
+{
+    DEVICE_NAME = name;
+}
+
 /**@brief Function for the GAP initialization.
  *
  * @details This function sets up all the necessary GAP (Generic Access Profile) parameters of the

@@ -35,6 +35,11 @@ private:
 
 public:
     BLEClass(void) {};
+    BLEClass(String name) {
+        char arr[name.length()];
+        name.toCharArray(arr, name.length());
+        HAL_BLE_Set_Adv_Name(arr);
+    };
     
     static BLEState getState();
     
@@ -66,5 +71,7 @@ public:
 };
 
 extern BLEClass BLE;
+
+#define BLE_ADV_NAME(name)  BLEClass AdvName(name);
 
 #endif  // __SPARK_WIRING_BLUETOOTH_LE_H
