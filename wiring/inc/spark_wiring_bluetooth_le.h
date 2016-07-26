@@ -35,10 +35,8 @@ private:
 
 public:
     BLEClass(void) {};
-    BLEClass(String name) {
-        char arr[name.length()];
-        name.toCharArray(arr, name.length());
-        HAL_BLE_Set_Adv_Name(arr);
+    BLEClass(char* name) {
+        HAL_BLE_Set_Adv_Name(name);
     };
     
     static BLEState getState();
