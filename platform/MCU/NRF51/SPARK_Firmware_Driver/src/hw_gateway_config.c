@@ -55,6 +55,7 @@ uint8_t info_data_service_buffer[INFO_DATA_SERVICE_BUF_SIZE];
 uint32_t lastConnectionErrorTime;
 uint8_t connectionErrors;
 
+char TARGET_DEV_NAME[MAX_TARGET_LENGTH];
 
 /**@brief Function for initializing the BLE stack.
  *
@@ -96,6 +97,9 @@ void gateway_notify_disconnect_all(void) {
 //HW Init Functions
 void gateway_init(void)
 {
+    char* target_name = "Bluz DK";
+    memcpy(TARGET_DEV_NAME, target_name, strlen(target_name));
+
     memset(&m_connection_param, 0, sizeof(m_connection_param));
     m_connection_param.min_conn_interval = (uint16_t)MIN_CONNECTION_INTERVAL;
     m_connection_param.max_conn_interval = (uint16_t)MAX_CONNECTION_INTERVAL;
@@ -269,4 +273,17 @@ void setGatewayConnParameters(int minimum, int maximum)
 ble_gap_conn_params_t get_gw_conn_params(void)
 {
     return m_connection_param;
+}
+
+void set_gateway_target_name(char* name)
+{
+    disconnect_all_peripherals();
+    if (strlen(name) < MAX_TARGET_LENGTH) {
+        memcpy(TARGET_DEV_NAME, name, strlen(name));
+    }
+}
+
+char* get_gateway_target_name()
+{
+    return TARGET_DEV_NAME;
 }

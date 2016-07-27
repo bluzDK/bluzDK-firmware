@@ -80,3 +80,10 @@ void HAL_BLE_Set_Adv_Name(char* name)
 {
     set_advertised_name(name);
 }
+
+void HAL_BLE_Set_Gateway_Target(char* name)
+{
+#if PLATFORM_ID==269
+    set_gateway_target_name(name);
+#endif
+}

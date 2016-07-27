@@ -51,6 +51,8 @@ extern "C" {
 
     void HAL_BLE_Set_Adv_Name(char* name);
 
+    void HAL_BLE_Set_Gateway_Target(char* name);
+
 #ifdef __cplusplus
 }
 #endif

@@ -35,12 +35,12 @@
 
 #define INFO_DATA_SERVICE_BUF_SIZE  8
 
+#define MAX_TARGET_LENGTH 24
+
 #define MIN_CONNECTION_INTERVAL          MSEC_TO_UNITS(7.5, UNIT_1_25_MS)                /**< Determines minimum connection interval in millisecond. */
 #define MAX_CONNECTION_INTERVAL          MSEC_TO_UNITS(30, UNIT_1_25_MS)                /**< Determines maximum connection interval in millisecond. */
 #define SLAVE_LATENCY                    0                                              /**< Determines slave latency in counts of connection events. */
 #define SUPERVISION_TIMEOUT              MSEC_TO_UNITS(4000, UNIT_10_MS)                /**< Determines supervision time-out in units of 10 millisecond. */
-
-#define TARGET_DEV_NAME                  "Bluz DK"                                      /**< Target device name that application is looking for. */
 
 #define SCAN_INTERVAL                    0x00A0                                         /**< Determines scan interval in units of 0.625 millisecond. */
 #define SCAN_WINDOW                      0x0050                                         /**< Determines scan window in units of 0.625 millisecond. */
@@ -99,6 +99,9 @@ void gateway_loop(void);
 void setGatewayConnParameters(int minimum, int maximum);
 
 void gateway_cancel_connect_and_start_scanning(void);
+
+void set_gateway_target_name(char* name);
+char* get_gateway_target_name();
 
 //Gateway Callback Functions
 #if PLATFORM_ID==269

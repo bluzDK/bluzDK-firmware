@@ -67,3 +67,8 @@ void BLEClass::setConnectionParameters(int minimum, int maximum)
 {
     HAL_BLE_Set_CONN_PARAMS(minimum, maximum);
 }
+
+void BLEClass::setGatewayTargetName(char* name)
+{
+    HAL_BLE_Set_Gateway_Target(name);
+}

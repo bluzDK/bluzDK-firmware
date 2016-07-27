@@ -192,8 +192,9 @@ void on_ble_evt(ble_evt_t * p_ble_evt)
             //                                                  &type_data);
             
             // Verify if short or complete name matches target.
+            char* target = get_gateway_target_name();
             if ((err_code == NRF_SUCCESS) &&
-                (0 == memcmp(TARGET_DEV_NAME,type_data.p_data,type_data.data_len)) &&
+                (0 == memcmp(target,type_data.p_data,type_data.data_len)) &&
 //                isCloudConnected &&
                 !isCloudUpdating &&
                 system_millis() - lastConnectionTime > TIME_BETWEEN_CONNECTIONS)
