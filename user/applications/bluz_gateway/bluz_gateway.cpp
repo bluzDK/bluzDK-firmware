@@ -28,6 +28,7 @@ PRODUCT_ID(PLATFORM_ID);
 
 /* Function prototypes -------------------------------------------------------*/
 int setConnectionParameters(String command);
+int setGatewayTarget(String name);
 
 String version = xstr(SYSTEM_VERSION_STRING);
 
@@ -38,6 +39,7 @@ void setup()
 
     //Register all the Tinker functions
     Particle.function("setConParam", setConnectionParameters);
+    Particle.function("setGWTarget", setGatewayTarget);
 
     Particle.variable("version", version);
 
@@ -67,5 +69,14 @@ int setConnectionParameters(String cmd)
 
     Particle.publish("Setting conn params to min: " + String (minimm) + " max: " + String(maximum));
     BLE.setConnectionParameters(minimm, maximum);
+    return 0;
+}
+
+int setGatewayTarget(String name)
+{
+    char c_name[name.length()+1];
+    name.toCharArray(c_name, name.length()+1);
+    Particle.publish("Setting gateway target to: ", String(c_name));
+    BLE.setGatewayTargetName(c_name);
     return 0;
 }
