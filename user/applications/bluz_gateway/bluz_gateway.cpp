@@ -26,6 +26,13 @@ PRODUCT_ID(PLATFORM_ID);
 #define xstr(s) str(s)
 #define str(s) #s
 
+#define TARGET_NAME_ADDR 10
+struct TargetName {
+    uint8_t length;
+    char name[24];
+};
+
+
 /* Function prototypes -------------------------------------------------------*/
 int setConnectionParameters(String command);
 int setGatewayTarget(String name);
@@ -42,6 +49,12 @@ void setup()
     Particle.function("setGWTarget", setGatewayTarget);
 
     Particle.variable("version", version);
+
+    TargetName setTarget;
+    EEPROM.get(TARGET_NAME_ADDR, setTarget);
+    if (setTarget.length > 0 && setTarget.length != 0xFF) {
+        BLE.setGatewayTargetName(setTarget.name);
+    }
 
     //gateway shield
 #if PLATFORM_ID==269
@@ -78,5 +91,10 @@ int setGatewayTarget(String name)
     name.toCharArray(c_name, name.length()+1);
     Particle.publish("Setting gateway target to: ", String(c_name));
     BLE.setGatewayTargetName(c_name);
+    TargetName setTarget;
+    setTarget.length = (uint8_t)name.length()+1;
+    memcpy(setTarget.name, c_name, setTarget.length);
+    EEPROM.put(TARGET_NAME_ADDR, setTarget);
+
     return 0;
 }
