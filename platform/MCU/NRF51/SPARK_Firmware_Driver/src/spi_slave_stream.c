@@ -38,7 +38,7 @@ void ble_radio_ntf_handler(bool radio_state)
  */
 void spi_slave_send_data(uint8_t *buf, uint16_t size)
 {
-	DEBUG("Entering spi_send");
+	DEBUG("Entering spi_send, size %d", size);
 	//let the Photon know we are about to transmit
 	nrf_gpio_pin_set(SPIS_PTS_PIN);
 
@@ -47,8 +47,8 @@ void spi_slave_send_data(uint8_t *buf, uint16_t size)
 	//now let's send the size of the data first
 	m_tx_buf[0] = (( (size) & 0xFF00) >> 8);
 	m_tx_buf[1] = ( (size) & 0xFF);
-	nrf_gpio_pin_set(SPIS_SA_PIN);
 	busy = true;
+	nrf_gpio_pin_set(SPIS_SA_PIN);
 	while (busy) { }
 
 	//now lets send the data one chunk at a time
@@ -56,8 +56,8 @@ void spi_slave_send_data(uint8_t *buf, uint16_t size)
 		uint16_t chunkLength = (size-i > SPI_SLAVE_HW_TX_BUF_SIZE ? SPI_SLAVE_HW_TX_BUF_SIZE : size-i);
 		memcpy(m_tx_buf, buf+i, chunkLength);
 		//alert the particle board we have data to send
-		nrf_gpio_pin_set(SPIS_SA_PIN);
 		busy = true;
+		nrf_gpio_pin_set(SPIS_SA_PIN);
 		while (busy) { }
 	}
 	DEBUG("Done in spi_slave_send_data");
