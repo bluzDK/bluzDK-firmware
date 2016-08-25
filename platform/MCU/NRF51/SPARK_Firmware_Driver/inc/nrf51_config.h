@@ -76,6 +76,23 @@
 #define SEC_PARAM_MIN_KEY_SIZE          7                                           /**< Minimum encryption key size. */
 #define SEC_PARAM_MAX_KEY_SIZE          16                                          /**< Maximum encryption key size. */
 
+#define BEACON_ADV_INTERVAL    			MSEC_TO_UNITS(950, UNIT_0_625_MS) /**< The advertising interval for non-connectable advertisement (100 ms). This value can vary between 100ms to 10.24s). */
+#define APP_BEACON_INFO_LENGTH          0x17                              /**< Total length of information advertised by the Beacon. */
+#define APP_ADV_DATA_LENGTH             0x15                              /**< Length of manufacturer specific data in the advertisement. */
+#define APP_DEVICE_TYPE                 0x02                              /**< 0x02 refers to Beacon. */
+#define APP_MEASURED_RSSI               0xC4                              /**< The Beacon's measured RSSI at 1 meter distance in dBm. */
+#define APP_COMPANY_IDENTIFIER          0x004C                            /**< Company identifier for Nordic Semiconductor ASA. as per www.bluetooth.org. */
+#define APP_MAJOR_VALUE                 0x11, 0x22                        /**< Major value used to identify Beacons. */
+#define APP_MINOR_VALUE                 0x33, 0x44                        /**< Minor value used to identify Beacons. */
+
+#define EDDYSTONE_BEACON_LENGTH 0x18
+
+#define EDDYSTONE_HEADER 0x02, 0x01, 0x06, 0x03, 0x03, 0xAA, 0xFE, 0x10, 0x16, 0xAA, 0xFE
+#define EDDYSTONE_FRAME_TYPE 0x10
+#define EDDYSTONE_TX_POWER 0xEB
+#define EDDYSTONE_URL_SCHEME 0x02
+#define EDDYSTONE_URL 0x6d, 0x63, 0x6f, 0x6e, 0x74, 0x69, 0x2e, 0x78, 0x79, 0x7a
+
 
 
 //timers

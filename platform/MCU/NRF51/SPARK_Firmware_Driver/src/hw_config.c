@@ -396,6 +396,13 @@ char* DEVICE_NAME = "Bluz DK";
 void set_advertised_name(char* name)
 {
     DEVICE_NAME = name;
+
+    //if we are already advertising, reset to the new name
+    if (state == BLE_ADVERTISING) {
+        advertising_stop();
+        gap_params_init();
+        advertising_start();
+    }
 }
 
 /**@brief Function for the GAP initialization.
@@ -564,6 +571,81 @@ void advertising_init(void)
     err_code = ble_advdata_set(&advdata, &scanrsp);
     APP_ERROR_CHECK(err_code);
 }
+
+//uint8_t APP_BEACON_UUID[16] = {0};
+//void advertising_init_beacon(uint32_t major, uint32_t minor, uint8_t *UUID)
+//{
+//    uint8_t m_beacon_info[APP_BEACON_INFO_LENGTH];
+//
+//    m_beacon_info[0] = (uint8_t)APP_DEVICE_TYPE; // Manufacturer specific information. Specifies the device type in this implementation.
+//    m_beacon_info[1] = (uint8_t)APP_ADV_DATA_LENGTH; // Manufacturer specific information. Specifies the length of the manufacturer specific data in this implementation.
+//    memcpy(m_beacon_info + 2, UUID, 16);
+//    m_beacon_info[18] = (uint8_t)(major >> 8);
+//    m_beacon_info[19] = (uint8_t)(major);
+//    m_beacon_info[20] = (uint8_t)(minor >> 8);
+//    m_beacon_info[21] = (uint8_t)(minor);
+//    m_beacon_info[22] = APP_MEASURED_RSSI;
+//
+//    uint32_t      err_code;
+//    ble_advdata_t advdata;
+//    ble_advdata_t scanrsp;
+//    uint8_t       flags = BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE;
+//
+//    ble_advdata_manuf_data_t manuf_specific_data;
+//
+//    manuf_specific_data.company_identifier = APP_COMPANY_IDENTIFIER;
+//
+//    manuf_specific_data.data.p_data = (uint8_t *) m_beacon_info;
+//    manuf_specific_data.data.size   = APP_BEACON_INFO_LENGTH;
+//
+//    // Build and set advertising data.
+//    memset(&advdata, 0, sizeof(advdata));
+//
+//    advdata.name_type             = BLE_ADVDATA_NO_NAME;
+//    advdata.flags.size            = sizeof(flags);
+//    advdata.flags.p_data          = &flags;
+//    advdata.p_manuf_specific_data = &manuf_specific_data;
+//
+//    ble_uuid_t adv_uuids[] = {{BLE_SCS_UUID_SERVICE, m_scs.uuid_type}};
+//
+//    memset(&scanrsp, 0, sizeof(scanrsp));
+//    scanrsp.uuids_complete.uuid_cnt = sizeof(adv_uuids) / sizeof(adv_uuids[0]);
+//    scanrsp.uuids_complete.p_uuids  = adv_uuids;
+//    scanrsp.name_type = BLE_ADVDATA_FULL_NAME;
+//
+//    err_code = ble_advdata_set(&advdata, &scanrsp);
+//    APP_ERROR_CHECK(err_code);
+//
+//    // Initialize advertising parameters (used when starting advertising).
+//    memset(&m_adv_params, 0, sizeof(m_adv_params));
+//
+//    m_adv_params.type        = BLE_GAP_ADV_TYPE_ADV_IND;
+//    m_adv_params.p_peer_addr = NULL;                             // Undirected advertisement.
+//    m_adv_params.fp          = BLE_GAP_ADV_FP_ANY;
+//    m_adv_params.interval    = BEACON_ADV_INTERVAL;
+//}
+//
+//static void advertising_init_eddystone()
+//{
+//    uint8_t m_beacon_info[URL_BEACON_LENGTH] =                  /**< Information advertised by the Beacon. */
+//    {
+//            EDDYSTONE_HEADER,
+//            EDDYSTONE_FRAME_TYPE,
+//            EDDYSTONE_TX_POWER,
+//            EDDYSTONE_URL_SCHEME,
+//            EDDYSTONE_URL
+//    };
+//    sd_ble_gap_adv_data_set(m_beacon_info, URL_BEACON_LENGTH, NULL, 0);
+//
+//    // Initialize advertising parameters (used when starting advertising).
+//    memset(&m_adv_params, 0, sizeof(m_adv_params));
+//
+//    m_adv_params.type        = BLE_GAP_ADV_TYPE_ADV_IND;
+//    m_adv_params.p_peer_addr = NULL;                             // Undirected advertisement.
+//    m_adv_params.fp          = BLE_GAP_ADV_FP_ANY;
+//    m_adv_params.interval    = BEACON_ADV_INTERVAL;
+//    m_adv_params.timeout     = APP_CFG_NON_CONN_ADV_TIMEOUT;
+//}
 
 //Startup Functions
 
