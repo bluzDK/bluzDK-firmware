@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/sbluzDK/bluzDK-firmware.svg?branch=develop)](https://travis-ci.org/bluzDK/bluzDK-firmware)
+[![Build Status](https://travis-ci.org/bluzDK/bluzDK-firmware.svg?branch=develop)](https://travis-ci.org/bluzDK/bluzDK-firmware)
 
 # Particle Firmware for the Core, Photon and bluz
 
