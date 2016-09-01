@@ -86,7 +86,9 @@ bool network_sleep_flag(uint32_t flags)
 {
     static_assert(static_cast<int>(SystemSleepNetwork::Off)==0, "expected SystemSleepNetwork::Off==0");
     static_assert(static_cast<int>(SystemSleepNetwork::Standby)==1, "expected SystemSleepNetwork::Standby==1");
-    return (flags & 1)==0;
+    //TODO: Is there a bug or something with this line? It always seems to return true even when I don't want it to...
+    //return (flags & 1)==0;
+    return false;
 }
 
 void system_sleep(Spark_Sleep_TypeDef sleepMode, long seconds, uint32_t param, void* reserved)
