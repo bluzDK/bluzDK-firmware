@@ -215,6 +215,7 @@ void app_setup_and_loop_passive(void)
                         }
                     }
                 } else {
+                    LED_SetRGBColor(system_mode()==SAFE_MODE ? RGB_COLOR_YELLOW : RGB_COLOR_GREEN);
                     ledOffTime = 250;
                     HAL_Delay_Milliseconds(2000);
                     DEBUG("Calling Spark Connect");
