@@ -25,7 +25,7 @@
 
 #if PLATFORM_ID==103   /*--bluz*/
 const module_bounds_t module_bootloader = { 0x4000, 0x3C000, 0x40000, MODULE_FUNCTION_BOOTLOADER, 0, MODULE_STORE_MAIN };
-const module_bounds_t module_system_part1 = { 0x1F000, 0x18000, 0x37000, MODULE_FUNCTION_SYSTEM_PART, 1, MODULE_STORE_MAIN };
+const module_bounds_t module_system_part1 = { 0x1B000, 0x18000, 0x33000, MODULE_FUNCTION_SYSTEM_PART, 1, MODULE_STORE_MAIN };
 const module_bounds_t module_user = { 0x5000, 0x37000, 0x3C000, MODULE_FUNCTION_USER_PART, 2, MODULE_STORE_MAIN};
 const module_bounds_t module_factory = { 0x1F000, 0x1021000, 0x1040000, MODULE_FUNCTION_USER_PART, 1, MODULE_STORE_FACTORY};
 const module_bounds_t* module_bounds[] = { &module_bootloader, &module_system_part1, &module_user, &module_factory };
