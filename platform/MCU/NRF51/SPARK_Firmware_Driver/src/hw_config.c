@@ -35,6 +35,7 @@
 #include "nrf_drv_wdt.h"
 #include "client_handling.h"
 #include "app_timer.h"
+#include "spi_master_fast.h"
 
 uint32_t NbrOfPage = 0;
 uint16_t Flash_Update_Index = 0;
@@ -313,6 +314,11 @@ void buttons_init(void)
 
 void external_flash_init(void)
 {
+    // issue #35: starting with v2.0.50 we swapped which TWI/SPI instance the user app uses from 1 to 0. however, the bootloader
+    // still uses the original (1) instance, meaning that when the system firmware starts, the wrong SPI instance is enabled. so,
+    // we need to disable the incorrect version before we go any further
+    spi_master_disable(SPI1);
+
     sFLASH_Init();
 }
 
