@@ -47,9 +47,9 @@ void HAL_PWM_Write(uint16_t pin, uint8_t value)
         app_pwm_disable(&PWM2);
         app_pwm_uninit(&PWM2);
     }
-    app_pwm_config_t pwm1_cfg = APP_PWM_DEFAULT_CONFIG_1CH(1000000/PWM_FREQUENCY_HZ, PIN_MAP[pin].gpio_pin);
-    pwm1_cfg.pin_polarity[0] = APP_PWM_POLARITY_ACTIVE_HIGH;
-    int err_code = app_pwm_init(&PWM2,&pwm1_cfg,pwm_ready_callback);
+    app_pwm_config_t pwm2_cfg = APP_PWM_DEFAULT_CONFIG_1CH(1000000/PWM_FREQUENCY_HZ, PIN_MAP[pin].gpio_pin);
+    pwm2_cfg.pin_polarity[0] = APP_PWM_POLARITY_ACTIVE_HIGH;
+    int err_code = app_pwm_init(&PWM2,&pwm2_cfg,pwm_ready_callback);
     if (err_code != NRF_SUCCESS) {
         return;
     }
