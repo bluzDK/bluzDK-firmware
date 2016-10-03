@@ -32,38 +32,37 @@
 #undef SS
 #include "app_pwm.h"
 
-#define PWM_FREQUENCY_HZ 500
+uint32_t PWM_FREQUENCY_HZ = 500;
 
-APP_PWM_INSTANCE(PWM1,1);                   // Create the instance "PWM1" using TIMER1.
+APP_PWM_INSTANCE(PWM2,2);                   // Create the instance "PWM2" using TIMER1.
 
-static bool enabled = false;
-static volatile bool ready_flag;            // A flag indicating PWM status.
+static bool pwm_enabled = false;
 void pwm_ready_callback(uint32_t pwm_id)    // PWM callback function
 {
-    ready_flag = true;
 }
 
 void HAL_PWM_Write(uint16_t pin, uint8_t value)
 {
-    if (enabled) {
-        app_pwm_disable(&PWM1);
-        app_pwm_uninit(&PWM1);
+    if (pwm_enabled) {
+        app_pwm_disable(&PWM2);
+        app_pwm_uninit(&PWM2);
     }
     app_pwm_config_t pwm1_cfg = APP_PWM_DEFAULT_CONFIG_1CH(1000000/PWM_FREQUENCY_HZ, PIN_MAP[pin].gpio_pin);
-    pwm1_cfg.pin_polarity[1] = APP_PWM_POLARITY_ACTIVE_HIGH;
-    int err_code = app_pwm_init(&PWM1,&pwm1_cfg,pwm_ready_callback);
+    pwm1_cfg.pin_polarity[0] = APP_PWM_POLARITY_ACTIVE_HIGH;
+    int err_code = app_pwm_init(&PWM2,&pwm1_cfg,pwm_ready_callback);
     if (err_code != NRF_SUCCESS) {
         return;
     }
-    app_pwm_enable(&PWM1);
-    ready_flag = false;
+    app_pwm_enable(&PWM2);
     /* Set the duty cycle - keep trying until PWM is ready... */
-    while (app_pwm_channel_duty_set(&PWM1, 0, 255-value) == NRF_ERROR_BUSY);
-    enabled = true;
+    while (app_pwm_channel_duty_set(&PWM2, 0, value) == NRF_ERROR_BUSY);
+    pwm_enabled = true;
 }
 
 void HAL_PWM_Write_With_Frequency(uint16_t pin, uint8_t value, uint16_t pwm_frequency)
 {
+    PWM_FREQUENCY_HZ = pwm_frequency;
+    HAL_PWM_Write(pin, value);
 }
 
 uint16_t HAL_PWM_Get_Frequency(uint16_t pin)
