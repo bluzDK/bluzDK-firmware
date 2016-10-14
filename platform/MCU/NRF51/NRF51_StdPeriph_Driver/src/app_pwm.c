@@ -41,7 +41,6 @@
 #include "app_util_platform.h"
 #include "nrf_assert.h"
 
-
 #define APP_PWM_CHANNEL_INITIALIZED                1
 #define APP_PWM_CHANNEL_UNINITIALIZED              0
 
@@ -55,24 +54,43 @@
 #define APP_PWM_REQUIRED_PPI_CHANNELS_PER_CHANNEL  2
 
 #define UNALLOCATED                                0xFFFFFFFFUL
+#define BUSY_STATE_CHANGING                        0xFE
+#define BUSY_STATE_IDLE                            0xFF
 
 #define PWM_MAIN_CC_CHANNEL                        2
 #define PWM_SECONDARY_CC_CHANNEL                   3
 
 /**
+ * @brief PWM busy status
+ *
+ * Stores the number of a channel being currently updated.
+ *
+ */
+static volatile uint8_t  m_pwm_busy[TIMER_COUNT];
+
+
+/**
+ * @brief New duty cycle value
+ *
+ * When the channel duty cycle reaches this value, the update process is complete.
+ */
+static volatile uint32_t m_pwm_target_value[TIMER_COUNT];
+
+
+/**
  * @brief PWM ready counter
  *
- * The value in this counter is decremented every PWM cycle.
- * To be sure if PWM is updated we have to wait for two PWM cycle events
- * that means that we have at least one full cycle.
+ * The value in this counter is decremented in every PWM cycle after initiating the update.
+ * If an event handler function was specified by the user, it is being called
+ * after two cycle events (at least one full PWM cycle).
  */
-volatile uint8_t m_pwm_ready_counter[TIMER_COUNT];
+volatile uint8_t m_pwm_ready_counter[TIMER_COUNT][APP_PWM_CHANNELS_PER_INSTANCE];
 
 /**
  * @brief Pointers to instances
  *
- * This array connect any active timer instance number with the pointer to PWM instance.
- * It is used by interrupt runtime.
+ * This array connects any active timer instance number with the pointer to the PWM instance.
+ * It is used by the interrupt runtime.
  */
 static const app_pwm_t * m_instances[TIMER_COUNT];
 
@@ -92,6 +110,7 @@ static const app_pwm_t * m_instances[TIMER_COUNT];
  */
 static void pan73_workaround(NRF_TIMER_Type * p_timer, bool enable)
 {
+#ifdef NRF51
     if (p_timer == NRF_TIMER0)
     {
         *(uint32_t *)0x40008C0C = (enable ? 1 : 0);
@@ -104,7 +123,32 @@ static void pan73_workaround(NRF_TIMER_Type * p_timer, bool enable)
     {
         *(uint32_t *)0x4000AC0C = (enable ? 1 : 0);
     }
+#endif
     return;
+}
+
+
+bool app_pwm_busy_check(app_pwm_t const * const p_instance)
+{
+    uint8_t busy_state = (m_pwm_busy[p_instance->p_timer->instance_id]);
+    bool busy = true;
+    if (busy_state != BUSY_STATE_IDLE)
+    {
+        if (busy_state != BUSY_STATE_CHANGING)
+        {
+            if (nrf_drv_timer_capture_get(p_instance->p_timer, (nrf_timer_cc_channel_t) busy_state) 
+                == m_pwm_target_value[p_instance->p_timer->instance_id])
+            {
+                m_pwm_busy[p_instance->p_timer->instance_id] = BUSY_STATE_IDLE;
+                busy = false;
+            }
+        }
+    }
+    else
+    {
+        busy = false;
+    }
+    return busy;
 }
 
 
@@ -167,23 +211,34 @@ __STATIC_INLINE void pwm_ppi_disable(app_pwm_t const * const p_instance)
 void pwm_ready_tick(nrf_timer_event_t event_type, void * p_context)
 {
     uint32_t timer_instance_id = (uint32_t)p_context;
-
-    if (m_pwm_ready_counter[timer_instance_id])
+    uint8_t disable = 1;
+    
+    for (uint8_t channel = 0; channel < APP_PWM_CHANNELS_PER_INSTANCE; ++channel)
     {
-        --m_pwm_ready_counter[timer_instance_id];
-        if (m_pwm_ready_counter[timer_instance_id])
+        if (m_pwm_ready_counter[timer_instance_id][channel])
         {
-            return;
+            --m_pwm_ready_counter[timer_instance_id][channel];
+            if (!m_pwm_ready_counter[timer_instance_id][channel])
+            {
+                app_pwm_cb_t * p_cb = m_instances[timer_instance_id]->p_cb;
+                p_cb->p_ready_callback(timer_instance_id);
+            }
+            else
+            {
+                disable = 0;
+            }
         }
+    }
+    
+    if (disable)
+    {
         pwm_irq_disable(m_instances[timer_instance_id]);
-        app_pwm_cb_t * p_cb = m_instances[timer_instance_id]->p_cb;
-        p_cb->p_ready_callback(timer_instance_id);
     }
 }
 
 
 /**
- * @brief Function for resource deallocation.
+ * @brief Function for resource de-allocation.
  *
  * @param[in] p_instance       PWM instance.
  */
@@ -238,27 +293,47 @@ static void pwm_transition_n_to_0or100(app_pwm_t const * const p_instance,
 {
     app_pwm_cb_t            * p_cb     = p_instance->p_cb;
     app_pwm_channel_cb_t    * p_ch_cb  = &p_cb->channels_cb[channel];
-    nrf_ppi_channel_group_t * p_ppigrp = &p_cb->ppi_group;
+    nrf_ppi_channel_group_t   p_ppigrp = p_cb->ppi_group;
 
     pwm_ppi_disable(p_instance);
-    nrf_drv_ppi_group_clear(*p_ppigrp);
-    nrf_drv_ppi_channel_include_in_group(p_ch_cb->ppi_channels[0], *p_ppigrp);
-    nrf_drv_ppi_channel_include_in_group(p_ch_cb->ppi_channels[1], *p_ppigrp);
+    nrf_drv_ppi_group_clear(p_ppigrp);
+    nrf_drv_ppi_channels_include_in_group(
+            nrf_drv_ppi_channel_to_mask(p_ch_cb->ppi_channels[0]) | 
+            nrf_drv_ppi_channel_to_mask(p_ch_cb->ppi_channels[1]),
+            p_ppigrp);
+
     if (!ticks)
     {
         nrf_drv_ppi_channel_assign(p_cb->ppi_channels[0],
                     nrf_drv_timer_compare_event_address_get(p_instance->p_timer, channel),
-                    nrf_drv_ppi_task_addr_group_disable_get(*p_ppigrp));
+                    nrf_drv_ppi_task_addr_group_disable_get(p_ppigrp));
+        nrf_drv_timer_compare(p_instance->p_timer, (nrf_timer_cc_channel_t) PWM_SECONDARY_CC_CHANNEL, 0, false);
+        m_pwm_target_value[p_instance->p_timer->instance_id] =
+            nrf_drv_timer_capture_get(p_instance->p_timer, (nrf_timer_cc_channel_t) channel);
+        nrf_drv_ppi_channel_assign(p_cb->ppi_channels[1],
+                    nrf_drv_timer_compare_event_address_get(p_instance->p_timer, channel),
+                    nrf_drv_timer_capture_task_address_get(p_instance->p_timer, PWM_SECONDARY_CC_CHANNEL));
     }
     else
     {
         ticks = p_cb->period;
         nrf_drv_ppi_channel_assign(p_cb->ppi_channels[0],
                     nrf_drv_timer_compare_event_address_get(p_instance->p_timer, PWM_MAIN_CC_CHANNEL),
-                    nrf_drv_ppi_task_addr_group_disable_get(*p_ppigrp));
+                    nrf_drv_ppi_task_addr_group_disable_get(p_ppigrp));
+        // Set secondary CC channel to non-zero value:
+        nrf_drv_timer_compare(p_instance->p_timer, (nrf_timer_cc_channel_t) PWM_SECONDARY_CC_CHANNEL, 1, false);
+        m_pwm_target_value[p_instance->p_timer->instance_id] = 0;
+        // The captured value will be equal to 0, because timer clear on main PWM CC channel compare is enabled.
+        nrf_drv_ppi_channel_assign(p_cb->ppi_channels[1],
+                    nrf_drv_timer_compare_event_address_get(p_instance->p_timer, PWM_MAIN_CC_CHANNEL),
+                    nrf_drv_timer_capture_task_address_get(p_instance->p_timer, PWM_SECONDARY_CC_CHANNEL));
     }
+    
     nrf_drv_ppi_channel_enable(p_cb->ppi_channels[0]);
+    nrf_drv_ppi_channel_enable(p_cb->ppi_channels[1]);
+    
     p_ch_cb->pulsewidth = ticks;
+    m_pwm_busy[p_instance->p_timer->instance_id] = PWM_SECONDARY_CC_CHANNEL;
 }
 
 
@@ -274,31 +349,38 @@ static void pwm_transition_n_to_m(app_pwm_t const * const p_instance,
 {
     app_pwm_cb_t            * p_cb     = p_instance->p_cb;
     app_pwm_channel_cb_t    * p_ch_cb  = &p_cb->channels_cb[channel];
-    nrf_ppi_channel_group_t * p_ppigrp = &p_cb->ppi_group;
+    nrf_ppi_channel_group_t   p_ppigrp = p_cb->ppi_group;
 
-    nrf_drv_ppi_group_clear(*p_ppigrp);
-    nrf_drv_ppi_channel_include_in_group(p_cb->ppi_channels[0], *p_ppigrp);
-    nrf_drv_ppi_channel_include_in_group(p_cb->ppi_channels[1], *p_ppigrp);
-    nrf_drv_ppi_group_disable(*p_ppigrp);
+    pwm_ppi_disable(p_instance);
+    nrf_drv_ppi_group_clear(p_ppigrp);
+    nrf_drv_ppi_channels_include_in_group(
+        nrf_drv_ppi_channel_to_mask(p_cb->ppi_channels[0]) | 
+        nrf_drv_ppi_channel_to_mask(p_cb->ppi_channels[1]),
+        p_ppigrp);
 
     nrf_drv_ppi_channel_assign(p_cb->ppi_channels[0],
                 nrf_drv_timer_compare_event_address_get(p_instance->p_timer, PWM_SECONDARY_CC_CHANNEL),
-                (uint32_t)&p_instance->p_timer->p_reg->TASKS_CAPTURE[channel] );
-    
-    if (ticks < p_cb->channels_cb[channel].pulsewidth)
+                nrf_drv_timer_capture_task_address_get(p_instance->p_timer, channel));
+
+    if (ticks + ((nrf_timer_frequency_get(p_instance->p_timer->p_reg) == NRF_TIMER_FREQ_16MHz) ? 1 : 0)
+        < p_ch_cb->pulsewidth)
     {
-        // For lower value we need one more transition.
+        // For lower value, we need one more transition. Timer task delay is included.
+        // If prescaler is enabled, one tick must be added because of 1 PCLK16M clock cycle delay.
         nrf_drv_ppi_channel_assign(p_cb->ppi_channels[1],
                 nrf_drv_timer_compare_event_address_get(p_instance->p_timer, PWM_SECONDARY_CC_CHANNEL),
                 nrf_drv_gpiote_out_task_addr_get(p_ch_cb->gpio_pin));
     }
     else
     {
-        nrf_drv_ppi_channel_remove_from_group(p_cb->ppi_channels[1], *p_ppigrp);
+        nrf_drv_ppi_channel_remove_from_group(p_cb->ppi_channels[1], p_ppigrp);
     }
     p_ch_cb->pulsewidth = ticks;
     nrf_drv_timer_compare(p_instance->p_timer, (nrf_timer_cc_channel_t) PWM_SECONDARY_CC_CHANNEL, ticks, false);
-    nrf_drv_ppi_group_enable(*p_ppigrp);
+    nrf_drv_ppi_group_enable(p_ppigrp);
+    
+    m_pwm_target_value[p_instance->p_timer->instance_id] = ticks;
+    m_pwm_busy[p_instance->p_timer->instance_id] = channel;
 }
 
 
@@ -314,34 +396,52 @@ static void pwm_transition_0or100_to_n(app_pwm_t const * const p_instance,
 {
     app_pwm_cb_t            * p_cb      = p_instance->p_cb;
     app_pwm_channel_cb_t    * p_ch_cb   = &p_cb->channels_cb[channel];
-    nrf_ppi_channel_group_t * p_ppigrp  = &p_cb->ppi_group;
+    nrf_ppi_channel_group_t   p_ppigrp  = p_cb->ppi_group;
     nrf_timer_cc_channel_t    pwm_ch_cc = (nrf_timer_cc_channel_t)(channel);
 
     pwm_ppi_disable(p_instance);
     pwm_channel_ppi_disable(p_instance, channel);
 
     nrf_drv_timer_compare(p_instance->p_timer, pwm_ch_cc, ticks, false);
-    nrf_drv_ppi_group_clear(*p_ppigrp);
-    nrf_drv_ppi_channel_include_in_group(p_ch_cb->ppi_channels[0], *p_ppigrp);
-    nrf_drv_ppi_channel_include_in_group(p_ch_cb->ppi_channels[1], *p_ppigrp);
+    nrf_drv_ppi_group_clear(p_ppigrp);
+    nrf_drv_ppi_channels_include_in_group(
+        nrf_drv_ppi_channel_to_mask(p_ch_cb->ppi_channels[0])|
+        nrf_drv_ppi_channel_to_mask(p_ch_cb->ppi_channels[1]),
+        p_ppigrp);
 
     if (!p_ch_cb->pulsewidth)
     {
-        // Channel is at 0%. Force inactive state and schedule next transition.
+        // Channel is at 0%.
         nrf_drv_ppi_channel_assign(p_cb->ppi_channels[0],
                     nrf_drv_timer_compare_event_address_get(p_instance->p_timer, channel),
-                    nrf_drv_ppi_task_addr_group_enable_get(*p_ppigrp));
+                    nrf_drv_ppi_task_addr_group_enable_get(p_ppigrp));
+        nrf_drv_timer_compare(p_instance->p_timer, (nrf_timer_cc_channel_t) PWM_SECONDARY_CC_CHANNEL, 0, false);
+        m_pwm_target_value[p_instance->p_timer->instance_id] = 
+            nrf_drv_timer_capture_get(p_instance->p_timer, (nrf_timer_cc_channel_t) channel);
+        nrf_drv_ppi_channel_assign(p_cb->ppi_channels[1],
+                    nrf_drv_timer_compare_event_address_get(p_instance->p_timer, channel),
+                    nrf_drv_timer_capture_task_address_get(p_instance->p_timer, PWM_SECONDARY_CC_CHANNEL));
        
     }
     else
     {
-        // Channel is at 100%. Force active state and schedule next transition.
+        // Channel is at 100%.
         nrf_drv_ppi_channel_assign(p_cb->ppi_channels[0],
                     nrf_drv_timer_compare_event_address_get(p_instance->p_timer, PWM_MAIN_CC_CHANNEL),
-                    nrf_drv_ppi_task_addr_group_enable_get(*p_ppigrp));
+                    nrf_drv_ppi_task_addr_group_enable_get(p_ppigrp));
+        // Set secondary CC channel to non-zero value:
+        nrf_drv_timer_compare(p_instance->p_timer, (nrf_timer_cc_channel_t) PWM_SECONDARY_CC_CHANNEL, 1, false);
+        m_pwm_target_value[p_instance->p_timer->instance_id] = 0;
+        // The captured value will be equal to 0, because timer clear on main PWM CC channel compare is enabled.
+        nrf_drv_ppi_channel_assign(p_cb->ppi_channels[1],
+                    nrf_drv_timer_compare_event_address_get(p_instance->p_timer, PWM_MAIN_CC_CHANNEL),
+                    nrf_drv_timer_capture_task_address_get(p_instance->p_timer, PWM_SECONDARY_CC_CHANNEL));
     }
     nrf_drv_ppi_channel_enable(p_cb->ppi_channels[0]);
+    nrf_drv_ppi_channel_enable(p_cb->ppi_channels[1]);
+    
     p_ch_cb->pulsewidth = ticks;
+    m_pwm_busy[p_instance->p_timer->instance_id] = PWM_SECONDARY_CC_CHANNEL;
 }
 
 
@@ -368,14 +468,17 @@ static void pwm_transition_0or100_to_0or100(app_pwm_t const * const p_instance,
     }
     else if (ticks >= p_cb->period)
     {
-        // Set to 100%
+        // Set to 100%.
         ticks = p_cb->period;
         nrf_drv_gpiote_out_task_force(p_ch_cb->gpio_pin, POLARITY_ACTIVE(p_instance, channel));
     }
     nrf_drv_timer_compare(p_instance->p_timer, pwm_ch_cc, ticks, false);
     p_ch_cb->pulsewidth = ticks;
+    
+    m_pwm_busy[p_instance->p_timer->instance_id] = BUSY_STATE_IDLE;
     return;
 }
+
 
 ret_code_t app_pwm_channel_duty_ticks_set(app_pwm_t const * const p_instance,
                                           uint8_t           channel,
@@ -393,13 +496,18 @@ ret_code_t app_pwm_channel_duty_ticks_set(app_pwm_t const * const p_instance,
     }
     if (ticks == p_ch_cb->pulsewidth)
     {
-        p_cb->p_ready_callback(p_instance->p_timer->instance_id);
+        if (p_cb->p_ready_callback)
+        {
+            p_cb->p_ready_callback(p_instance->p_timer->instance_id);
+        }
         return NRF_SUCCESS;     // No action required.
     }
-    if (m_pwm_ready_counter[p_instance->p_timer->instance_id])
+    if (app_pwm_busy_check(p_instance))
     {
         return NRF_ERROR_BUSY;  // PPI channels for synchronization are still in use.
     }
+    
+    m_pwm_busy[p_instance->p_timer->instance_id] = BUSY_STATE_CHANGING;
 
     // Pulse width change sequence:
     if (!p_ch_cb->pulsewidth || p_ch_cb->pulsewidth >= p_cb->period)
@@ -426,25 +534,32 @@ ret_code_t app_pwm_channel_duty_ticks_set(app_pwm_t const * const p_instance,
         }
         else
         {
-            // Set to any other value
+            // Set to any other value.
             pwm_transition_n_to_m(p_instance, channel, ticks);
         }
     }
-
-    m_pwm_ready_counter[p_instance->p_timer->instance_id] = 2; // PWM will be ready to next change on 2nd CC0 event (minimum 1 full period)
-    pwm_irq_enable(p_instance);
+    if (p_instance->p_cb->p_ready_callback)
+    {
+        //PWM ready interrupt handler will be called after one full period.
+        m_pwm_ready_counter[p_instance->p_timer->instance_id][channel] = 2;
+        pwm_irq_enable(p_instance);
+    }
     return NRF_SUCCESS;
 }
 
 uint16_t app_pwm_channel_duty_ticks_get(app_pwm_t const * const p_instance, uint8_t channel)
 {
-    return nrf_drv_timer_capture_get(p_instance->p_timer, (nrf_timer_cc_channel_t)(channel));
+    app_pwm_cb_t         * p_cb      = p_instance->p_cb;
+    app_pwm_channel_cb_t * p_ch_cb   = &p_cb->channels_cb[channel];
+
+    return p_ch_cb->pulsewidth;
 }
 
 uint16_t app_pwm_cycle_ticks_get(app_pwm_t const * const p_instance)
 {
-    return (uint16_t)nrf_drv_timer_capture_get(p_instance->p_timer,
-            (nrf_timer_cc_channel_t) PWM_MAIN_CC_CHANNEL);
+    app_pwm_cb_t * p_cb = p_instance->p_cb;
+
+    return (uint16_t)p_cb->period;
 }
 
 ret_code_t app_pwm_channel_duty_set(app_pwm_t const * const p_instance,
@@ -472,8 +587,8 @@ app_pwm_duty_t app_pwm_channel_duty_get(app_pwm_t const * const p_instance, uint
  * @param[in] pin              GPIO pin number.
  *
  * @retval    NRF_SUCCESS If initialization was successful.
- * @retval    NRF_ERROR_NO_MEM if there was not enough free resources.
- * @retval    NRF_ERROR_INVALID_STATE if timer is already in use or initialization failed.
+ * @retval    NRF_ERROR_NO_MEM If there were not enough free resources.
+ * @retval    NRF_ERROR_INVALID_STATE If the timer is already in use or initialization failed.
  */
 static ret_code_t app_pwm_channel_init(app_pwm_t const * const p_instance, uint8_t channel,
                                      uint32_t pin, app_pwm_polarity_t polarity)
@@ -488,6 +603,7 @@ static ret_code_t app_pwm_channel_init(app_pwm_t const * const p_instance, uint8
     }
 
     p_channel_cb->pulsewidth = 0;
+    p_channel_cb->polarity   = polarity;
     ret_code_t err_code;
 
     /* GPIOTE setup: */
@@ -498,14 +614,23 @@ static ret_code_t app_pwm_channel_init(app_pwm_t const * const p_instance, uint8
         return NRF_ERROR_NO_MEM;
     }
     p_cb->channels_cb[channel].gpio_pin = pin;
-    nrf_drv_gpiote_out_task_enable(pin);
+
+    // Set output to inactive state.
+    if (polarity)
+    {
+        nrf_gpio_pin_clear(pin);
+    }
+    else
+    {
+        nrf_gpio_pin_set(pin);
+    }
 
     /* PPI setup: */
     for (uint8_t i = 0; i < APP_PWM_REQUIRED_PPI_CHANNELS_PER_CHANNEL; ++i)
     {
         if (nrf_drv_ppi_channel_alloc(&p_channel_cb->ppi_channels[i]) != NRF_SUCCESS)
         {
-            return NRF_ERROR_NO_MEM; // Resource deallocation is done by callee.
+            return NRF_ERROR_NO_MEM; // Resource de-allocation is done by callee.
         }
     }
 
@@ -518,13 +643,8 @@ static ret_code_t app_pwm_channel_init(app_pwm_t const * const p_instance, uint8
                                nrf_drv_timer_compare_event_address_get(p_instance->p_timer, PWM_MAIN_CC_CHANNEL),
                                nrf_drv_gpiote_out_task_addr_get(p_channel_cb->gpio_pin));
 
-    if (polarity == APP_PWM_POLARITY_ACTIVE_HIGH)
-    {
-        nrf_drv_gpiote_out_task_trigger(p_channel_cb->gpio_pin);
-    }
-
-    p_channel_cb->polarity    = polarity;
     p_channel_cb->initialized = APP_PWM_CHANNEL_INITIALIZED;
+    m_pwm_ready_counter[p_instance->p_timer->instance_id][channel] = 0;
 
     return NRF_SUCCESS;
 }
@@ -555,7 +675,6 @@ ret_code_t app_pwm_init(app_pwm_t const * const p_instance, app_pwm_config_t con
                         app_pwm_callback_t p_ready_callback)
 {
     ASSERT(p_instance);
-    ASSERT(p_ready_callback);
 
     if (!p_config)
     {
@@ -598,7 +717,7 @@ ret_code_t app_pwm_init(app_pwm_t const * const p_instance, app_pwm_config_t con
         p_cb->channels_cb[i].gpio_pin        = UNALLOCATED;
     }
 
-    // Allocate PPI channels and grouops:
+    // Allocate PPI channels and groups:
     for (uint8_t i = 0; i < APP_PWM_REQUIRED_PPI_CHANNELS_PER_INSTANCE; ++i)
     {
         if (nrf_drv_ppi_channel_alloc(&p_cb->ppi_channels[i]) != NRF_SUCCESS)
@@ -653,9 +772,8 @@ ret_code_t app_pwm_init(app_pwm_t const * const p_instance, app_pwm_config_t con
     nrf_drv_timer_compare_int_disable(p_instance->p_timer, PWM_MAIN_CC_CHANNEL);
 
     p_cb->p_ready_callback = p_ready_callback;
-    m_pwm_ready_counter[p_instance->p_timer->instance_id] = 0;
-    pan73_workaround(p_instance->p_timer->p_reg, true);
     m_instances[p_instance->p_timer->instance_id] = p_instance;
+    m_pwm_busy[p_instance->p_timer->instance_id] = BUSY_STATE_IDLE;
     p_cb->state = NRF_DRV_STATE_INITIALIZED;
 
     return NRF_SUCCESS;
@@ -667,7 +785,23 @@ void app_pwm_enable(app_pwm_t const * const p_instance)
     app_pwm_cb_t * p_cb = p_instance->p_cb;
 
     ASSERT(p_cb->state != NRF_DRV_STATE_UNINITIALIZED);
+
+    for (uint32_t channel = 0; channel < APP_PWM_CHANNELS_PER_INSTANCE; ++channel)
+    {
+        app_pwm_channel_cb_t * p_ch_cb = &p_cb->channels_cb[channel];
+        m_pwm_ready_counter[p_instance->p_timer->instance_id][channel] = 0;
+        if (p_ch_cb->initialized)
+        {
+            nrf_drv_gpiote_out_task_force(p_ch_cb->gpio_pin, POLARITY_INACTIVE(p_instance, channel));
+            nrf_drv_gpiote_out_task_enable(p_ch_cb->gpio_pin);
+            p_ch_cb->pulsewidth = 0;
+        }
+    }
+    m_pwm_busy[p_instance->p_timer->instance_id] = BUSY_STATE_IDLE;
+    pan73_workaround(p_instance->p_timer->p_reg, true);
+    nrf_drv_timer_clear(p_instance->p_timer);
     nrf_drv_timer_enable(p_instance->p_timer);
+
     p_cb->state = NRF_DRV_STATE_POWERED_ON;
     return;
 }
@@ -678,8 +812,34 @@ void app_pwm_disable(app_pwm_t const * const p_instance)
     app_pwm_cb_t * p_cb = p_instance->p_cb;
 
     ASSERT(p_cb->state != NRF_DRV_STATE_UNINITIALIZED);
+
     nrf_drv_timer_disable(p_instance->p_timer);
     pwm_irq_disable(p_instance);
+    for (uint8_t ppi_channel = 0; ppi_channel < APP_PWM_REQUIRED_PPI_CHANNELS_PER_INSTANCE; ++ppi_channel)
+    {
+        nrf_drv_ppi_channel_disable(p_cb->ppi_channels[ppi_channel]);
+    }
+    for (uint8_t channel = 0; channel < APP_PWM_CHANNELS_PER_INSTANCE; ++channel)
+    {
+        app_pwm_channel_cb_t * p_ch_cb = &p_cb->channels_cb[channel];
+        if (p_ch_cb->initialized)
+        {
+            uint8_t polarity = POLARITY_INACTIVE(p_instance, channel);
+            if (polarity)
+            {
+                nrf_gpio_pin_set(p_ch_cb->gpio_pin);
+            }
+            else
+            {
+                nrf_gpio_pin_clear(p_ch_cb->gpio_pin);
+            }
+            nrf_drv_gpiote_out_task_disable(p_ch_cb->gpio_pin);
+            nrf_drv_ppi_channel_disable(p_ch_cb->ppi_channels[0]);
+            nrf_drv_ppi_channel_disable(p_ch_cb->ppi_channels[1]);
+        }
+    }
+    pan73_workaround(p_instance->p_timer->p_reg, false);
+
     p_cb->state = NRF_DRV_STATE_INITIALIZED;
     return;
 }
@@ -697,7 +857,6 @@ ret_code_t app_pwm_uninit(app_pwm_t const * const p_instance)
     {
         return NRF_ERROR_INVALID_STATE;
     }
-    pan73_workaround(p_instance->p_timer->p_reg, false);
     pwm_dealloc(p_instance);
 
     p_cb->state = NRF_DRV_STATE_UNINITIALIZED;

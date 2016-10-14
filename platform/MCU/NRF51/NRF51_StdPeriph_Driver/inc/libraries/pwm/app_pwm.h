@@ -40,9 +40,14 @@
  *
  * @details This module provides a PWM implementation using timers, GPIOTE, and PPI.
  *
- * Each PWM instance utilizes 1 timer, 2 PPI channels, and 1 PPI channel group
- * plus 2 PPI and 1 GPIOTE channels per PWM channel. The maximum number of PWM
- * channels per instance is 2.
+ * Resource usage:
+ * - 2 PPI channels per instance + 2 PPI channels per PWM channel.
+ * - 1 PPI group per instance.
+ * - 1 GPIOTE channel per PWM channel.
+ *
+ * For example, a PWM instance with two channels will consume 2+4 PPI channels, 1 PPI group, and 2 GPIOTE channels.
+ *
+ * The maximum number of PWM channels per instance is 2.
  */
 
 #ifndef APP_PWM_H__
@@ -118,6 +123,7 @@ typedef struct
 
 
 /**
+ * @cond (NODOX)
  * @defgroup app_pwm_internal Auxiliary internal types declarations
  * @{
  * @internal
@@ -158,7 +164,9 @@ typedef struct
         nrf_ppi_channel_group_t ppi_group;                                  //!< PPI group used to synchronize changes on channels
         nrf_drv_state_t         state;                                      //!< Current driver status
     } app_pwm_cb_t;
-/** @} */
+/** @}
+ * @endcond
+ */
 
 
 /**@brief PWM instance structure. */
@@ -167,6 +175,16 @@ typedef struct
     app_pwm_cb_t *p_cb;                    //!< Pointer to control block internals.
     nrf_drv_timer_t const * const p_timer; //!< Timer used by this PWM instance.
 } app_pwm_t;
+
+/**
+ * @brief Function for checking if the PWM instance is busy updating the duty cycle.
+ *
+ * @param[in] p_instance  PWM instance.
+ *
+ * @retval True  If the PWM instance is ready for duty cycle changes.
+ * @retval False If a change operation is in progress.
+ */
+bool app_pwm_busy_check(app_pwm_t const * const p_instance);
 
 /**
  * @brief Function for initializing a PWM instance.
@@ -198,19 +216,13 @@ ret_code_t app_pwm_uninit(app_pwm_t const * const p_instance);
  * @brief Function for enabling a PWM instance after initialization.
  *
  * @param[in] p_instance  PWM instance.
- *
- * @retval    NRF_SUCCESS If the operation was successful.
- * @retval    NRF_ERROR_INVALID_STATE If the given instance was not initialized.
  */
 void app_pwm_enable(app_pwm_t const * const p_instance);
 
 /**
- * @brief Function for stopping a PWM instance after initialization.
+ * @brief Function for disabling a PWM instance after initialization.
  *
  * @param[in] p_instance  PWM instance.
- *
- * @retval    NRF_SUCCESS If the operation was successful.
- * @retval    NRF_ERROR_INVALID_STATE If the given instance was not initialized.
  */
 void app_pwm_disable(app_pwm_t const * const p_instance);
 
@@ -275,7 +287,7 @@ app_pwm_duty_t app_pwm_channel_duty_get(app_pwm_t const * const p_instance, uint
     /**
      * @brief Function for retrieving the PWM channel duty cycle in ticks.
      *
-     * This function retrieves real, currently set duty in ticks.
+     * This function retrieves the real, currently set duty cycle in ticks.
      * For one full PWM cycle the value might be different than the value set by the last
      * @ref app_pwm_channel_duty_ticks_set function call.
      *

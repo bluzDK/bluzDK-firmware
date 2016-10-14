@@ -43,6 +43,7 @@
 
 APP_PWM_INSTANCE(PWM1,1);                   // Create the instance "PWM1" using TIMER1.
 uint32_t SERVO_FREQUENCY_HZ = 50;
+uint16_t last_pulse_width = 1200;
 
 uint16_t microseconds_to_ticks(uint16_t micros)
 {
@@ -73,7 +74,7 @@ void HAL_Servo_Attach(uint16_t pin)
         return;
     }
     app_pwm_enable(&PWM1);
-    while (app_pwm_channel_duty_ticks_set(&PWM1, 0,  microseconds_to_ticks(1200)) == NRF_ERROR_BUSY);
+    while (app_pwm_channel_duty_ticks_set(&PWM1, 0,  microseconds_to_ticks(last_pulse_width)) == NRF_ERROR_BUSY);
     servo_enabled = true;
 }
 
@@ -84,16 +85,16 @@ void HAL_Servo_Detach(uint16_t pin)
 
 void HAL_Servo_Write_Pulse_Width(uint16_t pin, uint16_t pulseWidth)
 {
-    app_pwm_channel_duty_ticks_set(&PWM1, 0,  microseconds_to_ticks(pulseWidth));
-
+    while (app_pwm_channel_duty_ticks_set(&PWM1, 0,  microseconds_to_ticks(pulseWidth)) == NRF_ERROR_BUSY);
+    last_pulse_width = pulseWidth;
 }
 
 uint16_t HAL_Servo_Read_Pulse_Width(uint16_t pin)
 {
-    return 20000;
+    return last_pulse_width;
 }
 
 uint16_t HAL_Servo_Read_Frequency(uint16_t pin)
 {
-    return 0;
+    return SERVO_FREQUENCY_HZ;
 }
