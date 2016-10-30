@@ -367,7 +367,7 @@ int main(void)
         Set_RGB_LED_Values(colors[0],colors[1],colors[2]);
         while (nrf_gpio_pin_read(BOOTLOADER_BUTTON) == 0)
         {
-            if (counter >=100) {
+            if (counter >=150) {
                 //set to white
                 colors[0] = 0x255; colors[1] =  0x255; colors[2]= 0x255;
             } else if (counter >=30) {
@@ -384,11 +384,10 @@ int main(void)
             counter++;
             nrf_delay_ms(100);
         }
-        if (counter >=100) {
+        if (counter >=150) {
             //copy factory reset firmware to application space
             FLASH_CopyFW(FACTORY_RESET_FW_ADDRESS, FACTORY_RESET_FW_SIZE, true, false);
         } else if (counter > 30) {
-            
             //enter serial setup mode so we can get data from the user
             bool exit = false;
             uint8_t code = ' ';
@@ -439,6 +438,9 @@ int main(void)
 //                nrf_delay_ms(100);
             }
             uart_deinit();
+        } else {
+            //user wants to enter safe mode
+            FLASH_WipeUserApp();
         }
         
         

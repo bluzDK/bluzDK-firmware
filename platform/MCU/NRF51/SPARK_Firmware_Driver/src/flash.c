@@ -67,7 +67,7 @@ const module_info_t* FLASH_ModuleInfo(uint8_t flashDeviceID, uint32_t startAddre
         {
             moduleInfoAddress += 0xc0;
         }
-        
+
         const module_info_t *module_info = (const module_info_t*)(buf+moduleInfoAddress);
         return module_info;
         
@@ -154,7 +154,7 @@ bool FLASH_CopyFW(uint32_t flashFWLocation, uint32_t fw_len, bool wipeUserApp, b
     //let's init the pstorage
     pstorage_handle_t m_storage_handle_app;
     pstorage_module_param_t storage_module_param = {.cb = pstorage_callback_handler};
-    
+
     if (wipeUserApp) {
         //hack for now...
         fw_len += 0x4000;
@@ -171,7 +171,7 @@ bool FLASH_CopyFW(uint32_t flashFWLocation, uint32_t fw_len, bool wipeUserApp, b
     }
     
     m_storage_handle_app.block_id  = (uint32_t)modinfo->module_start_address;
-    
+
     if (!FLASH_isUserModuleInfoValid(FLASH_SERIAL, flashFWLocation, 0x00)) {
         return false;
     }
@@ -209,6 +209,43 @@ bool FLASH_CopyFW(uint32_t flashFWLocation, uint32_t fw_len, bool wipeUserApp, b
     }
     sFLASH_EraseSector(FLASH_FW_STATUS);
     sFLASH_WriteSingleByte(FLASH_FW_STATUS, 0x00);
+    Set_RGB_LED_Values(0,0,0);
+    return true;
+}
+
+//Will delete the user app located at the user firmware location
+bool FLASH_WipeUserApp()
+{
+    uint32_t         err_code;
+    //only need to wipe out the first 4k since that is what holds the module info
+    uint32_t         fw_len = 0x1000;
+
+    Set_RGB_LED_Values(0,0,255);
+
+    //let's init the pstorage
+    pstorage_handle_t m_storage_handle_app;
+    pstorage_module_param_t storage_module_param = {.cb = pstorage_callback_handler};
+
+    storage_module_param.block_size = 0x100;
+    storage_module_param.block_count = fw_len / 256;
+
+    err_code = pstorage_raw_register(&storage_module_param, &m_storage_handle_app);
+    APP_ERROR_CHECK(err_code);
+
+    m_storage_handle_app.block_id  = USER_FIRMWARE_IMAGE_LOCATION;
+
+    uint32_t    ops_count = 7;
+    //now clear the nrf51 flash
+    stillWorking = true;
+    err_code = pstorage_raw_clear(&m_storage_handle_app, fw_len);
+    do {
+        app_sched_execute();
+        err_code = pstorage_access_status_get(&ops_count);
+    }
+    while(ops_count != 0);
+
+    app_sched_execute();
+    APP_ERROR_CHECK(err_code);
     Set_RGB_LED_Values(0,0,0);
     return true;
 }

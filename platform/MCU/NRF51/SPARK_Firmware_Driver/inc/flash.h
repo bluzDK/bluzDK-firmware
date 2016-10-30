@@ -30,5 +30,6 @@ const module_info_t* FLASH_ModuleInfo(uint8_t flashDeviceID, uint32_t startAddre
 bool FLASH_VerifyCRC32(uint8_t flashDeviceID, uint32_t startAddress, uint32_t length);
 uint32_t FLASH_ModuleLength(uint8_t flashDeviceID, uint32_t startAddress);
 bool FLASH_CopyFW(uint32_t flashFWLocation, uint32_t fw_len, bool wipeUserApp, bool bootloader);
+bool FLASH_WipeUserApp();
 
 #endif  /*__FLASH_H*/
