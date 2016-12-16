@@ -192,6 +192,7 @@ void HAL_Notify_WDT()
 void CallConstructors(void);
 //main function
 int main(void) {
+    disable_bootloader_flash();
     CallConstructors();
     app_setup_and_loop_passive();
     return 0;

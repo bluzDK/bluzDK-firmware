@@ -52,6 +52,7 @@ void leds_init(void);
 void timers_init(void);
 void gpiote_init(void);
 void buttons_init(void);
+void disable_bootloader_flash(void);
 void external_flash_init(void);
 void gap_params_init(void);
 void device_manager_init(void);
