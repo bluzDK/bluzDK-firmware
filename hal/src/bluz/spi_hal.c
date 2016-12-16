@@ -126,11 +126,15 @@ void HAL_SPI_Set_Clock_Divider(HAL_SPI_Interface spi, uint8_t rate)
 
 uint16_t HAL_SPI_Send_Receive_Data(HAL_SPI_Interface spi, uint16_t data)
 {
-    uint8_t rx_data[1];
-    rx_data[0] = 0x00;
-    
-    spi_master_tx_rx(SPI1, 1, (uint8_t *)&data, rx_data);
-    return rx_data[0];
+    if (HW_ONE_CONFIG == HW1_SPI && NRF_SPI1->ENABLE) {
+        uint8_t rx_data[1];
+        rx_data[0] = 0x00;
+
+        spi_master_tx_rx(SPI1, 1, (uint8_t *)&data, rx_data);
+        return rx_data[0];
+    } else {
+        return 0xff;
+    }
 }
 
 bool HAL_SPI_Is_Enabled(HAL_SPI_Interface spi)
