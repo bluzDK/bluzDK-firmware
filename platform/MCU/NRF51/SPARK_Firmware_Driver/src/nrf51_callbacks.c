@@ -108,7 +108,7 @@ void on_ble_evt(ble_evt_t * p_ble_evt)
 {
 //    static ble_gap_evt_auth_status_t m_auth_status;
 //    ble_gap_enc_info_t *             p_enc_info;
-    
+    uint32_t err_code;
     switch (p_ble_evt->header.evt_id)
     {
 #if PLATFORM_ID==103
@@ -160,6 +160,11 @@ void on_ble_evt(ble_evt_t * p_ble_evt)
             break;
         case BLE_GAP_EVT_CONN_PARAM_UPDATE:
             system_connection_interval = p_ble_evt->evt.gap_evt.params.conn_param_update.conn_params.max_conn_interval;
+            break;
+
+        case BLE_GATTS_EVT_SYS_ATTR_MISSING:
+            err_code = sd_ble_gatts_sys_attr_set(m_conn_handle, NULL, 0, 0);
+            APP_ERROR_CHECK(err_code);
             break;
 #endif
 
@@ -226,11 +231,7 @@ void on_ble_evt(ble_evt_t * p_ble_evt)
 //                                                   &m_sec_params, NULL);
 //            APP_ERROR_CHECK(err_code);
 //            break;
-//            
-//        case BLE_GATTS_EVT_SYS_ATTR_MISSING:
-//            err_code = sd_ble_gatts_sys_attr_set(m_conn_handle, NULL, 0, 0);
-//            APP_ERROR_CHECK(err_code);
-//            break;
+//
 //            
 //        case BLE_GAP_EVT_AUTH_STATUS:
 //            m_auth_status = p_ble_evt->evt.gap_evt.params.auth_status;
