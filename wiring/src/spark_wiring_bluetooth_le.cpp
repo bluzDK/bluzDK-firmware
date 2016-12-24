@@ -72,3 +72,7 @@ void BLEClass::setGatewayTargetName(char* name)
 {
     HAL_BLE_Set_Gateway_Target(name);
 }
+
+void BLEClass::ibeacon(uint32_t major, uint32_t minor, uint8_t *UUID) {
+    HAL_BLE_Start_iBeacon(major, minor, UUID);
+};

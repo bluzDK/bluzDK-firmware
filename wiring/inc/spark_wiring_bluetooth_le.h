@@ -68,6 +68,9 @@ public:
 
     //function to set the target name for the gateway to connect to
     static void setGatewayTargetName(char* name);
+
+    //start iBeacon advertising
+    static void ibeacon(uint32_t major, uint32_t minor, uint8_t *UUID);
     
 };
 

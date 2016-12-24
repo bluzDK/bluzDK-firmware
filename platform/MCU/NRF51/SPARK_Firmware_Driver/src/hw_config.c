@@ -414,6 +414,16 @@ void set_advertised_name(char* name)
     }
 }
 
+void start_ibeacon_advertising(uint32_t major, uint32_t minor, uint8_t *UUID)
+{
+    //if we are already advertising, reset to the new name
+    if (state == BLE_ADVERTISING) {
+        advertising_stop();
+    }
+    advertising_init_beacon(major, minor, UUID);
+    advertising_start();
+}
+
 /**@brief Function for the GAP initialization.
  *
  * @details This function sets up all the necessary GAP (Generic Access Profile) parameters of the
@@ -495,9 +505,11 @@ void send_data(uint8_t *data, uint16_t length)
     customDataServiceSendData(data, length);
 }
 
-void setTxPower(int power)
+int transmit_power = 0;
+void setTxPower(int p)
 {
-    sd_ble_gap_tx_power_set(power);
+    transmit_power = p;
+    sd_ble_gap_tx_power_set(transmit_power);
 }
 
 void setConnParameters(int minimum, int maximum)
@@ -558,6 +570,7 @@ void services_init(void)
     APP_ERROR_CHECK(err_code);
 }
 
+ble_gap_adv_params_t m_adv_params;
 void advertising_init(void)
 {
     uint32_t      err_code;
@@ -579,60 +592,69 @@ void advertising_init(void)
     
     err_code = ble_advdata_set(&advdata, &scanrsp);
     APP_ERROR_CHECK(err_code);
+
+    //set the advertising parameters
+    memset(&m_adv_params, 0, sizeof(m_adv_params));
+
+    m_adv_params.type        = BLE_GAP_ADV_TYPE_ADV_IND;
+    m_adv_params.p_peer_addr = NULL;                             // Undirected advertisement.
+    m_adv_params.fp          = BLE_GAP_ADV_FP_ANY;
+    m_adv_params.interval    = APP_ADV_INTERVAL;
+    m_adv_params.timeout    = APP_ADV_NO_TIMEOUT;
 }
 
-//uint8_t APP_BEACON_UUID[16] = {0};
-//void advertising_init_beacon(uint32_t major, uint32_t minor, uint8_t *UUID)
-//{
-//    uint8_t m_beacon_info[APP_BEACON_INFO_LENGTH];
-//
-//    m_beacon_info[0] = (uint8_t)APP_DEVICE_TYPE; // Manufacturer specific information. Specifies the device type in this implementation.
-//    m_beacon_info[1] = (uint8_t)APP_ADV_DATA_LENGTH; // Manufacturer specific information. Specifies the length of the manufacturer specific data in this implementation.
-//    memcpy(m_beacon_info + 2, UUID, 16);
-//    m_beacon_info[18] = (uint8_t)(major >> 8);
-//    m_beacon_info[19] = (uint8_t)(major);
-//    m_beacon_info[20] = (uint8_t)(minor >> 8);
-//    m_beacon_info[21] = (uint8_t)(minor);
-//    m_beacon_info[22] = APP_MEASURED_RSSI;
-//
-//    uint32_t      err_code;
-//    ble_advdata_t advdata;
-//    ble_advdata_t scanrsp;
-//    uint8_t       flags = BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE;
-//
-//    ble_advdata_manuf_data_t manuf_specific_data;
-//
-//    manuf_specific_data.company_identifier = APP_COMPANY_IDENTIFIER;
-//
-//    manuf_specific_data.data.p_data = (uint8_t *) m_beacon_info;
-//    manuf_specific_data.data.size   = APP_BEACON_INFO_LENGTH;
-//
-//    // Build and set advertising data.
-//    memset(&advdata, 0, sizeof(advdata));
-//
-//    advdata.name_type             = BLE_ADVDATA_NO_NAME;
-//    advdata.flags.size            = sizeof(flags);
-//    advdata.flags.p_data          = &flags;
-//    advdata.p_manuf_specific_data = &manuf_specific_data;
-//
-//    ble_uuid_t adv_uuids[] = {{BLE_SCS_UUID_SERVICE, m_scs.uuid_type}};
-//
-//    memset(&scanrsp, 0, sizeof(scanrsp));
-//    scanrsp.uuids_complete.uuid_cnt = sizeof(adv_uuids) / sizeof(adv_uuids[0]);
-//    scanrsp.uuids_complete.p_uuids  = adv_uuids;
-//    scanrsp.name_type = BLE_ADVDATA_FULL_NAME;
-//
-//    err_code = ble_advdata_set(&advdata, &scanrsp);
-//    APP_ERROR_CHECK(err_code);
-//
-//    // Initialize advertising parameters (used when starting advertising).
-//    memset(&m_adv_params, 0, sizeof(m_adv_params));
-//
-//    m_adv_params.type        = BLE_GAP_ADV_TYPE_ADV_IND;
-//    m_adv_params.p_peer_addr = NULL;                             // Undirected advertisement.
-//    m_adv_params.fp          = BLE_GAP_ADV_FP_ANY;
-//    m_adv_params.interval    = BEACON_ADV_INTERVAL;
-//}
+uint8_t APP_BEACON_UUID[16] = {0};
+void advertising_init_beacon(uint32_t major, uint32_t minor, uint8_t *UUID)
+{
+    uint8_t m_beacon_info[APP_BEACON_INFO_LENGTH];
+
+    m_beacon_info[0] = (uint8_t)APP_DEVICE_TYPE; // Manufacturer specific information. Specifies the device type in this implementation.
+    m_beacon_info[1] = (uint8_t)APP_ADV_DATA_LENGTH; // Manufacturer specific information. Specifies the length of the manufacturer specific data in this implementation.
+    memcpy(m_beacon_info + 2, UUID, 16);
+    m_beacon_info[18] = (uint8_t)(major >> 8);
+    m_beacon_info[19] = (uint8_t)(major);
+    m_beacon_info[20] = (uint8_t)(minor >> 8);
+    m_beacon_info[21] = (uint8_t)(minor);
+    m_beacon_info[22] = APP_MEASURED_RSSI+transmit_power;
+
+    uint32_t      err_code;
+    ble_advdata_t advdata;
+    ble_advdata_t scanrsp;
+    uint8_t       flags = BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE;
+
+    ble_advdata_manuf_data_t manuf_specific_data;
+
+    manuf_specific_data.company_identifier = APP_COMPANY_IDENTIFIER;
+
+    manuf_specific_data.data.p_data = (uint8_t *) m_beacon_info;
+    manuf_specific_data.data.size   = APP_BEACON_INFO_LENGTH;
+
+    // Build and set advertising data.
+    memset(&advdata, 0, sizeof(advdata));
+
+    advdata.name_type             = BLE_ADVDATA_NO_NAME;
+    advdata.flags                 = flags;
+    advdata.p_manuf_specific_data = &manuf_specific_data;
+
+    ble_uuid_t adv_uuids[] = {{BLE_SCS_UUID_SERVICE, m_scs.uuid_type}};
+
+    memset(&scanrsp, 0, sizeof(scanrsp));
+    scanrsp.uuids_complete.uuid_cnt = sizeof(adv_uuids) / sizeof(adv_uuids[0]);
+    scanrsp.uuids_complete.p_uuids  = adv_uuids;
+    scanrsp.name_type = BLE_ADVDATA_FULL_NAME;
+
+    err_code = ble_advdata_set(&advdata, &scanrsp);
+    APP_ERROR_CHECK(err_code);
+
+    //set the advertising parameters
+    memset(&m_adv_params, 0, sizeof(m_adv_params));
+
+    m_adv_params.type        = BLE_GAP_ADV_TYPE_ADV_IND;
+    m_adv_params.p_peer_addr = NULL;                             // Undirected advertisement.
+    m_adv_params.fp          = BLE_GAP_ADV_FP_ANY;
+    m_adv_params.interval    = BEACON_ADV_INTERVAL;
+    m_adv_params.timeout     = APP_ADV_NO_TIMEOUT;
+}
 //
 //static void advertising_init_eddystone()
 //{
@@ -665,18 +687,7 @@ void advertising_start(void)
     uint32_t             err_code;
     
     if (state != BLE_ADVERTISING) {
-        ble_gap_adv_params_t adv_params;
-        
-        // Start advertising
-        memset(&adv_params, 0, sizeof(adv_params));
-        
-        adv_params.type        = BLE_GAP_ADV_TYPE_ADV_IND;
-        adv_params.p_peer_addr = NULL;
-        adv_params.fp          = BLE_GAP_ADV_FP_ANY;
-        adv_params.interval    = APP_ADV_INTERVAL;
-        adv_params.timeout     = APP_ADV_NO_TIMEOUT;
-        
-        err_code = sd_ble_gap_adv_start(&adv_params);
+        err_code = sd_ble_gap_adv_start(&m_adv_params);
         APP_ERROR_CHECK(err_code);
         state = BLE_ADVERTISING;
     }

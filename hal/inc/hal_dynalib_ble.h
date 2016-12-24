@@ -45,6 +45,7 @@ DYNALIB_FN(8, hal_ble,HAL_BLE_Set_TX_Power, void(int power))
 DYNALIB_FN(9, hal_ble,HAL_BLE_Set_CONN_PARAMS, void(int minimum, int maximum))
 DYNALIB_FN(10, hal_ble,HAL_BLE_Set_Adv_Name, void(char* name))
 DYNALIB_FN(11, hal_ble,HAL_BLE_Set_Gateway_Target, void(char* name))
+DYNALIB_FN(12, hal_ble,HAL_BLE_Start_iBeacon, void(uint32_t major, uint32_t minor, uint8_t *UUID))
 DYNALIB_END(hal_ble)
 
 #endif	/* HAL_DYNALIB_BLE_H */
