@@ -414,7 +414,7 @@ void set_advertised_name(char* name)
     }
 }
 
-void start_ibeacon_advertising(uint32_t major, uint32_t minor, uint8_t *UUID)
+void start_ibeacon_advertising(uint16_t major, uint16_t minor, uint8_t *UUID)
 {
     //if we are already advertising, reset to the new name
     if (state == BLE_ADVERTISING) {
@@ -604,7 +604,7 @@ void advertising_init(void)
 }
 
 uint8_t APP_BEACON_UUID[16] = {0};
-void advertising_init_beacon(uint32_t major, uint32_t minor, uint8_t *UUID)
+void advertising_init_beacon(uint16_t major, uint16_t minor, uint8_t *UUID)
 {
     uint8_t m_beacon_info[APP_BEACON_INFO_LENGTH];
 

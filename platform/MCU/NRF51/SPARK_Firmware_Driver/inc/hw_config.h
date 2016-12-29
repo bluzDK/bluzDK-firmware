@@ -65,7 +65,7 @@ void scheduler_init(void);
 void gap_params_init(void);
 void services_init(void);
 void advertising_init(void);
-void advertising_init_beacon(uint32_t major, uint32_t minor, uint8_t *UUID);
+void advertising_init_beacon(uint16_t major, uint16_t minor, uint8_t *UUID);
 void conn_params_init(void);
 void sec_params_init(void);
 void advertising_start(void);
@@ -99,7 +99,7 @@ uint32_t system_micros(void);
 void set_cloud_connection_state(bool connected);
 void wtd_feed(void);
 void set_advertised_name(char* name);
-void start_ibeacon_advertising(uint32_t major, uint32_t minor, uint8_t *UUID);
+void start_ibeacon_advertising(uint16_t major, uint16_t minor, uint8_t *UUID);
 
 //Flash functions
 uint16_t FLASH_GetDeviceInt(void);

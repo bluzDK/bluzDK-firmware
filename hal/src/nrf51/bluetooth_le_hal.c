@@ -81,7 +81,7 @@ void HAL_BLE_Set_Adv_Name(char* name)
     set_advertised_name(name);
 }
 
-void HAL_BLE_Start_iBeacon(uint32_t major, uint32_t minor, uint8_t *UUID)
+void HAL_BLE_Start_iBeacon(uint16_t major, uint16_t minor, uint8_t *UUID)
 {
 #if PLATFORM_ID==103
     start_ibeacon_advertising(major, minor, UUID);

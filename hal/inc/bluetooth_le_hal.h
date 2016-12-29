@@ -51,7 +51,7 @@ extern "C" {
 
     void HAL_BLE_Set_Adv_Name(char* name);
 
-    void HAL_BLE_Start_iBeacon(uint32_t major, uint32_t minor, uint8_t *UUID);
+    void HAL_BLE_Start_iBeacon(uint16_t major, uint16_t minor, uint8_t *UUID);
 
     void HAL_BLE_Set_Gateway_Target(char* name);
 
