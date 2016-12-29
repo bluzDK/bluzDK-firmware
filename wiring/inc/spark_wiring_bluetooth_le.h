@@ -70,7 +70,7 @@ public:
     static void setGatewayTargetName(char* name);
 
     //start iBeacon advertising
-    static void ibeacon(uint32_t major, uint32_t minor, uint8_t *UUID);
+    static void beacon(uint32_t major, uint32_t minor, uint8_t *UUID);
     
 };
 
