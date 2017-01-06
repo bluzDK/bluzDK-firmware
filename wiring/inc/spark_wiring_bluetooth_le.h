@@ -71,6 +71,9 @@ public:
 
     //start iBeacon advertising
     static void beacon(uint16_t major, uint16_t minor, uint8_t *UUID);
+
+    //start Eddystone URL advertising
+    static void eddystone_url_beacon(char* url);
     
 };
 

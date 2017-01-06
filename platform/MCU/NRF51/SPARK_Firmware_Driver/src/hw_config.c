@@ -36,6 +36,7 @@
 #include "client_handling.h"
 #include "app_timer.h"
 #include "spi_master_fast.h"
+#include "beacon_helper.h"
 
 uint32_t NbrOfPage = 0;
 uint16_t Flash_Update_Index = 0;
@@ -424,6 +425,16 @@ void start_ibeacon_advertising(uint16_t major, uint16_t minor, uint8_t *UUID)
     advertising_start();
 }
 
+void start_eddystone_url_advertising(char *url)
+{
+    //if we are already advertising, reset to the new name
+    if (state == BLE_ADVERTISING) {
+        advertising_stop();
+    }
+    advertising_init_eddystone(url);
+    advertising_start();
+}
+
 /**@brief Function for the GAP initialization.
  *
  * @details This function sets up all the necessary GAP (Generic Access Profile) parameters of the
@@ -655,10 +666,25 @@ void advertising_init_beacon(uint16_t major, uint16_t minor, uint8_t *UUID)
     m_adv_params.interval    = BEACON_ADV_INTERVAL;
     m_adv_params.timeout     = APP_ADV_NO_TIMEOUT;
 }
-//
-//static void advertising_init_eddystone()
-//{
-//    uint8_t m_beacon_info[URL_BEACON_LENGTH] =                  /**< Information advertised by the Beacon. */
+
+void advertising_init_eddystone(char *url)
+{
+    uint32_t err_code;
+
+    uint8_t header[11] = {0x02, 0x01, 0x06, 0x03, 0x03, 0xAA, 0xFE, 0x10, 0x16, 0xAA, 0xFE};
+
+    eddystone_beacon_payload packet = parse_url(url);
+
+    uint8_t m_beacon_info[EDDYSTONE_BEACON_LENGTH+packet.length];
+    memcpy(m_beacon_info, header, 11);
+    m_beacon_info[11] = EDDYSTONE_FRAME_TYPE;
+    m_beacon_info[12] = EDDYSTONE_TX_POWER;
+    memcpy(m_beacon_info+13, packet.data, packet.length);
+
+    err_code = sd_ble_gap_adv_data_set(m_beacon_info, EDDYSTONE_BEACON_LENGTH+packet.length, NULL, 0);
+    APP_ERROR_CHECK(err_code);
+
+//    uint8_t m_beacon_info[EDDYSTONE_BEACON_LENGTH] =                  /**< Information advertised by the Beacon. */
 //    {
 //            EDDYSTONE_HEADER,
 //            EDDYSTONE_FRAME_TYPE,
@@ -666,17 +692,19 @@ void advertising_init_beacon(uint16_t major, uint16_t minor, uint8_t *UUID)
 //            EDDYSTONE_URL_SCHEME,
 //            EDDYSTONE_URL
 //    };
-//    sd_ble_gap_adv_data_set(m_beacon_info, URL_BEACON_LENGTH, NULL, 0);
 //
-//    // Initialize advertising parameters (used when starting advertising).
-//    memset(&m_adv_params, 0, sizeof(m_adv_params));
-//
-//    m_adv_params.type        = BLE_GAP_ADV_TYPE_ADV_IND;
-//    m_adv_params.p_peer_addr = NULL;                             // Undirected advertisement.
-//    m_adv_params.fp          = BLE_GAP_ADV_FP_ANY;
-//    m_adv_params.interval    = BEACON_ADV_INTERVAL;
-//    m_adv_params.timeout     = APP_CFG_NON_CONN_ADV_TIMEOUT;
-//}
+//    err_code = sd_ble_gap_adv_data_set(m_beacon_info, EDDYSTONE_BEACON_LENGTH, NULL, 0);
+//    APP_ERROR_CHECK(err_code);
+
+    // Initialize advertising parameters (used when starting advertising).
+    memset(&m_adv_params, 0, sizeof(m_adv_params));
+
+    m_adv_params.type        = BLE_GAP_ADV_TYPE_ADV_IND;
+    m_adv_params.p_peer_addr = NULL;                             // Undirected advertisement.
+    m_adv_params.fp          = BLE_GAP_ADV_FP_ANY;
+    m_adv_params.interval    = BEACON_ADV_INTERVAL;
+    m_adv_params.timeout     = APP_ADV_NO_TIMEOUT;
+}
 
 //Startup Functions
 

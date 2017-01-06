@@ -85,7 +85,9 @@
 #define APP_MAJOR_VALUE                 0x11, 0x22                        /**< Major value used to identify Beacons. */
 #define APP_MINOR_VALUE                 0x33, 0x44                        /**< Minor value used to identify Beacons. */
 
-#define EDDYSTONE_BEACON_LENGTH 0x18
+
+
+#define EDDYSTONE_BEACON_LENGTH 0x0d
 
 #define EDDYSTONE_HEADER 0x02, 0x01, 0x06, 0x03, 0x03, 0xAA, 0xFE, 0x10, 0x16, 0xAA, 0xFE
 #define EDDYSTONE_FRAME_TYPE 0x10

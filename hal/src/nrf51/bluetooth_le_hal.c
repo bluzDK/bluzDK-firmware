@@ -88,6 +88,13 @@ void HAL_BLE_Start_iBeacon(uint16_t major, uint16_t minor, uint8_t *UUID)
 #endif
 }
 
+void HAL_BLE_Start_Eddystone_URL(char* url)
+{
+#if PLATFORM_ID==103
+    start_eddystone_url_advertising(url);
+#endif
+}
+
 void HAL_BLE_Set_Gateway_Target(char* name)
 {
 #if PLATFORM_ID==269
