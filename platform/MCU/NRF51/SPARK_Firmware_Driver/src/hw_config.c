@@ -587,20 +587,20 @@ void advertising_init(void)
     uint32_t      err_code;
     ble_advdata_t advdata;
     ble_advdata_t scanrsp;
-    
+
     ble_uuid_t adv_uuids[] = {{BLE_SCS_UUID_SERVICE, m_scs.uuid_type}};
-    
+
     // Build and set advertising data
     memset(&advdata, 0, sizeof(advdata));
-    
+
     advdata.name_type               = BLE_ADVDATA_FULL_NAME;
     advdata.include_appearance      = true;
     advdata.flags                   = BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE;
-    
+
     memset(&scanrsp, 0, sizeof(scanrsp));
     scanrsp.uuids_complete.uuid_cnt = sizeof(adv_uuids) / sizeof(adv_uuids[0]);
     scanrsp.uuids_complete.p_uuids  = adv_uuids;
-    
+
     err_code = ble_advdata_set(&advdata, &scanrsp);
     APP_ERROR_CHECK(err_code);
 
@@ -671,30 +671,46 @@ void advertising_init_eddystone(char *url)
 {
     uint32_t err_code;
 
-    uint8_t header[11] = {0x02, 0x01, 0x06, 0x03, 0x03, 0xAA, 0xFE, 0x10, 0x16, 0xAA, 0xFE};
-
     eddystone_beacon_payload packet = parse_url(url);
 
-    uint8_t m_beacon_info[EDDYSTONE_BEACON_LENGTH+packet.length];
-    memcpy(m_beacon_info, header, 11);
-    m_beacon_info[11] = EDDYSTONE_FRAME_TYPE;
-    m_beacon_info[12] = EDDYSTONE_TX_POWER;
-    memcpy(m_beacon_info+13, packet.data, packet.length);
+    //we will truncate the URL, otherwise we get an error as max BLE advertise size is 31 bytes
+    if (packet.length > MAX_URL_LENGTH) {
+        packet.length = MAX_URL_LENGTH;
+    }
 
-    err_code = sd_ble_gap_adv_data_set(m_beacon_info, EDDYSTONE_BEACON_LENGTH+packet.length, NULL, 0);
+    int length = EDDYSTONE_BEACON_LENGTH+packet.length;
+
+    uint8_t eddystone_url_data[length];
+    eddystone_url_data[0] = EDDYSTONE_FRAME_TYPE;
+    eddystone_url_data[1] = EDDYSTONE_TX_POWER;
+    memcpy(eddystone_url_data+2, packet.data, packet.length);
+
+    ble_advdata_t advdata;
+    uint8_t       flags = BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE;
+    ble_uuid_t    adv_uuids[] = {{APP_EDDYSTONE_UUID, BLE_UUID_TYPE_BLE}};
+
+    uint8_array_t eddystone_data_array;                             // Array for Service Data structure.
+    /** @snippet [Eddystone data array] */
+    eddystone_data_array.p_data = (uint8_t *) eddystone_url_data;   // Pointer to the data to advertise.
+    eddystone_data_array.size = sizeof(eddystone_url_data);         // Size of the data to advertise.
+    /** @snippet [Eddystone data array] */
+
+    ble_advdata_service_data_t service_data;                        // Structure to hold Service Data.
+    service_data.service_uuid = APP_EDDYSTONE_UUID;                 // Eddystone UUID to allow discoverability on iOS devices.
+    service_data.data = eddystone_data_array;                       // Array for service advertisement data.
+
+    // Build and set advertising data.
+    memset(&advdata, 0, sizeof(advdata));
+
+    advdata.name_type               = BLE_ADVDATA_NO_NAME;
+    advdata.flags                   = flags;
+    advdata.uuids_complete.uuid_cnt = sizeof(adv_uuids) / sizeof(adv_uuids[0]);
+    advdata.uuids_complete.p_uuids  = adv_uuids;
+    advdata.p_service_data_array    = &service_data;                // Pointer to Service Data structure.
+    advdata.service_data_count      = 1;
+
+    err_code = ble_advdata_set(&advdata, NULL);
     APP_ERROR_CHECK(err_code);
-
-//    uint8_t m_beacon_info[EDDYSTONE_BEACON_LENGTH] =                  /**< Information advertised by the Beacon. */
-//    {
-//            EDDYSTONE_HEADER,
-//            EDDYSTONE_FRAME_TYPE,
-//            EDDYSTONE_TX_POWER,
-//            EDDYSTONE_URL_SCHEME,
-//            EDDYSTONE_URL
-//    };
-//
-//    err_code = sd_ble_gap_adv_data_set(m_beacon_info, EDDYSTONE_BEACON_LENGTH, NULL, 0);
-//    APP_ERROR_CHECK(err_code);
 
     // Initialize advertising parameters (used when starting advertising).
     memset(&m_adv_params, 0, sizeof(m_adv_params));
