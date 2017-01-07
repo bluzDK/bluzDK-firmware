@@ -682,7 +682,7 @@ void advertising_init_eddystone(char *url)
 
     uint8_t eddystone_url_data[length];
     eddystone_url_data[0] = EDDYSTONE_FRAME_TYPE;
-    eddystone_url_data[1] = EDDYSTONE_TX_POWER;
+    eddystone_url_data[1] = EDDYSTONE_TX_POWER+transmit_power;
     memcpy(eddystone_url_data+2, packet.data, packet.length);
 
     ble_advdata_t advdata;
