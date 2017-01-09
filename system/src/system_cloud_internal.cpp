@@ -574,7 +574,11 @@ void system_info_to_json(BufferAppender &appender, hal_system_info_t& system)
         appender.append("\"v\":\"");
         appender.append(String(info->module_version));
         
-        appender.append("}");;
+        appender.append("\"}");
+
+        if (i<(system.module_count-(unsigned)2)) {
+            appender.append(",");
+        }
     }
     appender.append("]}");
 }
