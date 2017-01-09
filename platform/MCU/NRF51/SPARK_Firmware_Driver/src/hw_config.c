@@ -420,9 +420,9 @@ void start_ibeacon_advertising(uint16_t major, uint16_t minor, uint8_t *UUID)
     //if we are already advertising, reset to the new name
     if (state == BLE_ADVERTISING) {
         advertising_stop();
+        advertising_init_beacon(major, minor, UUID);
+        advertising_start();
     }
-    advertising_init_beacon(major, minor, UUID);
-    advertising_start();
 }
 
 void start_eddystone_url_advertising(char *url)
@@ -430,9 +430,9 @@ void start_eddystone_url_advertising(char *url)
     //if we are already advertising, reset to the new name
     if (state == BLE_ADVERTISING) {
         advertising_stop();
+        advertising_init_eddystone(url);
+        advertising_start();
     }
-    advertising_init_eddystone(url);
-    advertising_start();
 }
 
 /**@brief Function for the GAP initialization.
@@ -652,7 +652,7 @@ void advertising_init_beacon(uint16_t major, uint16_t minor, uint8_t *UUID)
     memset(&scanrsp, 0, sizeof(scanrsp));
     scanrsp.uuids_complete.uuid_cnt = sizeof(adv_uuids) / sizeof(adv_uuids[0]);
     scanrsp.uuids_complete.p_uuids  = adv_uuids;
-    scanrsp.name_type = BLE_ADVDATA_FULL_NAME;
+    scanrsp.name_type = BLE_ADVDATA_NO_NAME;
 
     err_code = ble_advdata_set(&advdata, &scanrsp);
     APP_ERROR_CHECK(err_code);
@@ -686,6 +686,7 @@ void advertising_init_eddystone(char *url)
     memcpy(eddystone_url_data+2, packet.data, packet.length);
 
     ble_advdata_t advdata;
+    ble_advdata_t scanrsp;
     uint8_t       flags = BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE;
     ble_uuid_t    adv_uuids[] = {{APP_EDDYSTONE_UUID, BLE_UUID_TYPE_BLE}};
 
@@ -709,7 +710,16 @@ void advertising_init_eddystone(char *url)
     advdata.p_service_data_array    = &service_data;                // Pointer to Service Data structure.
     advdata.service_data_count      = 1;
 
-    err_code = ble_advdata_set(&advdata, NULL);
+
+    //build scan response data to advertise bluz specific capabilities
+    ble_uuid_t bluz_adv_uuids[] = {{BLE_SCS_UUID_SERVICE, m_scs.uuid_type}};
+
+    memset(&scanrsp, 0, sizeof(scanrsp));
+    scanrsp.uuids_complete.uuid_cnt = sizeof(bluz_adv_uuids) / sizeof(bluz_adv_uuids[0]);
+    scanrsp.uuids_complete.p_uuids  = bluz_adv_uuids;
+    scanrsp.name_type = BLE_ADVDATA_NO_NAME;
+
+    err_code = ble_advdata_set(&advdata, &scanrsp);
     APP_ERROR_CHECK(err_code);
 
     // Initialize advertising parameters (used when starting advertising).
