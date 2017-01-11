@@ -169,7 +169,6 @@ void on_ble_evt(ble_evt_t * p_ble_evt)
 #endif
 
 #if PLATFORM_ID==269
-        uint32_t err_code;
         case BLE_GAP_EVT_ADV_REPORT:
         {
             data_t adv_data;

@@ -32,6 +32,13 @@ struct TargetName {
     char name[24];
 };
 
+#define CONN_INTERVAL_ADDR 50
+struct ConnInterval {
+    int min;
+    int max;
+    uint8_t set;
+};
+
 
 /* Function prototypes -------------------------------------------------------*/
 int setConnectionParameters(String command);
@@ -54,6 +61,12 @@ void setup()
     EEPROM.get(TARGET_NAME_ADDR, setTarget);
     if (setTarget.length > 0 && setTarget.length != 0xFF) {
         BLE.setGatewayTargetName(setTarget.name);
+    }
+
+    ConnInterval ci;
+    EEPROM.get(CONN_INTERVAL_ADDR, ci);
+    if (ci.set != 0xFF) {
+        BLE.setConnectionParameters(ci.min, ci.max);
     }
 
     //gateway shield
@@ -79,6 +92,12 @@ int setConnectionParameters(String cmd)
 {
     int minimm = atoi(cmd.substring(0, cmd.indexOf(',')));
     int maximum = atoi(cmd.substring(cmd.indexOf(',')+1, cmd.length()));
+
+    ConnInterval ci;
+    ci.min = minimm ;
+    ci.max = maximum;
+    ci.set = 0;
+    EEPROM.put(CONN_INTERVAL_ADDR, ci);
 
     Particle.publish("Setting conn params to min: " + String (minimm) + " max: " + String(maximum));
     BLE.setConnectionParameters(minimm, maximum);
