@@ -179,6 +179,15 @@ int32_t analogRead(pin_t pin)
 }
 
 /*
+ * @brief Read the supply voltage
+ * Should return a double with 2 decimal point precision that is the voltage level of the supply
+ */
+uint16_t readSupplyVoltage()
+{
+    return HAL_ADC_Read_Supply_Voltage();
+}
+
+/*
  * @brief Should take an integer 0-255 and create a 500Hz PWM signal with a duty cycle from 0-100%.
  * On Photon, DAC1 and DAC2 act as true analog outputs(values: 0 to 4095) using onchip DAC peripheral
  */

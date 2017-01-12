@@ -74,6 +74,8 @@ DYNALIB_FN(22, hal_gpio, HAL_PWM_Write_With_Frequency, void(uint16_t, uint8_t, u
 DYNALIB_FN(23, hal_gpio, HAL_DAC_Is_Enabled, uint8_t(pin_t))
 DYNALIB_FN(24, hal_gpio, HAL_DAC_Enable, uint8_t(pin_t, uint8_t))
 
+DYNALIB_FN(25, hal_gpio, HAL_ADC_Read_Supply_Voltage, uint16_t())
+
 DYNALIB_END(hal_gpio)
 
 #endif	/* HAL_DYNALIB_GPIO_H */

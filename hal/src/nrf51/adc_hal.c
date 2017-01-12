@@ -23,6 +23,7 @@
 #undef SS
 #include "nrf_soc.h"
 #include "nrf_adc.h"
+#include <math.h>
 
 volatile int32_t adc_sample = -1;
 /**
@@ -94,4 +95,23 @@ int32_t HAL_ADC_Read(uint16_t pin)
  */
 void HAL_ADC_DMA_Init()
 {
+}
+
+uint16_t HAL_ADC_Read_Supply_Voltage()
+{
+    while (nrf_adc_is_busy()) { }
+
+    nrf_adc_config_t nrf_adc_config = NRF_ADC_CONFIG_DEFAULT;
+    nrf_adc_config.scaling = NRF_ADC_CONFIG_SCALING_SUPPLY_ONE_THIRD;
+    adc_sample = -1;
+
+    // Initialize and configure ADC
+    nrf_adc_configure( (nrf_adc_config_t *)&nrf_adc_config);
+    nrf_adc_int_enable(ADC_INTENSET_END_Enabled << ADC_INTENSET_END_Pos);
+    NVIC_SetPriority(ADC_IRQn, NRF_APP_PRIORITY_HIGH);
+    NVIC_EnableIRQ(ADC_IRQn);
+    nrf_adc_start();
+
+    while (adc_sample == -1) { }
+    return adc_sample;
 }

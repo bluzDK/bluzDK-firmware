@@ -45,6 +45,7 @@ extern "C" {
 void HAL_ADC_Set_Sample_Time(uint8_t ADC_SampleTime);
 int32_t HAL_ADC_Read(pin_t pin);
 void HAL_ADC_DMA_Init();
+uint16_t HAL_ADC_Read_Supply_Voltage();
 
 #ifdef __cplusplus
 }
