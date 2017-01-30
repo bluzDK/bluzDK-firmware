@@ -180,7 +180,7 @@ int32_t analogRead(pin_t pin)
 
 /*
  * @brief Read the supply voltage
- * Should return a double with 2 decimal point precision that is the voltage level of the supply
+ * Will return an integer between 0 and 1023 that represents a voltage between 0V and 3.6V
  */
 uint16_t readSupplyVoltage()
 {
