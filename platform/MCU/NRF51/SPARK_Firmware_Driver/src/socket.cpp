@@ -93,7 +93,9 @@ int32_t Socket::send(const void* data, uint32_t len)
 int32_t Socket::receive(void* data, uint32_t len, unsigned long _timeout)
 {
     if (bufferLength > 0) {
-        DEBUG("When entering receive, buffer length is %d and buffer start is %d", bufferLength, bufferStart);
+        DEBUG("RX ASK: %d  AVAIL: %d", len, bufferLength);
+    } else {
+        return 0;
     }
     
     int bytesToCopy = len;
@@ -109,12 +111,7 @@ int32_t Socket::receive(void* data, uint32_t len, unsigned long _timeout)
     if (bufferLength == 0) {
         bufferStart = 0;
     }
-    
-    
-    if (bytesToCopy > 0) {
-        DEBUG("Socket data was received from id %d, read %d bytes. Leaving us %d bytes left, starting at %d", id, bytesToCopy, bufferLength, bufferStart);
-    }
-    
+
     return bytesToCopy;
 }
 int32_t Socket::close()
@@ -144,7 +141,8 @@ int32_t Socket::feed(uint8_t* data, uint32_t len)
     
     memcpy(buffer+bufferStart+bufferLength, data, len);
     bufferLength+=len;
+
 //    DEBUG("Fed %d bytes to socket id %d, leaving it with %d bytes", len, id, bufferLength);
-    
+
     return 0;
 }

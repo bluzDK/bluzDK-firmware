@@ -61,7 +61,8 @@ private:
     uint16_t port;
     uint32_t nif;
     
-    uint16_t bufferLength, bufferStart;
+    volatile uint16_t bufferLength;
+    volatile uint16_t bufferStart;
     uint8_t buffer[SOCKET_BUFFER_SIZE];
 };
 

@@ -47,7 +47,7 @@ static void on_disconnect(scs_t * p_scs, ble_evt_t * p_ble_evt)
     p_scs->conn_handle = BLE_CONN_HANDLE_INVALID;
 }
 
-uint16_t readBufferLength = 0;
+volatile uint16_t readBufferLength = 0;
 uint8_t readBuffer[1024];
 /**@brief Function for handling the Write event.
  *
