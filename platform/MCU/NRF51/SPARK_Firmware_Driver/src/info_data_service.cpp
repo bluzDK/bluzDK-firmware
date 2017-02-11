@@ -20,6 +20,7 @@
 #include "registered_data_services.h"
 #include "deviceid_hal.h"
 #include "bluetooth_le_hal.h"
+#include "eeprom_hal.h"
 //#include "system_mode.h"
 
 extern "C" {
@@ -37,6 +38,13 @@ InfoDataService* InfoDataService::instance()
     return m_pInstance;
 
 }
+
+#define CONN_INTERVAL_ADDR 50
+struct ConnInterval {
+    int min;
+    int max;
+    uint8_t set;
+};
 
 //DataService functions
 int32_t InfoDataService::getServiceID()
@@ -72,8 +80,13 @@ int32_t InfoDataService::DataCallback(uint8_t *data, int16_t length)
             break;
         }
         case SET_CONNECTION_PARAMETERS: {
-            uint16_t min = data[0] << 8 | data[1];
-            uint16_t max = data[2] << 8 | data[3];
+            uint16_t min = data[1] << 8 | data[2];
+            uint16_t max = data[3] << 8 | data[4];
+
+            //wipe out any values set from the user app
+            uint8_t clear_data[10] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
+            HAL_EEPROM_Put(50, clear_data, 10);
+
             HAL_BLE_Set_CONN_PARAMS(min, max);
             break;
         }

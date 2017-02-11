@@ -38,7 +38,6 @@ void ble_radio_ntf_handler(bool radio_state)
  */
 void spi_slave_send_data(uint8_t *buf, uint16_t size)
 {
-	DEBUG("Entering spi_send, size %d", size);
 	//let the Photon know we are about to transmit
 	nrf_gpio_pin_set(SPIS_PTS_PIN);
 
@@ -60,7 +59,6 @@ void spi_slave_send_data(uint8_t *buf, uint16_t size)
 		nrf_gpio_pin_set(SPIS_SA_PIN);
 		while (busy) { }
 	}
-	DEBUG("Done in spi_slave_send_data");
 }
 
 /**@brief Function for SPI slave event callback.
