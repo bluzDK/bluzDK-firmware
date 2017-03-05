@@ -89,6 +89,12 @@ extern "C" void HAL_SysTick_Handler(void) {
         TimingIWDGReload+=HAL_Get_Sys_Tick_Interval();
     }
 
+    // if the user is trying to signal, then run the rainbow
+    if (LED_Spark_Signal != 0)
+    {
+        LED_Signaling_Override();
+    }
+
     //tick the system seconds (separate from millis() so it won't roll over after 49 days)
     if (SystemSecondsTick >= 1000)
     {

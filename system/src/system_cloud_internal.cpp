@@ -686,7 +686,7 @@ void LED_Signaling_Override(void)
         LED_SetSignalingColor(VIBGYOR_Colors[VIBGYOR_Index]);
         LED_On(LED_RGB);
 
-        LED_Signaling_Timing = 100; // 100 ms
+        LED_Signaling_Timing = 1; // this is called every 100 ms, so 1 unit is 100 ms
 
         ++VIBGYOR_Index;
         if (VIBGYOR_Index >= VIBGYOR_Size)
