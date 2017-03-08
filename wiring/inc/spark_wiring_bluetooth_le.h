@@ -63,6 +63,9 @@ public:
     //function to set TX power
     static void setTxPower(int power);
 
+    //function to get RSSI value from gateway connection
+    static int getRSSI();
+
     //function to set the connection paramaters
     static void setConnectionParameters(int minimum, int maximum);
 

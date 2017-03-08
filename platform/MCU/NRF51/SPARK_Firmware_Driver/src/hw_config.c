@@ -523,9 +523,27 @@ void setTxPower(int p)
     sd_ble_gap_tx_power_set(transmit_power);
 }
 
+int getRSSI(void)
+{
+    if (state != BLE_CONNECTED) {
+        return -119;
+    }
+
+    //starts the RSSI measurements
+    sd_ble_gap_rssi_start(m_conn_handle, 0, 0);
+
+    //wait until we have the proper vaue
+    int8_t rssi = -119;
+    while (sd_ble_gap_rssi_get(m_conn_handle, &rssi) == NRF_ERROR_NOT_FOUND) { }
+
+    sd_ble_gap_rssi_stop(m_conn_handle);
+    return rssi;
+}
+
 void setConnParameters(int minimum, int maximum)
 {
     ble_disconnect();
+
     int err_code;
     ble_gap_conn_params_t   gap_conn_params;
     memset(&gap_conn_params, 0, sizeof(gap_conn_params));

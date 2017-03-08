@@ -47,6 +47,8 @@ extern "C" {
 
     void HAL_BLE_Set_TX_Power(int power);
 
+    int HAL_BLE_Get_RSSI(void);
+
     void HAL_BLE_Set_CONN_PARAMS(int minimum, int maximum);
 
     void HAL_BLE_Set_Adv_Name(char* name);

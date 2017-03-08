@@ -66,6 +66,11 @@ void HAL_BLE_Set_TX_Power(int power)
     setTxPower(power);
 }
 
+int HAL_BLE_Get_RSSI(void)
+{
+    return getRSSI();
+}
+
 void HAL_BLE_Set_CONN_PARAMS(int minimum, int maximum)
 {
 #if PLATFORM_ID==103
