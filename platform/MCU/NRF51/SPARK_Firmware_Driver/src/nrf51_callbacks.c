@@ -111,7 +111,7 @@ void on_ble_evt(ble_evt_t * p_ble_evt)
     uint32_t err_code;
     switch (p_ble_evt->header.evt_id)
     {
-#if PLATFORM_ID==103
+#if PLATFORM_ID==103 || PLATFORM_ID==102
         case BLE_GAP_EVT_CONNECTED:
             m_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
 
@@ -281,7 +281,7 @@ void ble_evt_dispatch(ble_evt_t * p_ble_evt)
 
     on_ble_evt(p_ble_evt);
     
-#if PLATFORM_ID==103
+#if PLATFORM_ID==103 || PLATFORM_ID==102
     ble_conn_params_on_ble_evt(p_ble_evt);
     scs_on_ble_evt(&m_scs, p_ble_evt);
 #endif

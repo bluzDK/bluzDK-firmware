@@ -83,7 +83,7 @@ void HAL_USART_Begin(HAL_USART_Serial serial, uint32_t baud)
       };
 
     APP_UART_FIFO_INIT(&comm_params,
-#if PLATFORM_ID==103
+#if PLATFORM_ID==103 || PLATFORM_ID==102
                        128,
                        256,
 #endif

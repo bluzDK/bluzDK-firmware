@@ -43,6 +43,10 @@ ifeq ("$(PLATFORM_ID)","103")
 INCLUDE_DIRS += $(TARGET_STDPERIPH_PATH)/inc/softdevice/s110/headers
 endif
 
+ifeq ("$(PLATFORM_ID)","102")
+INCLUDE_DIRS += $(TARGET_STDPERIPH_PATH)/inc/softdevice/s110/headers
+endif
+
 ifeq ("$(PLATFORM_ID)","269")
 INCLUDE_DIRS += $(TARGET_STDPERIPH_PATH)/inc/softdevice/s120/headers
 endif

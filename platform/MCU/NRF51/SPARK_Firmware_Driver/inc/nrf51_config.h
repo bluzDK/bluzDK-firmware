@@ -33,7 +33,7 @@
 
 #define APP_TIMER_PRESCALER             0                                           /**< Value of the RTC1 PRESCALER register. */
 
-#if PLATFORM_ID==103
+#if PLATFORM_ID==103 || PLATFORM_ID==102
 #define APP_TIMER_MAX_TIMERS            11                                          /**< Maximum number of simultaneously created timers. */
 #define APP_TIMER_OP_QUEUE_SIZE         12                                          /**< Size of timer operation queues. */
 #endif

@@ -20,6 +20,27 @@
 
 #define BUTTON_PULL    NRF_GPIO_PIN_PULLUP
 
+#if PLATFORM_ID==102   /*--goglove*/
+//Board LED's and buttons
+#define RGB_LED_PIN_RED          		25                                       /**< Pin one for the RGB LED. */
+#define RGB_LED_PIN_GREEN          		28                                       /**< Pin one for the RGB LED. */
+#define RGB_LED_PIN_BLUE          		8                                        /**< Pin one for the RGB LED. */
+#define BOARD_BUTTON          			9                                        /**< Main LED on the board. */
+
+//Flash SPI address
+#define SPIM0_SCK_PIN       7u     /**< SPI clock GPIO pin number. */
+#define SPIM0_MOSI_PIN      6u     /**< SPI Master Out Slave In GPIO pin number. */
+#define SPIM0_MISO_PIN      4u     /**< SPI Master In Slave Out GPIO pin number. */
+#define SPIM0_SS_PIN        5u     /**< SPI Slave Select GPIO pin number. */
+
+//SPI Pins
+#define SPIM1_SCK_PIN   30u
+#define SPIM1_MOSI_PIN  0u
+#define SPIM1_MISO_PIN  1u
+#define SPIM1_SS_PIN    2u
+
+#endif /*--goglove*/
+
 #if PLATFORM_ID==103   /*--bluz*/
 //Board LED's and buttons
 #define RGB_LED_PIN_RED          		19                                       /**< Pin one for the RGB LED. */
@@ -60,7 +81,7 @@
 #define BOOTLOADER_FLASH_PAGES 0x00
 
 #ifndef USER_FIRMWARE_IMAGE_LOCATION
-#if PLATFORM_ID==103   /*--bluz*/
+#if PLATFORM_ID==103 ||  PLATFORM_ID==102  /*--bluz*/
 #define USER_FIRMWARE_IMAGE_LOCATION 0x00033000
 #endif
 #if PLATFORM_ID==269   /*--bluz-gw*/
@@ -89,7 +110,7 @@
 #define FLASH_STORAGE_ADDRESS 0x03E000
 #define FLASH_STORAGE_SWAP_ADDRESS 0x03F000
 
-#if PLATFORM_ID==103   /*--bluz*/
+#if PLATFORM_ID==103 || PLATFORM_ID==102   /*--bluz*/
 #define FACTORY_RESET_FW_SIZE (int32_t)(FLASH_FW_ADDRESS - FACTORY_RESET_FW_ADDRESS)
 #endif
 #if PLATFORM_ID==269   /*--bluz-gw*/

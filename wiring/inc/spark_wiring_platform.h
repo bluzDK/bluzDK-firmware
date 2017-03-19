@@ -85,6 +85,12 @@
 #define Wiring_IPv6 0
 #endif
 
+#if PLATFORM_ID==102      // goglove
+#define Wiring_BLE 1
+#define Wiring_SPI1 1
+#define Wiring_IPv6 0
+#endif
+
 #if PLATFORM_ID==269      // bluz-gw
 #define Wiring_BLE 1
 #define Wiring_SPI1 1

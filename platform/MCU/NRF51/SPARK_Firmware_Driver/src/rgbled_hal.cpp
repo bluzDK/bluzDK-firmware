@@ -52,6 +52,19 @@ void Set_RGB_LED_Values(uint16_t r, uint16_t g, uint16_t b)
         nrf_gpio_pin_clear(0);
     }
 #endif
+
+#if PLATFORM_ID==102
+    if (g > 0x00 || b > 0x00) {
+         nrf_gpio_pin_set(RGB_LED_PIN_GREEN);
+    } else {
+        nrf_gpio_pin_clear(RGB_LED_PIN_GREEN);
+    }
+    if (r > 0x00) {
+         nrf_gpio_pin_set(RGB_LED_PIN_RED);
+    } else {
+        nrf_gpio_pin_clear(RGB_LED_PIN_RED);
+    }
+#endif
     
     rgbValues[0] = r;
     rgbValues[1] = g;

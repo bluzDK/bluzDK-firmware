@@ -269,6 +269,11 @@ void leds_init(void)
     nrf_gpio_pin_set(RGB_LED_PIN_GREEN);
     nrf_gpio_pin_set(RGB_LED_PIN_BLUE);
 
+#if PLATFORM_ID==102
+    //no RGB LED on GoGlove, so fake it with a normal LED
+    nrf_gpio_pin_clear(RGB_LED_PIN_RED);
+#endif
+
     nrf_gpio_cfg_output(0);
     nrf_gpio_pin_clear(0);
 }
@@ -388,7 +393,7 @@ void device_manager_init(void)
     register_param.evt_handler            = device_manager_evt_handler;
 
     //platofrm specific settings
-#if PLATFORM_ID==103
+#if PLATFORM_ID==103 || PLATFORM_ID==102
     //bluz
     register_param.service_type           = DM_PROTOCOL_CNTXT_GATT_SRVR_ID;
 #endif

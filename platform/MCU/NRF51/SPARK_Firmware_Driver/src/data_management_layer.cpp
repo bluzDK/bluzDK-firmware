@@ -52,7 +52,7 @@ void DataManagementLayer::feedData(int16_t length, uint8_t *data)
 void DataManagementLayer::sendData(int16_t length, uint8_t *data)
 {
 //a bit of a hack for now, should HAL this out, but it'll work for the time being
-#if PLATFORM_ID==103
+#if PLATFORM_ID==103 || PLATFORM_ID==102
     particle_service_send_data(data, length);
 #endif
 #if PLATFORM_ID==269

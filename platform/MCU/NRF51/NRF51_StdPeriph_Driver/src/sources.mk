@@ -49,6 +49,10 @@ ifeq ("$(PLATFORM_ID)","103")
 CSRC += $(TARGET_STDPERIPH_SRC_PATH)/device_manager_peripheral.c
 endif
 
+ifeq ("$(PLATFORM_ID)","102")
+CSRC += $(TARGET_STDPERIPH_SRC_PATH)/device_manager_peripheral.c
+endif
+
 # C++ source files included in this build.
 CPPSRC +=
 

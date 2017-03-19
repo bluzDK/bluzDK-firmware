@@ -172,7 +172,7 @@ ProtocolFacade* system_cloud_protocol_instance(void);
 #define SPARK_LOOP_DELAY_MILLIS		        1000    //1sec
 #define SPARK_RECEIVE_DELAY_MILLIS              10      //10ms
 
-#if PLATFORM_ID==103
+#if PLATFORM_ID==103 || PLATFORM_ID==102
 #define TIMING_FLASH_UPDATE_TIMEOUT             600000   //10 minutes
 #elif PLATFORM_ID==10
 #define TIMING_FLASH_UPDATE_TIMEOUT             90000   //90 seconds

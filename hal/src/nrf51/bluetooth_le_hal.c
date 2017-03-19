@@ -73,7 +73,7 @@ int HAL_BLE_Get_RSSI(void)
 
 void HAL_BLE_Set_CONN_PARAMS(int minimum, int maximum)
 {
-#if PLATFORM_ID==103
+#if PLATFORM_ID==103 || PLATFORM_ID==102
     setConnParameters(minimum, maximum);
 #endif
 #if PLATFORM_ID==269
@@ -88,14 +88,14 @@ void HAL_BLE_Set_Adv_Name(char* name)
 
 void HAL_BLE_Start_iBeacon(uint16_t major, uint16_t minor, uint8_t *UUID)
 {
-#if PLATFORM_ID==103
+#if PLATFORM_ID==103 || PLATFORM_ID==102
     start_ibeacon_advertising(major, minor, UUID);
 #endif
 }
 
 void HAL_BLE_Start_Eddystone_URL(char* url)
 {
-#if PLATFORM_ID==103
+#if PLATFORM_ID==103 || PLATFORM_ID==102
     start_eddystone_url_advertising(url);
 #endif
 }

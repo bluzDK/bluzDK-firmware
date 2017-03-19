@@ -22,6 +22,11 @@ CSRC += $(TARGET_SPARK_SRC_PATH)/ble_scs.c
 CSRC += $(TARGET_SPARK_SRC_PATH)/particle_data_service.c
 endif
 
+ifeq ("$(PLATFORM_ID)","102")
+CSRC += $(TARGET_SPARK_SRC_PATH)/ble_scs.c
+CSRC += $(TARGET_SPARK_SRC_PATH)/particle_data_service.c
+endif
+
 ifeq ("$(PLATFORM_ID)","269")
 CSRC += $(TARGET_SPARK_SRC_PATH)/hw_gateway_config.c
 CSRC += $(TARGET_SPARK_SRC_PATH)/spi_slave_stream.c

@@ -130,7 +130,7 @@
 #endif
 
 //Only enable TWI1 on bluz, not the gateway, which requires this peripheral for SPI Slave
-#if PLATFORM_ID==103
+#if PLATFORM_ID==103 || PLATFORM_ID==102
 #define TWI1_ENABLED 1
 #else 
 #define TWI1_ENABLED 0

@@ -23,7 +23,7 @@
 
 #if MODULAR_FIRMWARE
 
-#if PLATFORM_ID==103   /*--bluz*/
+#if PLATFORM_ID==103 || PLATFORM_ID==102   /*--bluz*/
 const module_bounds_t module_bootloader = { 0x4000, 0x3C000, 0x40000, MODULE_FUNCTION_BOOTLOADER, 0, MODULE_STORE_MAIN };
 const module_bounds_t module_system_part1 = { 0x1B000, 0x18000, 0x33000, MODULE_FUNCTION_SYSTEM_PART, 1, MODULE_STORE_MAIN };
 const module_bounds_t module_user = { 0x9000, 0x33000, 0x3C000, MODULE_FUNCTION_USER_PART, 2, MODULE_STORE_MAIN};

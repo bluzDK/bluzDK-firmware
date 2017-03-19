@@ -406,7 +406,7 @@ void system_delay_ms(unsigned long ms, bool force_no_background_loop=false)
 {
 	// if not threading, or we are the application thread, then implement delay
 	// as a background message pump
-    if (PLATFORM_ID != 103 && (!system_thread_get_state(NULL) ||
+    if (PLATFORM_ID != 103 && PLATFORM_ID != 102 && (!system_thread_get_state(NULL) ||
         APPLICATION_THREAD_CURRENT())) {
     		system_delay_pump(ms, force_no_background_loop);
     }

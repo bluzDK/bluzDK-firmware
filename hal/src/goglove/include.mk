@@ -2,23 +2,14 @@
 # Define the prefix to this directory. 
 # Note: The name must be unique within this build and should be
 #       based on the root of the project
-
-#if PLATFORM_ID==103
-HAL_SRC_BLUZ_PATH = $(TARGET_HAL_PATH)/src/bluz
-#endif
-
-#if PLATFORM_ID==102
 HAL_SRC_BLUZ_PATH = $(TARGET_HAL_PATH)/src/goglove
-#endif
-
-#if PLATFORM_ID==269
-HAL_SRC_BLUZ_PATH = $(TARGET_HAL_PATH)/src/bluz-gw
-#endif
+HAL_SRC_NRF51_SHARED_PATH = $(TARGET_HAL_PATH)/src/nrf51
 
 # if we are being compiled with platform as a dependency, then also include
 # implementation headers.
 ifneq (,$(findstring platform,$(DEPENDENCIES)))
 INCLUDE_DIRS += $(HAL_SRC_BLUZ_PATH)
+INCLUDE_DIRS += $(HAL_SRC_NRF51_SHARED_PATH)
 endif
 
 HAL_LINK ?= $(findstring hal,$(MAKE_DEPENDENCIES))

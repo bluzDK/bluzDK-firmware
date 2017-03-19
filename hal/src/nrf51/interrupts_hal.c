@@ -28,7 +28,7 @@
 #include "nrf_drv_gpiote.h"
 #include "debug.h"
 
-#if PLATFORM_ID==103
+#if PLATFORM_ID==103 || PLATFORM_ID==102
 #define MAX_PIN_COUNT       19
 #endif
 #if PLATFORM_ID==269

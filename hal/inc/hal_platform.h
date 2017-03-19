@@ -35,7 +35,7 @@ extern "C" {
 #define PANIC_BUT_KEEP_CALM 1
 #endif
     
-#if PLATFORM_ID==103 || PLATFORM_ID==269
+#if PLATFORM_ID==103 || PLATFORM_ID==102 || PLATFORM_ID==269
 #define HAL_PLATFORM_BLUETOOTH_LE 1
 #endif
 

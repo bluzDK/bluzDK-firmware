@@ -50,7 +50,7 @@
 
 #define SPI_MASTER_0_ENABLE 1
 //Only enable SPI1 on bluz, not the gateway, which requires this peripheral for SPI Slave
-#if PLATFORM_ID==103
+#if PLATFORM_ID==103 || PLATFORM_ID==102
 #define SPI_MASTER_1_ENABLE 1
 #endif
 
