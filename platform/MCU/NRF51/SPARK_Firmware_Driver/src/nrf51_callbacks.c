@@ -11,6 +11,7 @@
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  Lesser General Public License for more details.
  
+
  You should have received a copy of the GNU Lesser General Public
  License along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
@@ -284,6 +285,7 @@ void ble_evt_dispatch(ble_evt_t * p_ble_evt)
 #if PLATFORM_ID==103 || PLATFORM_ID==102
     ble_conn_params_on_ble_evt(p_ble_evt);
     scs_on_ble_evt(&m_scs, p_ble_evt);
+    ble_nus_on_ble_evt(&m_nus, p_ble_evt);
 #endif
 }
 

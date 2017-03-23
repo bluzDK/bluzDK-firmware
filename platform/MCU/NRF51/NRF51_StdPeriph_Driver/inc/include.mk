@@ -25,6 +25,7 @@ INCLUDE_DIRS += $(TARGET_STDPERIPH_PATH)/inc/ble/ble_radio_notification
 INCLUDE_DIRS += $(TARGET_STDPERIPH_PATH)/inc/ble/device_manager/config
 INCLUDE_DIRS += $(TARGET_STDPERIPH_PATH)/inc/ble/ble_error_log
 INCLUDE_DIRS += $(TARGET_STDPERIPH_PATH)/inc/ble/ble_debug_assert_handler
+INCLUDE_DIRS += $(TARGET_STDPERIPH_PATH)/inc/ble/ble_services/ble_nus
 INCLUDE_DIRS += $(TARGET_STDPERIPH_PATH)/inc/libraries/bootloader_dfu
 INCLUDE_DIRS += $(TARGET_STDPERIPH_PATH)/inc/libraries/crc16
 INCLUDE_DIRS += $(TARGET_STDPERIPH_PATH)/inc/libraries/timer
