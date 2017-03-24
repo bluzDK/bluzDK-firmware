@@ -46,5 +46,6 @@
 #include "hal_dynalib_usart.h"
 #include "hal_dynalib_concurrent.h"
 #include "hal_dynalib_ble.h"
+#include "hal_dynalib_ble_stream.h"
 #include "hal_dynalib_apptimer.h"
 

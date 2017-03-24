@@ -26,7 +26,6 @@
 #include "ble_scs.h"
 #include "ble_advdata.h"
 #include "device_manager.h"
-#include "ble_nus.h"
 
 
 #ifndef __NRF51_CONFIG_H
@@ -94,9 +93,6 @@
 #define EDDYSTONE_TX_POWER 0x00
 #define EDDYSTONE_URL_SCHEME 0x02
 
-
-#define NUS_SERVICE_UUID_TYPE           BLE_UUID_TYPE_VENDOR_BEGIN                  /**< UUID type for the Nordic UART Service (vendor specific). */
-
 //timers
 app_timer_id_t millis_timer;
 nrf_drv_timer_t micros_timer;
@@ -110,7 +106,6 @@ ble_gap_sec_params_t m_sec_params; /**< Security requirements for this applicati
 //handles
 scs_t m_scs;
 uint16_t m_conn_handle; /**< Handle of the current connection. */
-ble_nus_t m_nus; /**< Structure to identify the Nordic UART Service. */
 
 //system variables
 uint32_t system_seconds;

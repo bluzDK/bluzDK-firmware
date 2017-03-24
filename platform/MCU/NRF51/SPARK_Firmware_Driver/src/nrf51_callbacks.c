@@ -26,6 +26,7 @@
 #include "client_handling.h"
 #include "ble.h"
 #include "ble_srv_common.h"
+#include "ble_stream.h"
 
 
 //variables

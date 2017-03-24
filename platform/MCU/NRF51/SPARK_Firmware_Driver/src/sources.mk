@@ -16,6 +16,7 @@ CSRC += $(TARGET_SPARK_SRC_PATH)/system_nrf51.c
 CSRC += $(TARGET_SPARK_SRC_PATH)/nrf51_callbacks.c
 CSRC += $(TARGET_SPARK_SRC_PATH)/spi_master_fast.c
 CSRC += $(TARGET_SPARK_SRC_PATH)/beacon_helper.c
+CSRC += $(TARGET_SPARK_SRC_PATH)/ble_stream.c
 
 ifeq ("$(PLATFORM_ID)","103")
 CSRC += $(TARGET_SPARK_SRC_PATH)/ble_scs.c

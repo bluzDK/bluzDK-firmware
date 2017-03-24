@@ -69,6 +69,7 @@
 #include "spark_wiring_watchdog.h"
 #include "spark_wiring_thread.h"
 #include "spark_wiring_bluetooth_le.h"
+#include "bluz_wiring_ble_stream.h"
 #include "fast_pin.h"
 #include "string_convert.h"
 #include "debug_output_handler.h"

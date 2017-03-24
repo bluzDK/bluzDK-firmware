@@ -37,7 +37,7 @@
 #include "app_timer.h"
 #include "spi_master_fast.h"
 #include "beacon_helper.h"
-#include "ble_nus.h"
+#include "ble_stream.h"
 
 uint32_t NbrOfPage = 0;
 uint16_t Flash_Update_Index = 0;
@@ -135,13 +135,6 @@ void app_error_handler(uint32_t error_code, uint32_t line_num, const uint8_t * p
     
     // On assert, the system can only recover with a reset.
     NVIC_SystemReset();
-}
-
-static void nus_data_handler(ble_nus_t * p_nus, uint8_t * p_data, uint16_t length)
-{
-    //TODO Something...
-    nrf_gpio_cfg_output(30);
-    nrf_gpio_pin_set(30);
 }
 
 uint32_t OTA_FlashAddress()
@@ -642,7 +635,7 @@ void advertising_init(void)
     memset(&scanrsp, 0, sizeof(scanrsp));
     scanrsp.uuids_complete.uuid_cnt = sizeof(adv_uuids) / sizeof(adv_uuids[0]);
     scanrsp.uuids_complete.p_uuids  = adv_uuids;
-    
+
     err_code = ble_advdata_set(&advdata, &scanrsp);
     APP_ERROR_CHECK(err_code);
 
