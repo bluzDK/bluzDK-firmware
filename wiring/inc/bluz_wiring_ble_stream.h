@@ -48,6 +48,7 @@ public:
     bool isEnabled(void);
 };
 
-#define BLESerial BLEStream()
+#define BLESerial __fetch_global_bleserial()
+extern BLEStream& __fetch_global_bleserial();
 
 #endif /* __BLUZ_WIRING_BLE_STREAM_H */

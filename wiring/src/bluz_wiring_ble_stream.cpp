@@ -66,3 +66,10 @@ bool BLEStream::isEnabled() {
     return HAL_BLE_STREAM_Is_Enabled();
 }
 
+// Global Object
+BLEStream& __fetch_global_bleserial()
+{
+    static BLEStream bleserial;
+    return bleserial;
+}
+
