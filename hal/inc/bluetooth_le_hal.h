@@ -51,6 +51,8 @@ extern "C" {
 
     void HAL_BLE_Set_CONN_PARAMS(int minimum, int maximum);
 
+    void HAL_BLE_Set_ADV_INTERVAL(int inerval);
+
     void HAL_BLE_Set_Adv_Name(char* name);
 
     void HAL_BLE_Start_iBeacon(uint16_t major, uint16_t minor, uint8_t *UUID);

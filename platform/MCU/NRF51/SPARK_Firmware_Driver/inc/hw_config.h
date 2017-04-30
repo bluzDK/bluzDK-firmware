@@ -82,6 +82,7 @@ void send_data(uint8_t *data, uint16_t length);
 void setTxPower(int power);
 int getRSSI(void);
 void setConnParameters(int minimum, int maximum);
+void set_advertising_interval(int interval);
 
 //Data Services Functions
 void data_service_init(void);

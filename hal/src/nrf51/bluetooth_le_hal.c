@@ -81,6 +81,13 @@ void HAL_BLE_Set_CONN_PARAMS(int minimum, int maximum)
 #endif
 }
 
+void HAL_BLE_Set_ADV_INTERVAL(int interval)
+{
+#if PLATFORM_ID==103 || PLATFORM_ID==102
+    set_advertising_interval(interval);
+#endif
+}
+
 void HAL_BLE_Set_Adv_Name(char* name)
 {
     set_advertised_name(name);

@@ -563,6 +563,18 @@ void setConnParameters(int minimum, int maximum)
     APP_ERROR_CHECK(err_code);
 }
 
+int ADVERTISING_INTERVAL = APP_ADV_INTERVAL;
+void set_advertising_interval(int interval) {
+    ADVERTISING_INTERVAL = MSEC_TO_UNITS(interval, UNIT_0_625_MS);
+
+    //if we are already advertising, reset to the new name
+    if (state == BLE_ADVERTISING) {
+        advertising_stop();
+        advertising_init();
+        advertising_start();
+    }
+}
+
 /**@brief Function for initializing the BLE stack.
  *
  * @details Initializes the SoftDevice and the BLE event interrupt.
@@ -645,7 +657,7 @@ void advertising_init(void)
     m_adv_params.type        = BLE_GAP_ADV_TYPE_ADV_IND;
     m_adv_params.p_peer_addr = NULL;                             // Undirected advertisement.
     m_adv_params.fp          = BLE_GAP_ADV_FP_ANY;
-    m_adv_params.interval    = APP_ADV_INTERVAL;
+    m_adv_params.interval    = ADVERTISING_INTERVAL;
     m_adv_params.timeout    = APP_ADV_NO_TIMEOUT;
 }
 

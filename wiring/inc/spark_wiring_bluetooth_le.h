@@ -69,6 +69,9 @@ public:
     //function to set the connection paramaters
     static void setConnectionParameters(int minimum, int maximum);
 
+    //function to set the connection paramaters
+    static void setAdvertisingInterval(int interval);
+
     //function to set the target name for the gateway to connect to
     static void setGatewayTargetName(char* name);
 
