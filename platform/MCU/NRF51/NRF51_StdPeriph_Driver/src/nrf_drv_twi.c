@@ -621,6 +621,9 @@ void nrf_drv_twi_uninit(nrf_drv_twi_t const * const p_instance)
     nrf_twi_shorts_clear(p_instance->p_reg, DISABLE_MASK);
 
     m_cb[p_instance->instance_id].state = NRF_DRV_STATE_UNINITIALIZED;
+
+    // clear the interrupt
+    sd_nvic_ClearPendingIRQ(SPI1_TWI1_IRQn);
 }
 
 
