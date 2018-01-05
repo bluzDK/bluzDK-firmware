@@ -121,7 +121,7 @@ int32_t HAL_USART_Available_Data(HAL_USART_Serial serial)
 int32_t HAL_USART_Read_Data(HAL_USART_Serial serial)
 {
     if (!uartConfigured) {return -1;}
-    uint8_t byte;
+    uint8_t byte=-1;
     app_uart_get(&byte);
     return byte;
 }
